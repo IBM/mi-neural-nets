@@ -23,7 +23,9 @@
 *.a
 *.lib
 
-# Executables
-*.exe
-*.out
-*.app
+# Build & documentation directories
+build/*
+html/*
+latex/*
+data/*
+

@@ -1,0 +1,64 @@
+# Project name
+project(MINeuralNets CXX)
+
+#  Set current version number.
+set (MINeuralNets_VERSION_MAJOR 1)
+set (MINeuralNets_VERSION_MINOR 0)
+set (MINeuralNets_VERSION_PATCH 0)
+set (MINeuralNets_VERSION ${MINeuralNets_VERSION_MAJOR}.${MINeuralNets_VERSION_MINOR}.${MINeuralNets_VERSION_PATCH})
+
+# CMake required version.
+cmake_minimum_required(VERSION 3.2)
+
+# =======================================================================
+# Set compiler/linker flags.
+# =======================================================================
+# Add C++11 dependency.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -fopenmp -Wall")
+
+# Check, whether all necessary libraries are linked
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl") 
+
+# =======================================================================
+# Find required packages
+# =======================================================================
+# Add path to cmake dir.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+# Find Boost package
+find_package(Boost 1.54 REQUIRED COMPONENTS system thread random  serialization)
+# Try to include Boost as system directory to suppress it's warnings
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+
+# Find Armadillo.
+find_package(Armadillo REQUIRED)
+include_directories(${ARMADILLO_INCLUDE_DIRS})
+
+# Find MIC Toolchain
+find_package(MIToolchain 1.0 REQUIRED)
+
+# =======================================================================
+# RPATH settings
+# =======================================================================
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# =======================================================================
+# Add subdirectories
+# =======================================================================
+
+add_subdirectory(src)
+
+add_subdirectory(configs)
+
+#add_subdirectory(datasets)
