@@ -2,28 +2,25 @@ language: cpp
 
 matrix:
   include:
-    -os: osx
-     sudo: required      
-     compiler: clang
-    -os: linux
-     dist: trusty
-     sudo: required      
-     compiler: gcc
-     addons:
-       apt:
-         packages: &trusty_packages
-           - libboost-all-dev
-           - libarmadillo-dev
-           - libopenblas-dev
-     install:
-       # Fix GTest problem with symbolic links 
-       - DIR=$(pwd)
-       - sudo apt-get install libgtest-dev
-       - cd /usr/src/gtest
-       - sudo cmake CMakeLists.txt
-       - sudo make
-       - sudo cp *.a /usr/lib
-       - cd $DIR
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      addons:
+        apt:
+          packages: &trusty_packages
+            - libboost-all-dev
+            - libarmadillo-dev
+            - libopenblas-dev
+      install:
+        # Fix GTest problem with symbolic links 
+        - DIR=$(pwd)
+        - sudo apt-get install libgtest-dev
+        - cd /usr/src/gtest
+        - sudo cmake CMakeLists.txt
+        - sudo make
+        - sudo cp *.a /usr/lib
+        - cd $DIR
 
 before_script:
   - mkdir build
