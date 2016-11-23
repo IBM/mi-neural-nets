@@ -1,13 +1,9 @@
-language: cpp
-
 matrix:
   include:
-    ############################################################################
-    # Ubuntu 14.04 Trusty gcc
-    ############################################################################
     - os: linux
       dist: trusty
       sudo: required
+      language: cpp
       compiler: gcc
       addons:
         apt:
@@ -24,11 +20,6 @@ matrix:
         - sudo make
         - sudo cp *.a /usr/lib
         - cd $DIR
-
-
-############################################################################
-# Common (i.e. system independent) part 
-############################################################################
 
 before_script:
   - mkdir build
