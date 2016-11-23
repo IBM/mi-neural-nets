@@ -23,7 +23,12 @@ Additionally it depends on the following external libraries:
 
 Applications
 ------------
-   *  --
+   *  matrixSpeedTest -- application for testing matrix multiplication speed
+
+Unit tests
+------------
+   *  types2/matrixTestsRunner -- dense matrix unit tests
+   *  types2/matrixArrayTestsRunner -- dense array of matrices matrix unit tests
 
 Installation
 ------------

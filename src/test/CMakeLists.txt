@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Build and install - matrix test application.
 # =======================================================================
 
-set(BUILD_TEST_MATRIX ON CACHE BOOL "Build the application for testing matrix multiplication")
+set(BUILD_TEST_MATRIX ON CACHE BOOL "Build the application for testing matrix multiplication speed")
 
 if(${BUILD_TEST_MATRIX})
 	# Create exeutable.
