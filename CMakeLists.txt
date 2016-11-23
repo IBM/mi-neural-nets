@@ -38,6 +38,35 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 find_package(MIToolchain 1.0 REQUIRED)
 
 # =======================================================================
+# Find optional packages
+# =======================================================================
+
+# Find OpenBLAS
+find_package(OpenBLAS)
+if(NOT OpenBLAS_FOUND)
+    message(WARNING "-- OpenBLAS not found!")
+else(NOT OpenBLAS_FOUND)
+	include_directories(${OpenBLAS_INCLUDE_DIR})
+	add_definitions(-DOpenBLAS_FOUND=1)
+#	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lopenblas") 
+	ADD_DEFINITIONS("-DARMA_DONT_USE_WRAPPER -DARMA_USE_BLAS -DARMA_USE_LAPACK")
+endif(NOT OpenBLAS_FOUND)
+
+# Locate GTest
+find_package(GTest)
+
+if(NOT GTEST_FOUND)
+    message(WARNING "--   GTest not found!")
+else(NOT GTEST_FOUND)
+	include_directories(${GTEST_INCLUDE_DIRS})
+	# This must be set in the root directory for the tests to be run by 'make test' or ctest.
+	enable_testing()
+endif(NOT GTEST_FOUND)
+
+# Add additional option to cmake.
+set(BUILD_UNIT_TESTS ON CACHE BOOL "Build unit tests.")
+
+# =======================================================================
 # RPATH settings
 # =======================================================================
 # use, i.e. don't skip the full RPATH for the build tree

@@ -26,7 +26,7 @@ Installation
 ------------
 ```
 git clone git@github.ibm.com:tkornut/mi-neural-nets.git
-cd mi-rl
+cd mi-neural-nets
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=~/Documents/workspace/mic/
