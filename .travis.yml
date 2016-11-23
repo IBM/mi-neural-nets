@@ -24,21 +24,11 @@ matrix:
         - sudo make
         - sudo cp *.a /usr/lib
         - cd $DIR
-    - os: osx
-      osx_image: xcode8.1
-      compiler: clang
-
-
-############################################################################
-# Common (i.e. system independent) part 
-############################################################################
-
-before_script:
-  - mkdir build
-  - cd build
-  - cmake ..
-
-script:
-  - make -j4
-  - src/types2/matrixTestsRunner
-  - src/types2/matrixArrayTestsRunner
+      before_script:
+        - mkdir build
+        - cd build
+        - cmake ..
+      script:
+        - make -j4
+        - src/types2/matrixTestsRunner
+        - src/types2/matrixArrayTestsRunner
