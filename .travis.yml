@@ -1,21 +1,34 @@
-# Ubuntu 14.04 Trusty support
-sudo: required
-dist: trusty
-
 language: cpp
 
-compiler:
-  - gcc
+matrix:
+  include:
+    ############################################################################
+    # Ubuntu 14.04 Trusty gcc
+    ############################################################################
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      addons:
+        apt:
+          packages: &trusty_packages
+            - libboost-dev
+            - libarmadillo-dev
+            - libopenblas-dev
+      install:
+        # Fix GTest problem with symbolic links 
+        - DIR=$(pwd)
+        - sudo apt-get install libgtest-dev
+        - cd /usr/src/gtest
+        - sudo cmake CMakeLists.txt
+        - sudo make
+        - sudo cp *.a /usr/lib
+        - cd $DIR
 
-install:
-# Fix GTest problem with symbolic links 
-  - DIR=$(pwd)
-  - sudo apt-get install libgtest-dev
-  - cd /usr/src/gtest
-  - sudo cmake CMakeLists.txt
-  - sudo make
-  - sudo cp *.a /usr/lib
-  - cd $DIR
+
+############################################################################
+# Common (i.e. system independent) part 
+############################################################################
 
 before_script:
   - mkdir build
