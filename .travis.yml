@@ -12,7 +12,7 @@ matrix:
       addons:
         apt:
           packages: &trusty_packages
-            - libboost-dev
+            - libboost-all-dev
             - libarmadillo-dev
             - libopenblas-dev
       install:
