@@ -95,7 +95,7 @@ TEST(MatrixArray, Serialization) {
 
 
 	for (size_t i =0; i< ma1["w"]->n_elem; i++)
-		ASSERT_EQ((*ma1["w"])[i], (*restored_ma["w"])[i] -1);
+		ASSERT_EQ((*ma1["w"])[i], (*restored_ma["w"])[i]);
 }
 
 
