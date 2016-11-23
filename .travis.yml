@@ -1,17 +1,13 @@
-language: cpp
-
 matrix:
   include:
-    ############################################################################
-    # Ubuntu 14.04 Trusty gcc
-    ############################################################################
     - os: linux
       dist: trusty
       sudo: required
+      language: cpp
       compiler: gcc
       addons:
         apt:
-          packages: &trusty_packages
+          packages:
             - libboost-all-dev
             - libarmadillo-dev
             - libopenblas-dev
