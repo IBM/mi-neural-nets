@@ -35,7 +35,8 @@ find_package(Armadillo REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 # Find MIC Toolchain
-find_package(MIToolchain 1.0 REQUIRED)
+#find_package(MIToolchain 1.0 REQUIRED)
+# TODO: Commented for now, unti I will setup Travis dependent repository build!!
 
 # =======================================================================
 # Find optional packages

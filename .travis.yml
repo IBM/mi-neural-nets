@@ -1,0 +1,29 @@
+# Ubuntu 14.04 Trusty support
+sudo: required
+dist: trusty
+
+language: cpp
+
+compiler:
+  - gcc
+
+install:
+# Fix GTest problem with symbolic links 
+  - DIR=$(pwd)
+  - sudo apt-get install libgtest-dev
+  - cd /usr/src/gtest
+  - sudo cmake CMakeLists.txt
+  - sudo make
+  - sudo cp *.a /usr/lib
+  - cd $DIR
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make -j4
+  - src/types2/matrixTestsRunner
+  - src/types2/matrixArrayTestsRunner
+
