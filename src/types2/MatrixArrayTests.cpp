@@ -93,7 +93,6 @@ TEST(MatrixArray, Serialization) {
 //		std::cout << "Restored MatrixArray = " << restored_ma << std::endl;
 	}
 
-
 	for (size_t i =0; i< ma1["w"]->n_elem; i++)
 		ASSERT_EQ((*ma1["w"])[i], (*restored_ma["w"])[i]);
 }
