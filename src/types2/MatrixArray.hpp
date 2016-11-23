@@ -291,13 +291,13 @@ private:
 }//: namespace types2
 }//: namespace mic
 
-// Just in the case that something important will change in the MatrixArray class - set version.
-BOOST_CLASS_VERSION(mic::types2::MatrixArray<bool>, 1)
-BOOST_CLASS_VERSION(mic::types2::MatrixArray<short>, 1)
-BOOST_CLASS_VERSION(mic::types2::MatrixArray<int>, 1)
-BOOST_CLASS_VERSION(mic::types2::MatrixArray<long>, 1)
-BOOST_CLASS_VERSION(mic::types2::MatrixArray<float>, 1)
-BOOST_CLASS_VERSION(mic::types2::MatrixArray<double>, 1)
+// Set new version - it uses mic::types2::Matrix, which is now based on Armadillo, not Eigen!
+BOOST_CLASS_VERSION(mic::types2::MatrixArray<bool>, 2)
+BOOST_CLASS_VERSION(mic::types2::MatrixArray<short>, 2)
+BOOST_CLASS_VERSION(mic::types2::MatrixArray<int>, 2)
+BOOST_CLASS_VERSION(mic::types2::MatrixArray<long>, 2)
+BOOST_CLASS_VERSION(mic::types2::MatrixArray<float>, 2)
+BOOST_CLASS_VERSION(mic::types2::MatrixArray<double>, 2)
 
 
 

@@ -24,7 +24,7 @@
 
 #include <gtest/gtest.h>
 
-#include "types2/MatrixArray.hpp"
+#include <types2/MatrixArray.hpp>
 
 /*!
  * Tests whether matrices have proper dimensions.

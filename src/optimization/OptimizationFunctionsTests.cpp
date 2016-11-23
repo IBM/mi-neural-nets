@@ -1,7 +1,7 @@
 /*!
- * @file: Matrix_extra_bones.hpp
+ * @file: OptimizationFunctionsTests.cpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
- * @Date:   Nov 22, 2016
+ * @Date:   Nov 11, 2016
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
@@ -21,17 +21,11 @@
  *
  */
 
-#ifndef MAT_EXTRA_BONES_HPP_
-#define MAT_EXTRA_BONES_HPP_
+#include <gtest/gtest.h>
 
-//! Serialization operator.
-template<typename Archive>
-void serialize(Archive& ar, const unsigned int version);
 
-/*!
- * \brief Enumerates - sets values of elements to their indices.
- * \author tkornuta
- */
-void enumerate();
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
 
-#endif /* MAT_EXTRA_BONES_HPP_ */

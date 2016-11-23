@@ -51,20 +51,24 @@ namespace types2 {
 /*
  * \brief Typedef for a shared pointer to template-typed dynamic matrices.
  * \author tkornuta
+ * \tparam eT template parameter indicating data type (int/float/double)
  */
-template<typename T>
-using Matrix = typename arma::Mat<T>;
+template<typename eT>
+using Matrix = typename arma::Mat<eT>;
 
-/*!
- * \brief Typedef for a shared pointer to template-typed dynamic matrices.
- * \author tkornuta
- */
-template<typename T>
-using MatrixPtr = typename std::shared_ptr< mic::types2::Matrix<T> >;
+
 
 }//: namespace types2
 }//: namespace mic
 
+
+// Set new version - mic::types2::Matrix is now based on Armadillo, not Eigen!
+BOOST_CLASS_VERSION(mic::types2::Matrix<bool>, 2)
+BOOST_CLASS_VERSION(mic::types2::Matrix<short>, 2)
+BOOST_CLASS_VERSION(mic::types2::Matrix<int>, 2)
+BOOST_CLASS_VERSION(mic::types2::Matrix<long>, 2)
+BOOST_CLASS_VERSION(mic::types2::Matrix<float>, 2)
+BOOST_CLASS_VERSION(mic::types2::Matrix<double>, 2)
 
 
 #endif /* MATRIX_HPP_ */

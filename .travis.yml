@@ -30,3 +30,5 @@ script:
   - make -j4
   - src/types2/matrixTestsRunner
   - src/types2/matrixArrayTestsRunner
+  - src/optimization/artificialLandscapesTestsRunner
+  - src/optimization/optimizationFunctionsTestsRunner

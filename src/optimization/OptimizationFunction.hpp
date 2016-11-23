@@ -1,7 +1,7 @@
 /*!
- * @file: Matrix_extra_bones.hpp
+ * @file: OptimizationFunctions.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
- * @Date:   Nov 22, 2016
+ * @Date:   Nov 11, 2016
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
@@ -21,17 +21,36 @@
  *
  */
 
-#ifndef MAT_EXTRA_BONES_HPP_
-#define MAT_EXTRA_BONES_HPP_
 
-//! Serialization operator.
-template<typename Archive>
-void serialize(Archive& ar, const unsigned int version);
+#ifndef OPTIMIZATIONFUNCTIONS_HPP_
+#define OPTIMIZATIONFUNCTIONS_HPP_
+
+#include <types2/MatrixTypes.hpp>
+
+using namespace mic::types2;
 
 /*!
- * \brief Enumerates - sets values of elements to their indices.
+ * \brief Abstract class representing interface to optimization function.
  * \author tkornuta
+ * \tparam eT Template type (single/double precision)
  */
-void enumerate();
+template <typename eT=float>
+class OptimizationFunction {
+public:
+	/// Constructor.
+	OptimizationFunction () { }
 
-#endif /* MAT_EXTRA_BONES_HPP_ */
+	/// Virtual destructor - empty.
+	virtual ~OptimizationFunction () { }
+
+	/// Abstract method responsible for performing the update.
+	virtual void update(mic::types2::MatrixPtr<eT> x_, mic::types2::MatrixPtr<eT> dx_) = 0;
+
+protected:
+	/// A temporary variable used for storing the previous value of the input during update.
+	mic::types2::MatrixPtr<eT> prev_x;
+};
+
+
+
+#endif /* OPTIMIZATIONFUNCTIONS_HPP_ */

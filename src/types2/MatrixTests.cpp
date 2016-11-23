@@ -23,7 +23,7 @@
 
 #include <gtest/gtest.h>
 
-#include "types2/Matrix.hpp"
+#include <types2/Matrix.hpp>
 
 /*!
  * Tests whether matrix has proper dimensions (2x5).
@@ -79,6 +79,21 @@ TEST(Matrix, Serialization) {
 		ASSERT_EQ(nm[i], restored_mat[i]);
 }
 
+
+/*!
+ * Tests enumeration.
+ */
+TEST(Matrix, Enumeration4x5) {
+	// Default sizes of matrices.
+	const size_t N = 4;
+	const size_t M = 5;
+
+	mic::types2::Matrix<float> nm(N, M);
+	nm.enumerate();
+
+	for (size_t i =0; i< N*M; i++)
+		ASSERT_EQ(nm[i], i);
+}
 
 
 int main(int argc, char **argv) {

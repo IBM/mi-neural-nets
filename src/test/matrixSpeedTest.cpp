@@ -21,7 +21,7 @@
  *
  */
 
-#include "types2/Matrix.hpp"
+#include <types2/Matrix.hpp>
 
 #include <iostream>
 #include <chrono>

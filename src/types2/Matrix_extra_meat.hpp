@@ -25,7 +25,9 @@
 #define MAT_EXTRA_MEAT_HPP_
 
 
-// Add a serialization operator.
+/*!
+ * \brief A serialization operator.
+ */
 template<typename eT>
 template<typename Archive>
 void Mat<eT>::serialize(Archive& ar, const unsigned int /* version */)
@@ -58,6 +60,18 @@ void Mat<eT>::serialize(Archive& ar, const unsigned int /* version */)
   }
 
   ar & make_array(access::rwp(mem), n_elem);
+}
+
+/*!
+ * \brief Enumerates - sets values of elements to their indices.
+ * \author tkornuta
+ */
+template<typename eT>
+void Mat<eT>::enumerate() {
+	eT * data_ptr = this->memptr();
+#pragma omp parallel for
+	for (size_t i = 0; i < n_elem; i++)
+		data_ptr[i] = i;
 }
 
 

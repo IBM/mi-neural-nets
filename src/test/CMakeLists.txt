@@ -20,6 +20,6 @@ if(${BUILD_TEST_MATRIX})
 		)
 
 	# install test to bin directory
-	install(TARGETS matrixSpeedTest RUNTIME DESTINATION bin)
+	# install(TARGETS matrixSpeedTest RUNTIME DESTINATION bin)
 
 endif(${BUILD_TEST_MATRIX})
