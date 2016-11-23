@@ -78,7 +78,6 @@ mic::types2::Matrix<float> BLAS_mmultilpy(mic::types2::Matrix<float>& __restrict
 #endif /* USE_BLAS */
 
 
-
 /*!
  * \brief Program for testing multiplication of matrices with/without OpenBLAS.
  * \author tkornuta
