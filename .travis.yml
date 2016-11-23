@@ -24,6 +24,9 @@ matrix:
         - sudo make
         - sudo cp *.a /usr/lib
         - cd $DIR
+    - os: osx
+      osx_image: xcode8.1
+      compiler: clang
 
 
 ############################################################################
