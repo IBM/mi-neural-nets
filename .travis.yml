@@ -1,9 +1,13 @@
+language: cpp
+
 matrix:
   include:
-    - os: linux
+    -os: osx
+      sudo: required      
+      compiler: clang
+    -os: linux
       dist: trusty
-      sudo: required
-      language: cpp
+      sudo: required      
       compiler: gcc
       addons:
         apt:
