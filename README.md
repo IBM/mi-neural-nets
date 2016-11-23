@@ -1,12 +1,15 @@
 Machine Intelligence Core: Neural Nets
 =========================================
+Status of Travis Continuous Integration:
+
+[![Build Status](https://travis.ibm.com/tkornut/mi-neural-nets.svg?token=9XHfj7QaSbmFqHsyaQes&branch=master)](https://travis.ibm.com/tkornut/mi-neural-nets)
 
 Description
 -----------
 
 A subproject of Machine Intelligence Core framework.
 
-The repository contains solutions and applications related to multilayer (deep) feedforward (for now) neural nets.
+The repository contains solutions and applications related to multi-layer (deep) feed-forward (for now) neural nets.
 
 MIC dependencies
 ------------
