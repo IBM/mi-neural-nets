@@ -27,8 +27,10 @@ before_script:
   - cmake ..
 
 script:
-  - make -j4
+  - make -j8
   - src/types2/matrixTestsRunner
   - src/types2/matrixArrayTestsRunner
   - src/optimization/artificialLandscapesTestsRunner
   - src/optimization/optimizationFunctionsTestsRunner
+  - src/loss/lossTestsRunner
+  - src/feed_forward/fully_connected/FullyConnectedLayerTestsRunner
