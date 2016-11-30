@@ -29,7 +29,7 @@ Unit tests
 ------------
    *  types2/matrixTestsRunner -- dense matrix unit tests
    *  types2/matrixArrayTestsRunner -- dense array of matrices matrix unit tests
-   *  artificialLandscapesTestsRunner -- artificial lanscapes used fro optimization testing unit tests
+   *  artificialLandscapesTestsRunner -- artificial landscapes used for optimization testing unit tests
    *  optimizationFunctionsTestsRunner -- unit tests of different optimization functions/methods
    
 Installation

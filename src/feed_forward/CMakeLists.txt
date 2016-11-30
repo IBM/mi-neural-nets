@@ -8,12 +8,5 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Add subdirectories
 # =======================================================================
 
-add_subdirectory(types2)
 
-add_subdirectory(optimization)
-
-add_subdirectory(loss)
-
-add_subdirectory(feed_forward)
-
-add_subdirectory(test)
+add_subdirectory(fully_connected)

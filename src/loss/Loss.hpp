@@ -1,7 +1,7 @@
 /*!
- * @file: OptimizationFunctions.hpp
+ * @file: Loss.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
- * @Date:   Nov 11, 2016
+ * @Date:   Nov 8, 2016
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
@@ -21,36 +21,33 @@
  *
  */
 
-
-#ifndef OPTIMIZATIONFUNCTIONS_HPP_
-#define OPTIMIZATIONFUNCTIONS_HPP_
+#ifndef LOSS_HPP_
+#define LOSS_HPP_
 
 #include <types2/MatrixTypes.hpp>
 
-//using namespace mic::types2;
-
 /*!
- * \brief Abstract class representing interface to optimization function.
+ * \brief Abstract class representing a loss function.
+ * Defines interfaces.
  * \author tkornuta
- * \tparam eT Template type (single/double precision)
+ * \tparam dtype Template parameter denoting precision of variables.
  */
-template <typename eT=float>
-class OptimizationFunction {
+template <typename dtype=float>
+class Loss {
 public:
-	/// Constructor.
-	OptimizationFunction () { }
+	/*!
+	 * \brief Function calculating loss - abstract.
+	 */
+	virtual dtype calculateLoss (mic::types2::MatrixPtr<dtype> predicted_y_, mic::types2::MatrixPtr<dtype> target_y_) = 0;
 
-	/// Virtual destructor - empty.
-	virtual ~OptimizationFunction () { }
+	/*!
+	 * \brief Function calculating gradient - abstract.
+	 */
+	virtual mic::types2::MatrixPtr<dtype> calculateGradient (mic::types2::MatrixPtr<dtype> predicted_y_, mic::types2::MatrixPtr<dtype> target_y_) = 0;
 
-	/// Abstract method responsible for performing the update.
-	virtual void update(mic::types2::MatrixPtr<eT> x_, mic::types2::MatrixPtr<eT> dx_) = 0;
-
-protected:
-	/// A temporary variable used for storing the previous value of the input during update.
-	mic::types2::MatrixPtr<eT> prev_x;
 };
 
 
 
-#endif /* OPTIMIZATIONFUNCTIONS_HPP_ */
+
+#endif /* LOSS_HPP_ */
