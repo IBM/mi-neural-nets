@@ -27,7 +27,11 @@
 #define CROSSENTROPYLOSS_HPP_
 
 #include <cmath>
-#include "Loss.hpp"
+#include <loss/Loss.hpp>
+
+namespace mic {
+namespace neural_nets {
+namespace loss {
 
 /*!
  * \brief Class representing a cross-entropy loss function (regression).
@@ -69,6 +73,8 @@ public:
 
 };
 
-
+} //: loss
+} //: neural_nets
+} //: mic
 
 #endif /* CROSSENTROPYLOSS_HPP_ */

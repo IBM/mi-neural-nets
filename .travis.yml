@@ -33,4 +33,4 @@ script:
   - src/optimization/artificialLandscapesTestsRunner
   - src/optimization/optimizationFunctionsTestsRunner
   - src/loss/lossTestsRunner
-  - src/feed_forward/fully_connected/FullyConnectedLayerTestsRunner
+  - src/feed_forward/fully_connected/fullyConnectedLayerTestsRunner

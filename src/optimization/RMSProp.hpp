@@ -26,7 +26,9 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
-
+namespace mic {
+namespace neural_nets {
+namespace optimization {
 
 /*!
  * \brief Update using RMSProp - adaptive gradient descent with running average E[g^2].
@@ -87,6 +89,8 @@ protected:
 	mic::types2::MatrixPtr<dtype> delta;
 };
 
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* RMSPROP_HPP_ */

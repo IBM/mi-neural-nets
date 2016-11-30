@@ -42,7 +42,7 @@
  */
 TEST_F(Sphere1DLandscape, DISABLED_AdaGrad_Convergence) {
 	// Optimization function - 1d AdaGrad with learning rate = 0.1 (and default 0.9 momentum).
-	AdaGrad<double> opt(1);
+	mic::neural_nets::optimization::AdaGrad<double> opt(1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -70,7 +70,7 @@ TEST_F(Sphere1DLandscape, DISABLED_AdaGrad_Convergence) {
  */
 TEST_F(Sphere20DLandscape, DISABLED_AdaGrad_Convergence) {
 	// Optimization function - 20d AdaGrad (with default values).
-	AdaGrad<double> opt(20);
+	mic::neural_nets::optimization::AdaGrad<double> opt(20);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

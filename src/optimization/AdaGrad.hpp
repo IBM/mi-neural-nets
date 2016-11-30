@@ -26,6 +26,9 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
 
 /*!
  * \brief Update using AdaGrad - adaptive gradient descent.
@@ -67,7 +70,8 @@ protected:
 	mic::types2::MatrixPtr<eT> G;
 };
 
-
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* ADAGRAD_HPP_ */

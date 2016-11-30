@@ -26,6 +26,10 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
+
 /*!
  * \brief Update in the direction of gradient descent - with momentum.
  * \author tkornuta
@@ -66,8 +70,8 @@ protected:
 	eT momentum;
 };
 
-
-
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* MOMENTUM_HPP_ */

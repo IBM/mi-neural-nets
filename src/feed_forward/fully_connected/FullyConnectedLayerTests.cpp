@@ -84,10 +84,10 @@ TEST_F(FullyConnectedLayer2x3Float, Forward_y) {
  * Makes sure that the two stacked layers will return right result.
  */
 TEST(FullyConnectedLayerStacked1x2x3Float, Forward_y) {
-	FullyConnectedLayer<> layer(1,2);
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> layer(1,2);
 	layer.W = MAKE_MATRIX_PTR(float, {1.0, 2.0});
 	layer.b = MAKE_MATRIX_PTR(float, {0, 1});
-	FullyConnectedLayer<> l2(2,3);
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> l2(2,3);
 	l2.W = MAKE_MATRIX_PTR(float, {-1, -2, -3, -5, 6, 9});
 	l2.b = MAKE_MATRIX_PTR(float, {-3, -2, -1});
 	mic::types2::MatrixPtr<float> x = MAKE_MATRIX_PTR(float, {-1});
@@ -103,7 +103,7 @@ TEST(FullyConnectedLayerStacked1x2x3Float, Forward_y) {
  * Tests backward pass in the  y = w*x + b, size of layer: is 2x1.
  */
 TEST(FullyConnectedLayer2x1Float, Backward_dx) {
-	FullyConnectedLayer<> layer(2,1);
+	mic::neural_nets::feed_forward::FullyConnectedLayer<> layer(2,1);
 	layer.W = MAKE_MATRIX_PTR(float, {1, 2});
 	layer.b = MAKE_MATRIX_PTR(float, {1});
 	mic::types2::MatrixPtr<float> dx = layer.backward(MAKE_MATRIX_PTR(float, {2.0}));
@@ -172,7 +172,7 @@ TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_dW) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nW = layer.calculateNumericalGradient<SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
+	mic::types2::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
@@ -195,7 +195,7 @@ TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_db) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nb = layer.calculateNumericalGradient<SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
+	mic::types2::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
@@ -217,7 +217,7 @@ TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_dx) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nx = layer.calculateNumericalGradient<SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
+	mic::types2::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
@@ -243,7 +243,7 @@ TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_dW) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nW = layer.calculateNumericalGradient<SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
+	mic::types2::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
 
 
 	// Compare gradients.
@@ -271,7 +271,7 @@ TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_db) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nb = layer.calculateNumericalGradient<SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
+	mic::types2::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;
@@ -295,7 +295,7 @@ TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_dx) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nx = layer.calculateNumericalGradient<SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
+	mic::types2::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;

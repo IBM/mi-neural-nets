@@ -26,6 +26,10 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
+
 /*!
  * \brief BiasedGradPID - gradient descent with proportional, integral and derivative coefficients, with Adam-like bias correction.
  * \author tkornuta
@@ -142,6 +146,9 @@ protected:
 };
 
 
+} //: optimization
+} //: neural_nets
+} //: mic
 
 
 

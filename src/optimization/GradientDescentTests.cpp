@@ -43,7 +43,7 @@
  */
 TEST_F(Sphere1DLandscape, GradientDescent_Convergence) {
 	// Optimization function - (S)DG with learning rate = 0.1.
-	GradientDescent<double> opt(0.1);
+	mic::neural_nets::optimization::GradientDescent<double> opt(0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -71,7 +71,7 @@ TEST_F(Sphere1DLandscape, GradientDescent_Convergence) {
  */
 TEST_F(Sphere20DLandscape, GradientDescent_Convergence) {
 	// Optimization function - (S)DG with learning rate = 0.1.
-	GradientDescent<double> opt(0.1);
+	mic::neural_nets::optimization::GradientDescent<double> opt(0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -99,7 +99,7 @@ TEST_F(Sphere20DLandscape, GradientDescent_Convergence) {
  */
 TEST_F(Beale2DLandscape, GradientDescent_Convergence) {
 	// Optimization function - (S)DG with learning rate = 0.1.
-	GradientDescent<double> opt(0.01);
+	mic::neural_nets::optimization::GradientDescent<double> opt(0.01);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -130,7 +130,7 @@ TEST_F(Rosenbrock2DLandscape, GradientDescent_Convergence) {
 	// Such a simple gradient descent has a HUUGE problem with instability for bigger ni!
 	// Eg. 0.001 - gradiens explodes after 5 iterations!!
 	double ni = 0.00001;
-	GradientDescent<double> opt(ni);
+	mic::neural_nets::optimization::GradientDescent<double> opt(ni);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

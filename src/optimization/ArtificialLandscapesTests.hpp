@@ -51,7 +51,7 @@ public:
 
 private:
 	/// Sphere function 1d.
-	SphereFunction<double> fun;
+	mic::neural_nets::optimization::SphereFunction<double> fun;
 
 	/// Eps.
 	double eps = 1e-5;
@@ -79,7 +79,7 @@ public:
 
 private:
 	/// Sphere function 1d.
-	SphereFunction<double> fun;
+	mic::neural_nets::optimization::SphereFunction<double> fun;
 
 	/// Eps.
 	double eps = 1e-5;
@@ -109,7 +109,7 @@ public:
 
 private:
 	/// Beale's function 2d.
-	Beale2DFunction<double> fun;
+	mic::neural_nets::optimization::Beale2DFunction<double> fun;
 
 	/// Eps.
 	double eps = 1e-5;
@@ -139,7 +139,7 @@ public:
 
 private:
 	/// Rosenbrock function 2d.
-	Rosenbrock2DFunction<double> fun;
+	mic::neural_nets::optimization::Rosenbrock2DFunction<double> fun;
 
 	/// Eps.
 	double eps = 1e-5;

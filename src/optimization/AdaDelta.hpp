@@ -26,6 +26,9 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
 
 /*!
  * \brief Update using AdaDelta - adaptive gradient descent with running average E[g^2] and  E[d^2].
@@ -106,7 +109,8 @@ protected:
 };
 
 
-
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* ADADELTA_HPP_ */

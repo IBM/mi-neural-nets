@@ -26,6 +26,10 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
+
 /*!
  * \brief Adam - adaptive moment estimation.
  * \author tkornuta
@@ -99,9 +103,8 @@ protected:
 
 };
 
-
-
-
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* ADAM_HPP_ */

@@ -31,7 +31,7 @@
  */
 TEST_F(Vectors4Float, SquareErrorLoss) {
 	// Loss function.
-	SquaredErrorLoss<float> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 
 	ASSERT_EQ(loss.calculateLoss(predicted_y, target_y), (float)4.0);
 }
@@ -41,7 +41,7 @@ TEST_F(Vectors4Float, SquareErrorLoss) {
  */
 TEST_F(Vectors4Float, SquareErrorGradient) {
 	// Loss function.
-	SquaredErrorLoss<float> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 	mic::types2::MatrixPtr<float> dy = loss.calculateGradient(predicted_y, target_y);
 
 	for (size_t i=0; i<dy->size(); i++){
@@ -54,7 +54,7 @@ TEST_F(Vectors4Float, SquareErrorGradient) {
  */
 TEST_F(Vectors4Float3, SquareErrorLoss) {
 	// Loss function.
-	SquaredErrorLoss<float> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(predicted_y1, target_y);
@@ -69,7 +69,7 @@ TEST_F(Vectors4Float3, SquareErrorLoss) {
  */
 TEST_F(Vectors4Float3, SquareErrorGradient) {
 	// Loss function.
-	SquaredErrorLoss<float> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 	float eps = 1e-5;
 
 	mic::types2::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
@@ -92,7 +92,7 @@ TEST_F(Vectors4Float3, SquareErrorGradient) {
  */
 TEST_F(Vectors4Float3, CrossEntropyLoss) {
 	// Loss function.
-	CrossEntropyLoss<float> loss;
+	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(predicted_y1, target_y);
@@ -108,7 +108,7 @@ TEST_F(Vectors4Float3, CrossEntropyLoss) {
  */
 TEST_F(Vectors4Float3, CrossEntropyGradient) {
 	// Loss function.
-	CrossEntropyLoss<float> loss;
+	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
 	double eps = 1e-5;
 
 	mic::types2::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);

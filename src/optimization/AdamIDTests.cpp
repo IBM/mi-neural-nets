@@ -38,7 +38,7 @@
  */
 TEST_F(Sphere1DLandscape, AdamID_Convergence) {
 	// Optimization function - 1d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	AdamID<double> opt(1);
+	mic::neural_nets::optimization::AdamID<double> opt(1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -47,7 +47,7 @@ TEST_F(Sphere1DLandscape, AdamID_Convergence) {
 		mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
 		opt.update(x, dx);
 
-		// Check whether value of the function is finite.
+		// errorCheck whether value of the function is finite.
 		double value = fun.calculateValue(x);
 		ASSERT_EQ(true, std::isfinite(value)) << " at iteration i=" << iteration;
 
@@ -66,7 +66,7 @@ TEST_F(Sphere1DLandscape, AdamID_Convergence) {
  */
 TEST_F(Sphere20DLandscape, AdamID_Convergence) {
 	// Optimization function - 20d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	AdamID<double> opt(20);
+	mic::neural_nets::optimization::AdamID<double> opt(20);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -93,7 +93,7 @@ TEST_F(Sphere20DLandscape, AdamID_Convergence) {
  */
 TEST_F(Beale2DLandscape, AdamID_Convergence) {
 	// Optimization function.
-	AdamID<double> opt(2);
+	mic::neural_nets::optimization::AdamID<double> opt(2);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -121,7 +121,7 @@ TEST_F(Beale2DLandscape, AdamID_Convergence) {
  */
 TEST_F(Rosenbrock2DLandscape, AdamID_Convergence) {
 	// Optimization function.
-	AdamID<double> opt(2);
+	mic::neural_nets::optimization::AdamID<double> opt(2);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

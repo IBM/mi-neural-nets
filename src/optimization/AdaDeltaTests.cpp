@@ -42,7 +42,7 @@
  */
 TEST_F(Sphere1DLandscape, AdaDelta_Convergence) {
 	// Optimization function - 1d AdaGrad with default values.
-	AdaDelta<double> opt(1);
+	mic::neural_nets::optimization::AdaDelta<double> opt(1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -70,7 +70,7 @@ TEST_F(Sphere1DLandscape, AdaDelta_Convergence) {
  */
 TEST_F(Sphere20DLandscape, AdaDelta_Convergence) {
 	// Optimization function - 20d AdaDelta (with default values).
-	AdaDelta<double> opt(20);
+	mic::neural_nets::optimization::AdaDelta<double> opt(20);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -98,7 +98,7 @@ TEST_F(Sphere20DLandscape, AdaDelta_Convergence) {
  */
 TEST_F(Beale2DLandscape, DISABLED_AdaDelta_Convergence) {
 	// Optimization AdaDelta.
-	AdaDelta<double> opt(2);
+	mic::neural_nets::optimization::AdaDelta<double> opt(2);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

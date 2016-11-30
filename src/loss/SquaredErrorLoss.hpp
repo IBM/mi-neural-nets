@@ -25,7 +25,11 @@
 #ifndef SQUAREDLOSS_HPP_
 #define SQUAREDLOSS_HPP_
 
-#include "Loss.hpp"
+#include <loss/Loss.hpp>
+
+namespace mic {
+namespace neural_nets {
+namespace loss {
 
 /*!
  * \brief Class representing a squared error loss function (regression).
@@ -67,7 +71,8 @@ public:
 
 };
 
-
-
+} //: loss
+} //: neural_nets
+} //: mic
 
 #endif /* SQUAREDLOSS_HPP_ */

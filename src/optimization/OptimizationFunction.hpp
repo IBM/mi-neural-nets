@@ -27,7 +27,9 @@
 
 #include <types2/MatrixTypes.hpp>
 
-//using namespace mic::types2;
+namespace mic {
+namespace neural_nets {
+namespace optimization {
 
 /*!
  * \brief Abstract class representing interface to optimization function.
@@ -51,6 +53,10 @@ protected:
 	mic::types2::MatrixPtr<eT> prev_x;
 };
 
+
+} //: optimization
+} //: neural_nets
+} //: mic
 
 
 #endif /* OPTIMIZATIONFUNCTIONS_HPP_ */

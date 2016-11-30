@@ -27,6 +27,10 @@
 #include <optimization/OptimizationFunction.hpp>
 
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
+
 /*!
  * \brief GradPID - adaptive gradient descent with proportional, integral and derivative coefficients.
  * \author tkornuta
@@ -369,7 +373,8 @@ protected:		// Initialize ratios and variables.
 	mic::types2::MatrixPtr<eT> delta;
 };
 
-
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* GRADPID_HPP_ */

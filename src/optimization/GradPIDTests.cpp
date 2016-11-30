@@ -42,7 +42,7 @@
  */
 TEST_F(Sphere1DLandscape, GradPID_Convergence) {
 	// Optimization function - 1d GradPID (with default values).
-	GradPID<double> opt(1, 0.1);
+	mic::neural_nets::optimization::GradPID<double> opt(1, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -75,7 +75,7 @@ TEST_F(Sphere20DLandscape, GradPID_Convergence) {
 	for (size_t i=0; i<20; i++)
 		(*x)[i] = i;
 	// Optimization function - 20d GradPID (with default values).
-	GradPID<double> opt(20, 0.1);
+	mic::neural_nets::optimization::GradPID<double> opt(20, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -105,7 +105,7 @@ TEST_F(Sphere20DLandscape, GradPID_Convergence) {
  */
 TEST_F(Beale2DLandscape, GradPID_Convergence) {
 	// Optimization function - 2d GradPID.
-	GradPID<double> opt(2, 0.01);
+	mic::neural_nets::optimization::GradPID<double> opt(2, 0.01);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -134,7 +134,7 @@ TEST_F(Beale2DLandscape, GradPID_Convergence) {
 TEST_F(Rosenbrock2DLandscape, GradPID_Convergence) {
 	// Optimization function - 2d GradPID.
 	double ni = 0.0001;
-	GradPID<double> opt(2, ni);
+	mic::neural_nets::optimization::GradPID<double> opt(2, ni);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

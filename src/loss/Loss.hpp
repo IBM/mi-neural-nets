@@ -26,6 +26,10 @@
 
 #include <types2/MatrixTypes.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace loss {
+
 /*!
  * \brief Abstract class representing a loss function.
  * Defines interfaces.
@@ -47,7 +51,8 @@ public:
 
 };
 
-
-
+} //: loss
+} //: neural_nets
+} //: mic
 
 #endif /* LOSS_HPP_ */

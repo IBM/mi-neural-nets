@@ -50,7 +50,7 @@ protected:
 
 private:
 	// Object to be tested.
-	FullyConnectedLayer<float> layer;
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> layer;
 };
 
 /*!
@@ -63,8 +63,8 @@ public:
 	FullyConnectedLayer5x2Float () : layer(5,2) { }
 
 private:
-  // Object to be tested.
-  FullyConnectedLayer<float> layer;
+	// Object to be tested.
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> layer;
 };
 
 
@@ -90,7 +90,7 @@ protected:
 
 private:
 	// Object to be tested.
-	FullyConnectedLayer<float> layer;
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> layer;
 
 	// Test input x - used in forward pass.
 	mic::types2::MatrixPtr<float> const_x;
@@ -102,7 +102,7 @@ private:
 	mic::types2::MatrixPtr<float> target_y;
 
 	// Loss function.
-	SquaredErrorLoss<float> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 };
 
 
@@ -127,7 +127,7 @@ protected:
 
 private:
 	// Object to be tested.
-	FullyConnectedLayer<double> layer;
+	mic::neural_nets::feed_forward::FullyConnectedLayer<double> layer;
 
 	// Test input x - used in forward pass.
 	mic::types2::MatrixPtr<double> const_x;
@@ -139,7 +139,7 @@ private:
 	mic::types2::MatrixPtr<double> target_y;
 
 	// Loss function.
-	SquaredErrorLoss<double> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
 };
 
 
@@ -184,7 +184,7 @@ protected:
 
 private:
 	// Object to be tested.
-	FullyConnectedLayer<double> layer;
+	mic::neural_nets::feed_forward::FullyConnectedLayer<double> layer;
 
 	// Test input x - used in forward pass.
 	mic::types2::MatrixPtr<double> const_x;
@@ -193,6 +193,6 @@ private:
 	mic::types2::MatrixPtr<double> target_y;
 
 	// Loss function.
-	SquaredErrorLoss<double> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
 };
 #endif /* LINEARLAYERTESTS_HPP_ */

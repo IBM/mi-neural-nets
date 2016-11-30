@@ -30,15 +30,13 @@
 #define private public
 #include <optimization/Adam.hpp>
 
-
-
 /*!
  * Tests Adam's convergence on a 1d square "artificial landscape".
  * \author tkornuta
  */
 TEST_F(Sphere1DLandscape, Adam_Convergence) {
 	// Optimization function - 1d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	Adam<double> opt(1, 0.1);
+	mic::neural_nets::optimization::Adam<double> opt(1, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -66,7 +64,7 @@ TEST_F(Sphere1DLandscape, Adam_Convergence) {
  */
 TEST_F(Sphere20DLandscape, Adam_Convergence) {
 	// Optimization function - 20d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	Adam<double> opt(20, 0.1);
+	mic::neural_nets::optimization::Adam<double> opt(20, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -93,7 +91,7 @@ TEST_F(Sphere20DLandscape, Adam_Convergence) {
  */
 TEST_F(Beale2DLandscape, Adam_Convergence) {
 	// Optimization function.
-	Adam<double> opt(2, 0.1);
+	mic::neural_nets::optimization::Adam<double> opt(2, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -121,7 +119,7 @@ TEST_F(Beale2DLandscape, Adam_Convergence) {
  */
 TEST_F(Rosenbrock2DLandscape, Adam_Convergence) {
 	// Optimization function.
-	Adam<double> opt(2, 0.1);
+	mic::neural_nets::optimization::Adam<double> opt(2, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

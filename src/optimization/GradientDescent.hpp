@@ -26,6 +26,10 @@
 
 #include <optimization/OptimizationFunction.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
+
 /*!
  * \brief Update in the direction of gradient descent.
  * \author tkornuta
@@ -51,7 +55,8 @@ protected:
 	eT learning_rate;
 };
 
-
-
+} //: optimization
+} //: neural_nets
+} //: mic
 
 #endif /* GRADIENTDESCENT_HPP_ */

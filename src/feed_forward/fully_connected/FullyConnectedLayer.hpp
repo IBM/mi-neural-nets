@@ -25,6 +25,9 @@
 
 #include "loss/Loss.hpp"
 
+namespace mic {
+namespace neural_nets {
+namespace feed_forward {
 
 /*!
  * \brief Class representing a fully connected layer.
@@ -178,3 +181,9 @@ private:
 	mic::types2::MatrixPtr<eT> db;
 
 };
+
+} //: feed_forward
+} //: neural_nets
+} //: mic
+
+

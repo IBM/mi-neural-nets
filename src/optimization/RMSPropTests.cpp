@@ -43,7 +43,7 @@
  */
 TEST_F(Sphere1DLandscape, RMSProp_Convergence) {
 	// Optimization function - 1d RMSProp (with default values).
-	RMSProp<double> opt(1, 0.1);
+	mic::neural_nets::optimization::RMSProp<double> opt(1, 0.1);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -71,7 +71,7 @@ TEST_F(Sphere1DLandscape, RMSProp_Convergence) {
  */
 TEST_F(Sphere20DLandscape,  RMSProp_Convergence) {
 	// Optimization function - 20d RMSProp (with default values).
-	RMSProp<double> opt(20);
+	mic::neural_nets::optimization::RMSProp<double> opt(20);
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

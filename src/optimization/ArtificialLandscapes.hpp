@@ -26,6 +26,10 @@
 
 #include <types2/MatrixTypes.hpp>
 
+namespace mic {
+namespace neural_nets {
+namespace optimization {
+
 /*!
  * \brief Abstract class representing interface to a differentiable function.
  * \author tkornuta
@@ -238,6 +242,9 @@ private:
 };
 
 
+} //: optimization
+} //: neural_nets
+} //: mic
 
 
 #endif /* ARTIFICIALLANDSCAPES_HPP_ */

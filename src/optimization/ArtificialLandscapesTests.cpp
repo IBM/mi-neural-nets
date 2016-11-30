@@ -57,7 +57,7 @@ TEST_F(Sphere1DLandscape, Gradient) {
  * \author tkornuta
  */
 TEST(Sphere3DLandscape, Gradient) {
-	SphereFunction<double> fun(3);
+	mic::neural_nets::optimization::SphereFunction<double> fun(3);
 	mic::types2::MatrixPtr<double> x = MAKE_MATRIX_PTR(double, 3,1);
 	mic::types2::MatrixPtr<double> dx;
 	/// Eps.
