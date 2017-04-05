@@ -1,5 +1,5 @@
 # Project name
-project(MINeuralNets CXX)
+project(MINeuralNets CXX C)
 
 #  Set current version number.
 set (MINeuralNets_VERSION_MAJOR 1)
