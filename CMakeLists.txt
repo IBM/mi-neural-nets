@@ -3,7 +3,7 @@ project(MINeuralNets CXX C)
 
 #  Set current version number.
 set (MINeuralNets_VERSION_MAJOR 1)
-set (MINeuralNets_VERSION_MINOR 0)
+set (MINeuralNets_VERSION_MINOR 1)
 set (MINeuralNets_VERSION_PATCH 0)
 set (MINeuralNets_VERSION ${MINeuralNets_VERSION_MAJOR}.${MINeuralNets_VERSION_MINOR}.${MINeuralNets_VERSION_PATCH})
 
@@ -34,9 +34,18 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 find_package(Armadillo REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 
+# Find Eigen package
+find_package( Eigen3 REQUIRED )
+include_directories( ${EIGEN3_INCLUDE_DIR} )
+
 # Find MIC Toolchain
-#find_package(MIToolchain 1.0 REQUIRED)
-# TODO: Commented for now, unti I will setup Travis dependent repository build!!
+find_package(MIToolchain 1.0 REQUIRED)
+
+# Find MIC Algorithms
+find_package(MIAlgorithms 1.1 REQUIRED)
+
+# Find MIC Visualization
+find_package(MIVisualization 1.0 REQUIRED)
 
 # =======================================================================
 # Find optional packages

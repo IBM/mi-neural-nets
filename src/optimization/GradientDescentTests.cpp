@@ -5,20 +5,6 @@
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 #include <gtest/gtest.h>
@@ -49,7 +35,7 @@ TEST_F(Sphere1DLandscape, GradientDescent_Convergence) {
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
-		mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.
@@ -77,7 +63,7 @@ TEST_F(Sphere20DLandscape, GradientDescent_Convergence) {
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
-		mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.
@@ -105,7 +91,7 @@ TEST_F(Beale2DLandscape, GradientDescent_Convergence) {
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
-		mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.
@@ -136,7 +122,7 @@ TEST_F(Rosenbrock2DLandscape, GradientDescent_Convergence) {
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
-		mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		opt.update(x, dx);
 
 /*		std::cout << "i=" << iteration << std::endl;

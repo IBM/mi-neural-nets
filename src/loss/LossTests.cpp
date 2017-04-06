@@ -5,20 +5,6 @@
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 #include "LossTests.hpp"
@@ -42,7 +28,7 @@ TEST_F(Vectors4Float, SquareErrorLoss) {
 TEST_F(Vectors4Float, SquareErrorGradient) {
 	// Loss function.
 	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
-	mic::types2::MatrixPtr<float> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<float> dy = loss.calculateGradient(predicted_y, target_y);
 
 	for (size_t i=0; i<dy->size(); i++){
 		ASSERT_EQ((*dy)[i], -2.0) << "Gradient error at position i=" << i;
@@ -72,13 +58,13 @@ TEST_F(Vectors4Float3, SquareErrorGradient) {
 	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 	float eps = 1e-5;
 
-	mic::types2::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
+	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
 	ASSERT_LE(std::abs((*dy1)[0] + 0.3), eps) << "Gradient error at position i=0";
 	ASSERT_LE(std::abs((*dy1)[1] - 0.3), eps) << "Gradient error at position i=1";
 	ASSERT_LE(std::abs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
 	ASSERT_LE(std::abs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
 
-	mic::types2::MatrixPtr<float> dy2 = loss.calculateGradient(predicted_y2, target_y);
+	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(predicted_y2, target_y);
 	ASSERT_LE(std::abs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
 	ASSERT_LE(std::abs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
 	ASSERT_LE(std::abs((*dy2)[2] + 0.3), eps) << "Gradient error at position i=2";
@@ -111,13 +97,13 @@ TEST_F(Vectors4Float3, CrossEntropyGradient) {
 	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
 	double eps = 1e-5;
 
-	mic::types2::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
+	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
 	ASSERT_LE(std::abs((*dy1)[0] - 0.15), eps) << "Gradient error at position i=0";
 	ASSERT_LE(std::abs((*dy1)[1] + 0.15), eps) << "Gradient error at position i=1";
 	ASSERT_LE(std::abs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
 	ASSERT_LE(std::abs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
 
-	mic::types2::MatrixPtr<float> dy2 = loss.calculateGradient(predicted_y2, target_y);
+	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(predicted_y2, target_y);
 	ASSERT_LE(std::abs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
 	ASSERT_LE(std::abs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
 	ASSERT_LE(std::abs((*dy2)[2] - 0.15), eps) << "Gradient error at position i=2";

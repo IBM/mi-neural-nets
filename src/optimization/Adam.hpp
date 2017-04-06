@@ -5,20 +5,6 @@
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 #ifndef ADAM_HPP_
@@ -55,20 +41,20 @@ public:
 	}
 
 	/// Performs update in the direction of gradient descent.
-	void update(mic::types2::MatrixPtr<eT> x_, mic::types2::MatrixPtr<eT> dx_) {
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == m->size());
 
 		// Update the decaying average of past gradients.
-		for (size_t i=0; i<x_->size(); i++)
+		for (size_t i=0; i<(size_t)x_->size(); i++)
 			(*m)[i] = beta1 * (*m)[i] + (1-beta1) * (*dx_)[i];
 
 		// Update the decaying average of past squared gradients.
-		for (size_t i=0; i<x_->size(); i++)
+		for (size_t i=0; i<(size_t)x_->size(); i++)
 			(*v)[i] = beta2 * (*v)[i] + (1-beta2) * (*dx_)[i] * (*dx_)[i];
 
 		// Theta = Theta - update.
-		for (size_t i=0; i<x_->size(); i++)
+		for (size_t i=0; i<(size_t)x_->size(); i++)
 			(*x_)[i] -= learning_rate / (sqrt( (*v)[i] / (1 - beta2_powt)) + eps) * (*m)[i] / (1 - beta1_powt);
 
 		// Update "powered" factors.
@@ -78,10 +64,10 @@ public:
 
 protected:
 	/// Exponentially decaying average of past gradients.
-	mic::types2::MatrixPtr<eT> m;
+	mic::types::MatrixPtr<eT> m;
 
 	/// Exponentially decaying average of past squared gradients.
-	mic::types2::MatrixPtr<eT> v;
+	mic::types::MatrixPtr<eT> v;
 
 	/// Learning rate.
 	eT learning_rate;

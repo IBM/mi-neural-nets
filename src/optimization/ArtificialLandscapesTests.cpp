@@ -5,20 +5,6 @@
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 #include <optimization/ArtificialLandscapesTests.hpp>
@@ -58,8 +44,8 @@ TEST_F(Sphere1DLandscape, Gradient) {
  */
 TEST(Sphere3DLandscape, Gradient) {
 	mic::neural_nets::optimization::SphereFunction<double> fun(3);
-	mic::types2::MatrixPtr<double> x = MAKE_MATRIX_PTR(double, 3,1);
-	mic::types2::MatrixPtr<double> dx;
+	mic::types::MatrixPtr<double> x = MAKE_MATRIX_PTR(double, 3,1);
+	mic::types::MatrixPtr<double> dx;
 	/// Eps.
 	double eps = 1e-10;
 
@@ -112,7 +98,7 @@ TEST_F(Sphere20DLandscape, Value) {
  * \author tkornuta
  */
 TEST_F(Sphere20DLandscape, Gradient) {
-	mic::types2::MatrixPtr<double> dx;
+	mic::types::MatrixPtr<double> dx;
 
 	// 0.0
 	for (size_t i=0; i<20; i++)
@@ -143,7 +129,7 @@ TEST_F(Sphere20DLandscape, Gradient) {
 TEST_F(Beale2DLandscape, GradientInMin) {
 	(*x)[0] = 3.0;
 	(*x)[1] = 0.5;
-	mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+	mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 	ASSERT_LE(std::abs((*dx)[0]), eps);
 	ASSERT_LE(std::abs((*dx)[1]), eps);
 }
@@ -172,7 +158,7 @@ TEST_F(Rosenbrock2DLandscape, Value) {
 TEST_F(Rosenbrock2DLandscape, GradientInMin) {
 	(*x)[0] = 1;
 	(*x)[1] = 1;
-	mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+	mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 	ASSERT_LE(std::abs((*dx)[0]), eps);
 	ASSERT_LE(std::abs((*dx)[1]), eps);
 }
@@ -184,7 +170,7 @@ TEST_F(Rosenbrock2DLandscape, GradientInMin) {
 TEST_F(Rosenbrock2DLandscape, Gradient) {
 	(*x)[0] = 2;
 	(*x)[1] = 0;
-	mic::types2::MatrixPtr<double> dx = fun.calculateGradient(x);
+	mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 	ASSERT_LE(std::abs((*dx)[0] - 3202.0), eps);
 	ASSERT_LE(std::abs((*dx)[1] + 800.0), eps);
 	(*x)[0] = 2;
