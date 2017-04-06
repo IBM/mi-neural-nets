@@ -5,20 +5,6 @@
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 #include <random>
@@ -80,7 +66,7 @@ public:
 	/*!
 	 * Forwards the activations of the neural network.
 	 */
-	mic::types2::MatrixPtr<eT> forward(mic::types2::MatrixPtr<eT> x_) {
+	mic::types::MatrixPtr<eT> forward(mic::types::MatrixPtr<eT> x_) {
 		// Memorize input.
 		for(size_t col=0; col < input_size; col++)
 			(*x)[col] = (*x_)[col];
@@ -99,7 +85,7 @@ public:
 	/*!
 	 * Backward pass - backpropagation.
 	 */
-	mic::types2::MatrixPtr<eT> backward(mic::types2::MatrixPtr<eT> dy_) {
+	mic::types::MatrixPtr<eT> backward(mic::types::MatrixPtr<eT> dy_) {
 		// Memorize input - gradient.
 		for(size_t col=0; col < output_size; col++)
 			(*dy)[col] = (*dy_)[col];
@@ -126,10 +112,10 @@ public:
 	}
 
 	template<typename loss>
-	mic::types2::MatrixPtr<eT> calculateNumericalGradient(mic::types2::MatrixPtr<eT> x_, mic::types2::MatrixPtr<eT> target_y_, mic::types2::MatrixPtr<eT> param_, loss loss_, eT delta_) {
+	mic::types::MatrixPtr<eT> calculateNumericalGradient(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> target_y_, mic::types::MatrixPtr<eT> param_, loss loss_, eT delta_) {
 		// Allocate memory.
-		mic::types2::MatrixPtr<eT> nGrad = MAKE_MATRIX_PTR(eT, param_->size(), 1);
-		for (size_t i=0; i<param_->size(); i++) {
+		mic::types::MatrixPtr<eT> nGrad = MAKE_MATRIX_PTR(eT, param_->size(), 1);
+		for (size_t i=0; i<(size_t)param_->size(); i++) {
 			// Add delta.
 			(*param_)[i] += delta_;
 			// Calculate loss.
@@ -157,28 +143,28 @@ private:
 	std::size_t output_size;
 
 	/// Input vector of size [input_size x 1] (no batch).
-	mic::types2::MatrixPtr<eT> x;
+	mic::types::MatrixPtr<eT> x;
 
 	/// Input vector of size [output_size x 1] (no batch)
-	mic::types2::MatrixPtr<eT> y;
+	mic::types::MatrixPtr<eT> y;
 
 	// Weights of layer [output_size * input_size]
-	mic::types2::MatrixPtr<eT> W;
+	mic::types::MatrixPtr<eT> W;
 
 	// Biases of layer of size [output_size * 1]
-	mic::types2::MatrixPtr<eT> b;
+	mic::types::MatrixPtr<eT> b;
 
 	// Gradient dx of size [input_size x 1]
-	mic::types2::MatrixPtr<eT> dx;
+	mic::types::MatrixPtr<eT> dx;
 
 	// dy of size [output_size x 1].
-	mic::types2::MatrixPtr<eT> dy;
+	mic::types::MatrixPtr<eT> dy;
 
 	// Gradient dW of size [output_size * input_size]
-	mic::types2::MatrixPtr<eT> dW;
+	mic::types::MatrixPtr<eT> dW;
 
 	// Gradient db of size [output_size x 1]
-	mic::types2::MatrixPtr<eT> db;
+	mic::types::MatrixPtr<eT> db;
 
 };
 

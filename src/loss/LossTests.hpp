@@ -30,8 +30,10 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		predicted_y = MAKE_MATRIX_PTR(float, {1.0, 2.0, 3.0, 4.0});
-		target_y = MAKE_MATRIX_PTR(float, {2.0, 3.0, 4.0, 5.0});
+		predicted_y = MAKE_MATRIX_PTR(float, 4, 1);
+		(*predicted_y) << 1.0, 2.0, 3.0, 4.0;
+		target_y = MAKE_MATRIX_PTR(float, 4, 1);
+		(*target_y)  << 2.0, 3.0, 4.0, 5.0;
 	}
 
 private:
@@ -54,9 +56,12 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		target_y = MAKE_MATRIX_PTR(float, {.4, .1, .25, .25});
-		predicted_y1 = MAKE_MATRIX_PTR(float, {.25, .25, .25, .25});
-		predicted_y2 = MAKE_MATRIX_PTR(float, {.4, .1, .1, .4});
+		target_y = MAKE_MATRIX_PTR(float, 4,1);
+		(*target_y) << .4, .1, .25, .25;
+		predicted_y1 = MAKE_MATRIX_PTR(float, 4, 1);
+		(*predicted_y1) << .25, .25, .25, .25;
+		predicted_y2 = MAKE_MATRIX_PTR(float, 4, 1);
+		(*predicted_y2) << .4, .1, .1, .4;
 	}
 
 private:

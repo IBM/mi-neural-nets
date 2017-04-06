@@ -30,7 +30,7 @@ TEST_F(Vectors4Float, SquareErrorGradient) {
 	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 	mic::types::MatrixPtr<float> dy = loss.calculateGradient(predicted_y, target_y);
 
-	for (size_t i=0; i<dy->size(); i++){
+	for (size_t i=0; i<(size_t)dy->size(); i++){
 		ASSERT_EQ((*dy)[i], -2.0) << "Gradient error at position i=" << i;
 	}
 }

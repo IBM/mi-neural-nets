@@ -5,20 +5,6 @@
  *
  * Copyright (c) 2016, IBM Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 #ifndef LINEARLAYERTESTS_HPP_
@@ -80,11 +66,17 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		layer.W = MAKE_MATRIX_PTR(float, {1, 2, 3, 5, 6, 9});
-		layer.b = MAKE_MATRIX_PTR(float, {-3, -2, -1});
-		const_x = MAKE_MATRIX_PTR(float, {-1, 1});
-		const_dy = MAKE_MATRIX_PTR(float, {-1, -2, 1});
-		target_y = MAKE_MATRIX_PTR(float, {-1, -2, 1});
+		(*layer.W) << 1, 2, 3, 5, 6, 9;
+		(*layer.b) << -3, -2, -1;
+
+		const_x = MAKE_MATRIX_PTR(float, 2, 1);
+		(*const_x) << -1, 1;
+
+		const_dy = MAKE_MATRIX_PTR(float, 3, 1);
+		(*const_dy) << -1, -2, 1;
+
+		target_y = MAKE_MATRIX_PTR(float, 3, 1);
+		(*target_y) << -1, -2, 1;
 	}
 
 
@@ -93,13 +85,13 @@ private:
 	mic::neural_nets::feed_forward::FullyConnectedLayer<float> layer;
 
 	// Test input x - used in forward pass.
-	mic::types2::MatrixPtr<float> const_x;
+	mic::types::MatrixPtr<float> const_x;
 
 	// Test gradient dy - used in backward pass.
-	mic::types2::MatrixPtr<float> const_dy;
+	mic::types::MatrixPtr<float> const_dy;
 
 	// Target y values.
-	mic::types2::MatrixPtr<float> target_y;
+	mic::types::MatrixPtr<float> target_y;
 
 	// Loss function.
 	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
@@ -118,11 +110,17 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		layer.W = MAKE_MATRIX_PTR(double, {1, 2, 3, 5, 6, 9});
-		layer.b = MAKE_MATRIX_PTR(double, {-3, -2, -1});
-		const_x = MAKE_MATRIX_PTR(double, {-1, 1});
-		const_dy = MAKE_MATRIX_PTR(double, {-1, -2, 1});
-		target_y = MAKE_MATRIX_PTR(double, {-1, -2, 1});
+		(*layer.W) << 1, 2, 3, 5, 6, 9;
+		(*layer.b) << -3, -2, -1;
+
+		const_x = MAKE_MATRIX_PTR(double, 2, 1);
+		(*const_x) << -1, 1;
+
+		const_dy = MAKE_MATRIX_PTR(double, 3, 1);
+		(*const_dy) << -1, -2, 1;
+
+		target_y = MAKE_MATRIX_PTR(double, 3, 1);
+		(*target_y) << -1, -2, 1;
 	}
 
 private:
@@ -130,13 +128,13 @@ private:
 	mic::neural_nets::feed_forward::FullyConnectedLayer<double> layer;
 
 	// Test input x - used in forward pass.
-	mic::types2::MatrixPtr<double> const_x;
+	mic::types::MatrixPtr<double> const_x;
 
 	// Test gradient dy - used in backward pass.
-	mic::types2::MatrixPtr<double> const_dy;
+	mic::types::MatrixPtr<double> const_dy;
 
 	// Target y values.
-	mic::types2::MatrixPtr<double> target_y;
+	mic::types::MatrixPtr<double> target_y;
 
 	// Loss function.
 	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
@@ -187,10 +185,10 @@ private:
 	mic::neural_nets::feed_forward::FullyConnectedLayer<double> layer;
 
 	// Test input x - used in forward pass.
-	mic::types2::MatrixPtr<double> const_x;
+	mic::types::MatrixPtr<double> const_x;
 
 	// Target y values.
-	mic::types2::MatrixPtr<double> target_y;
+	mic::types::MatrixPtr<double> target_y;
 
 	// Loss function.
 	mic::neural_nets::loss::SquaredErrorLoss<double> loss;

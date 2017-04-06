@@ -52,15 +52,20 @@ TEST_F(FullyConnectedLayer5x2Float, WAreDifferent) {
  * Makes sure that the layer calculates y = w*x + b, size of layer: is 1x1.
  */
 TEST_F(FullyConnectedLayer1x1Float, Forward_y) {
-	ASSERT_EQ( (*layer.forward(MAKE_MATRIX_PTR(float, {0.0})))[0], 1.0 );
-	ASSERT_EQ( (*layer.forward(MAKE_MATRIX_PTR(float, {1.0})))[0], 2.0 );
+	mic::types::MatrixPtr<float> input = MAKE_MATRIX_PTR(float, 1, 1);
+
+	(*input)[0] = 0.0;
+	ASSERT_EQ( (*layer.forward( input ))[0], 1.0 );
+
+	(*input)[0] = 1.0;
+	ASSERT_EQ( (*layer.forward( input ))[0], 2.0 );
 }
 
 /*!
  * Makes sure that the layer calculates y = w*x + b, size of layer: is 2x3.
  */
 TEST_F(FullyConnectedLayer2x3Float, Forward_y) {
-	mic::types2::MatrixPtr<float> y = layer.forward(const_x);
+	mic::types::MatrixPtr<float> y = layer.forward(const_x);
 	ASSERT_EQ((*y)[0], -2 );
 	ASSERT_EQ((*y)[1], 0 );
 	ASSERT_EQ((*y)[2], 2 );
@@ -70,15 +75,21 @@ TEST_F(FullyConnectedLayer2x3Float, Forward_y) {
  * Makes sure that the two stacked layers will return right result.
  */
 TEST(FullyConnectedLayerStacked1x2x3Float, Forward_y) {
-	mic::neural_nets::feed_forward::FullyConnectedLayer<float> layer(1,2);
-	layer.W = MAKE_MATRIX_PTR(float, {1.0, 2.0});
-	layer.b = MAKE_MATRIX_PTR(float, {0, 1});
-	mic::neural_nets::feed_forward::FullyConnectedLayer<float> l2(2,3);
-	l2.W = MAKE_MATRIX_PTR(float, {-1, -2, -3, -5, 6, 9});
-	l2.b = MAKE_MATRIX_PTR(float, {-3, -2, -1});
-	mic::types2::MatrixPtr<float> x = MAKE_MATRIX_PTR(float, {-1});
-	mic::types2::MatrixPtr<float> y = l2.forward(layer.forward(x));
+	// Initialize network consisting  of two layers.
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> l1(1,2);
+	(*l1.W) << 1.0, 2.0;
+	(*l1.b) << 0.0, 1.0;
 
+	mic::neural_nets::feed_forward::FullyConnectedLayer<float> l2(2,3);
+	(*l2.W) << -1, -2, -3, -5, 6, 9;
+	(*l2.b) << -3, -2, -1;
+
+	// Input.
+	mic::types::MatrixPtr<float> x = MAKE_MATRIX_PTR(float, 1, 1);
+	(*x) << -1;
+
+	// Check the result.
+	mic::types::MatrixPtr<float> y = l2.forward(l1.forward(x));
 	ASSERT_EQ((*y)[0], 0 );
 	ASSERT_EQ((*y)[1], 6 );
 	ASSERT_EQ((*y)[2], -16 );
@@ -90,9 +101,14 @@ TEST(FullyConnectedLayerStacked1x2x3Float, Forward_y) {
  */
 TEST(FullyConnectedLayer2x1Float, Backward_dx) {
 	mic::neural_nets::feed_forward::FullyConnectedLayer<> layer(2,1);
-	layer.W = MAKE_MATRIX_PTR(float, {1, 2});
-	layer.b = MAKE_MATRIX_PTR(float, {1});
-	mic::types2::MatrixPtr<float> dx = layer.backward(MAKE_MATRIX_PTR(float, {2.0}));
+	(*layer.W) << 1.0, 2.0;
+	(*layer.b) << 1.0;
+
+	// Output.
+	mic::types::MatrixPtr<float> dy = MAKE_MATRIX_PTR(float, 1, 1);
+	(*dy) << 2.0;
+
+	mic::types::MatrixPtr<float> dx = layer.backward(dy);
 	ASSERT_EQ((*dx)[0], 2 );
 	ASSERT_EQ((*dx)[1], 4 );
 }
@@ -102,7 +118,7 @@ TEST(FullyConnectedLayer2x1Float, Backward_dx) {
  * Tests backward pass in the  y = w*x + b (dx gradient), size of layer: is 2x3.
  */
 TEST_F(FullyConnectedLayer2x3Float, Backward_dx) {
-	mic::types2::MatrixPtr<float> dx = layer.backward(const_dy);
+	mic::types::MatrixPtr<float> dx = layer.backward(const_dy);
 
 	// Check dx.
 	ASSERT_EQ((*dx)[0], -1);
@@ -114,9 +130,9 @@ TEST_F(FullyConnectedLayer2x3Float, Backward_dx) {
  */
 TEST_F(FullyConnectedLayer2x3Float, Backward_dWdb) {
 	// Forward pass.
-	mic::types2::MatrixPtr<float> y = layer.forward(const_x);
+	mic::types::MatrixPtr<float> y = layer.forward(const_x);
 	// Backward pass.
-	mic::types2::MatrixPtr<float> dx = layer.backward(const_dy);
+	mic::types::MatrixPtr<float> dx = layer.backward(const_dy);
 
 	// Check dW.
 	ASSERT_EQ((*layer.dW)[0], 1);
@@ -132,13 +148,13 @@ TEST_F(FullyConnectedLayer2x3Float, Backward_dWdb) {
 }
 
 
-double calculateLoss (mic::types2::MatrixPtr<double> predicted_y_, mic::types2::MatrixPtr<double> target_y_) {
+double calculateLoss (mic::types::MatrixPtr<double> predicted_y_, mic::types::MatrixPtr<double> target_y_) {
 	// Sizes must match.
 	assert(predicted_y_->size() == target_y_->size());
 
 	// Calculate loss.
 	double loss =0;
-	for (size_t i=0; i <predicted_y_->size(); i++) {
+	for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
 		loss += ((*predicted_y_)[i] - (*target_y_)[i])*((*predicted_y_)[i] - (*target_y_)[i]);
 	}
 	return loss;
@@ -150,19 +166,19 @@ double calculateLoss (mic::types2::MatrixPtr<double> predicted_y_, mic::types2::
 TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_dW) {
 
 	// Calculate gradients.
-	mic::types2::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types2::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types2::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.dW);
+	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.dW);
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
+	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
-	for (size_t i=0; i<dW->size(); i++)
+	for (size_t i=0; i<(size_t)dW->size(); i++)
 		EXPECT_LE(((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
 }
 
@@ -173,19 +189,19 @@ TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_dW) {
 TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_db) {
 
 	// Calculate gradients.
-	mic::types2::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types2::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types2::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.db);
+	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.db);
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
+	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
-	for (size_t i=0; i<db->size(); i++)
+	for (size_t i=0; i<(size_t)db->size(); i++)
 		EXPECT_LE(((*db)[i] - (*nb)[i]), eps) << "Too big difference between db and numerical db at position i=" << i;
 }
 
@@ -196,18 +212,18 @@ TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_db) {
 TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_dx) {
 
 	// Calculate gradients.
-	mic::types2::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types2::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	// Store resulting gradients - make a copy!
-	mic::types2::MatrixPtr<double> dx = MAKE_MATRIX_PTR(double, *layer.backward(dy));
+	mic::types::MatrixPtr<double> dx = MAKE_MATRIX_PTR(double, *layer.backward(dy));
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
+	mic::types::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
-	for (size_t i=0; i<dx->size(); i++)
+	for (size_t i=0; i<(size_t)dx->size(); i++)
 		EXPECT_LE(((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
 }
 
@@ -219,22 +235,22 @@ TEST_F(FullyConnectedLayer2x3Double, NumericalGradientCheck_dx) {
 TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_dW) {
 
 	// Calculate gradients.
-	mic::types2::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types2::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types2::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.dW);
+	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.dW);
 
 //	(*layer.W)[0] = 50000.0;
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
+	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.W, loss, delta);
 
 
 	// Compare gradients.
 	double eps = 1e-6;
-	for (size_t i=0; i<dW->size(); i++){
+	for (size_t i=0; i<(size_t)dW->size(); i++){
 		//std::cout << "i=" << i << " (*dW)[i]= " << (*dW)[i] << " (*nW)[i]= " << (*nW)[i] << std::endl;
 		ASSERT_LE(((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
 	}
@@ -247,21 +263,21 @@ TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_dW) {
 TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_db) {
 
 	// Calculate gradients.
-	mic::types2::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types2::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types2::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.db);
+	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.db);
 
 //	(*layer.W)[0] = 50000.0;
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
+	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.b, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;
-	for (size_t i=0; i<db->size(); i++)
+	for (size_t i=0; i<(size_t)db->size(); i++)
 		ASSERT_LE(((*db)[i] - (*nb)[i]), eps) << "Too big difference between db and numerical db at position i=" << i;
 }
 
@@ -272,20 +288,20 @@ TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_db) {
 TEST_F(FullyConnectedLayer50x100Double, NumericalGradientCheck_dx) {
 
 	// Calculate gradients.
-	mic::types2::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types2::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	// Store resulting gradients - make a copy!
-	mic::types2::MatrixPtr<double> dx = MAKE_MATRIX_PTR(double, *layer.backward(dy));
+	mic::types::MatrixPtr<double> dx = MAKE_MATRIX_PTR(double, *layer.backward(dy));
 
 //	(*layer.W)[0] = 50000.0;
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types2::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
+	mic::types::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;
-	for (size_t i=0; i<dx->size(); i++)
+	for (size_t i=0; i<(size_t)dx->size(); i++)
 		ASSERT_LE(((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
 }
 
