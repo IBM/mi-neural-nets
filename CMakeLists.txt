@@ -10,6 +10,7 @@ set (MINeuralNets_VERSION ${MINeuralNets_VERSION_MAJOR}.${MINeuralNets_VERSION_M
 # CMake required version.
 cmake_minimum_required(VERSION 3.2)
 
+
 # =======================================================================
 # Set compiler/linker flags.
 # =======================================================================
@@ -17,7 +18,7 @@ cmake_minimum_required(VERSION 3.2)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -fopenmp -Wall")
 
 # Check, whether all necessary libraries are linked
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl") 
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}") 
 
 # =======================================================================
 # Find required packages
@@ -29,10 +30,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(Boost 1.54 REQUIRED COMPONENTS system thread random  serialization)
 # Try to include Boost as system directory to suppress it's warnings
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-
-# Find Armadillo.
-find_package(Armadillo REQUIRED)
-include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 # Find Eigen package
 find_package( Eigen3 REQUIRED )
@@ -59,12 +56,11 @@ else(NOT OpenBLAS_FOUND)
 	include_directories(${OpenBLAS_INCLUDE_DIR})
 	add_definitions(-DOpenBLAS_FOUND=1)
 #	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lopenblas") 
-	ADD_DEFINITIONS("-DARMA_DONT_USE_WRAPPER -DARMA_USE_BLAS -DARMA_USE_LAPACK")
+#	ADD_DEFINITIONS("-DARMA_DONT_USE_WRAPPER -DARMA_USE_BLAS -DARMA_USE_LAPACK")
 endif(NOT OpenBLAS_FOUND)
 
 # Locate GTest
 find_package(GTest)
-
 if(NOT GTEST_FOUND)
     message(WARNING "--   GTest not found!")
 else(NOT GTEST_FOUND)

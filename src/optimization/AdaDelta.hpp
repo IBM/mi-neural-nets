@@ -50,7 +50,7 @@ public:
 		}*/
 
 		// Update decaying sum of squares of gradients - up to time t.
-		for (size_t i=0; i<x_->size(); i++) {
+		for (size_t i=0; i<(size_t)x_->size(); i++) {
 			(*EG)[i] = decay *(*EG)[i] + (1.0 - decay) * (*dx_)[i] * (*dx_)[i];
 //			std::cout << "(*EG)["<< i <<"] = " << (*EG)[i] <<std::endl;
 			assert(std::isfinite((*EG)[i]));
