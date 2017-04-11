@@ -15,7 +15,7 @@
 // Redefine word "public" so every class field/method will be accessible for tests.
 #define private public
 #include "feed_forward/fully_connected/FullyConnectedLayer.hpp"
-#include "loss/SquaredErrorLoss.hpp"
+#include "loss/RegressionLoss.hpp"
 
 /*!
  * \brief Test Fixture - layer of size 1x1, floats, sets W[0] = 1.0 and b[0] = 1.0.
@@ -94,7 +94,7 @@ private:
 	mic::types::MatrixPtr<float> target_y;
 
 	// Loss function.
-	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
+	mic::neural_nets::loss::RegressionLoss<float> loss;
 };
 
 
@@ -137,7 +137,7 @@ private:
 	mic::types::MatrixPtr<double> target_y;
 
 	// Loss function.
-	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
+	mic::neural_nets::loss::RegressionLoss<double> loss;
 };
 
 
@@ -191,6 +191,6 @@ private:
 	mic::types::MatrixPtr<double> target_y;
 
 	// Loss function.
-	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
+	mic::neural_nets::loss::RegressionLoss<double> loss;
 };
 #endif /* LINEARLAYERTESTS_HPP_ */

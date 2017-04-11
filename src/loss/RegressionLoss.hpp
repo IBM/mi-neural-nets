@@ -1,5 +1,5 @@
 /*!
- * @file: SquaredErrorLoss.hpp
+ * @file: RegressionLoss.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
  * @Date:   Nov 8, 2016
  *
@@ -23,7 +23,7 @@ namespace loss {
  * \tparam dtype Template parameter denoting precision of variables.
  */
 template <typename dtype=float>
-class SquaredErrorLoss : public Loss<dtype> {
+class RegressionLoss : public Loss<dtype> {
 public:
 	/*!
 	 * \brief Function calculating loss - for squared difference (regression).
