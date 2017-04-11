@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_CONVOLUTION_HPP_
 #define SRC_MLNN_CONVOLUTION_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 #include<types/MatrixTypes.hpp>
 #include<types/MatrixArray.hpp>
@@ -24,7 +24,7 @@ namespace convolution {
 class Convolution : public mic::mlnn::Layer {
 public:
 
-	Convolution(size_t inputs, size_t channels, size_t filter_size, size_t filters, size_t batch_size, std::string name_ = "Convolution");
+	Convolution(size_t inputs, size_t channels, size_t filter_size, size_t filters, std::string name_ = "Convolution");
 
 	virtual ~Convolution() {};
 
@@ -46,9 +46,6 @@ public:
 	void resetGrads();
 
 	void applyGrads(double alpha, double decay = 0);
-
-	//this is mainly for debugging - TODO: proper serialization of layers
-	void save_to_files(std::string prefix);
 
 protected:
 	mic::types::MatrixXf W;

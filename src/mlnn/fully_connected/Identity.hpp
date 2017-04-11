@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_IDENTITY_HPP_
 #define SRC_MLNN_IDENTITY_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -23,7 +23,7 @@ namespace fully_connected {
 class Identity : public mic::mlnn::Layer {
 public:
 
-	Identity(size_t inputs, size_t outputs, size_t batch_size, std::string name_ = "Identity");
+	Identity(size_t inputs, size_t batch_size = 1, std::string name_ = "Identity");
 
 	virtual ~Identity() {};
 

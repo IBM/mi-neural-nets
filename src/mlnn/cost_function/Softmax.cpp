@@ -12,8 +12,8 @@ namespace mlnn {
 namespace cost_function {
 
 
-Softmax::Softmax(size_t inputs_, size_t outputs_, size_t batch_size_, std::string name_) :
-	Layer(inputs_, outputs_, batch_size_, LayerTypes::Softmax, name_) {
+Softmax::Softmax(size_t inputs_, std::string name_) :
+	Layer(inputs_, inputs_, 1, LayerTypes::Softmax, name_) {
 
 }
 

@@ -71,31 +71,33 @@ int main() {
 	MultiLayerNeuralNetwork nn;
 
 	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution(28*28, input_channels, filter_size[0], filters[0], batch_size));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize(), nn.lastLayerOutputsSize(), batch_size));
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[0], filters[0], filter_size[1], filters[1], batch_size));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize(), nn.lastLayerOutputsSize(), batch_size));
-	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[2], batch_size));
+	nn.pushLayer(new Convolution(28*28, input_channels, filter_size[0], filters[0]));
+	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[0], filters[0], filter_size[1], filters[1]));
+	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[2]));
 
 	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[1], filters[1], filter_size[2], filters[2], batch_size));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize(), nn.lastLayerOutputsSize(), batch_size));
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[2], filters[2], filter_size[3], filters[3], batch_size));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize(), nn.lastLayerOutputsSize(), batch_size));
-	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[3], batch_size));
+	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[1], filters[1], filter_size[2], filters[2]));
+	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[2], filters[2], filter_size[3], filters[3]));
+	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[3]));
 
 	//CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[3], filters[3], filter_size[4], filters[4], batch_size));
-	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[4], batch_size));
+	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[3], filters[3], filter_size[4], filters[4]));
+	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[4]));
 
 	//FULLY CONNECTED
-	nn.pushLayer(new Linear(nn.lastLayerOutputsSize(), fully_connected_size, batch_size));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize(), nn.lastLayerOutputsSize(), batch_size));
-	nn.pushLayer(new Dropout(nn.lastLayerOutputsSize(), nn.lastLayerOutputsSize(), batch_size, dropout));
+	nn.pushLayer(new Linear(nn.lastLayerOutputsSize(), fully_connected_size));
+	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Dropout(nn.lastLayerOutputsSize(), dropout));
 
 	//SOFTMAX
-	nn.pushLayer(new Linear(nn.lastLayerOutputsSize(), 10, batch_size));
-	nn.pushLayer(new Softmax(10, 10, batch_size));
+	nn.pushLayer(new Linear(nn.lastLayerOutputsSize(), 10));
+	nn.pushLayer(new Softmax(10));
+
+	nn.resizeBatch(batch_size);
 
 	// Set training parameters.
 	double 	learning_rate = 1e-2;

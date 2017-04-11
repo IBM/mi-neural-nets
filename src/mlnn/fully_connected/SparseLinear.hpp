@@ -10,7 +10,7 @@
 #ifndef SPARSELINEAR_H_
 #define SPARSELINEAR_H_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -29,7 +29,7 @@ public:
 	 * @param batch_size_ Size of the batch.
 	 * @param name_ Name of the layer.
 	 */
-	SparseLinear(size_t inputs_, size_t outputs_, size_t batch_size_, std::string name_ = "SparseLinear");
+	SparseLinear(size_t inputs_, size_t outputs_, size_t batch_size_ = 1, std::string name_ = "SparseLinear");
 
 	/*!
 	 * Virtual constructor.

@@ -25,11 +25,11 @@ int main() {
 	LOGGER->addOutput(new ConsoleOutput());
 
 	MultiLayerNeuralNetwork nn("simple_linear_network");
-	nn.pushLayer(new Linear(10, 20, 1, "First Linear"));
-	nn.pushLayer(new ReLU(20, 20, 1, "ReLU"));
-	nn.pushLayer(new Linear(20, 4, 1, "Second Linear"));
-	nn.pushLayer(new ReLU(4, 4, 1, "ReLU"));
-	nn.pushLayer(new Regression(4, 4, 1, "Final Regression"));
+	nn.pushLayer(new Linear(10, 20, "First Linear"));
+	nn.pushLayer(new ReLU(20, "ReLU"));
+	nn.pushLayer(new Linear(20, 4, "Second Linear"));
+	nn.pushLayer(new ReLU(4, "ReLU"));
+	nn.pushLayer(new Regression(4, "Final Regression"));
 
 	// Generate a dataset.
 	Batch<MatrixXf, MatrixXf> dataset;

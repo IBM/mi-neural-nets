@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_PADDING_HPP_
 #define SRC_MLNN_PADDING_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -16,12 +16,12 @@ namespace convolution {
 
 /*!
  * \brief Class implementing padding operation - expanding the size of image (matrix) by a margin of n pixels on every image side.
- * \author krocki
+ * \author krocki/tkornuta
  */
 class Padding : public Layer {
 public:
 
-	Padding(size_t inputs, size_t _channels, size_t batch_size, size_t _padding, std::string name_ = "Padding");
+	Padding(size_t inputs, size_t _channels, size_t _padding, std::string name_ = "Padding");
 
 	~Padding() {};
 

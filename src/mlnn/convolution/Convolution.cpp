@@ -13,8 +13,8 @@ namespace convolution {
 
 #define ADDRESS_3D_TO_1D(i, j, k, cols, channel_size) ((i) + (j) * (cols) + (k) * (channel_size))
 
-Convolution::Convolution(size_t inputs, size_t channels, size_t filter_size, size_t filters, size_t batch_size, std::string name_) :
-	Layer(inputs * channels, filters * (sqrt(inputs) - filter_size + 1) * (sqrt(inputs) - filter_size + 1), batch_size, LayerTypes::Convolution, name_),
+Convolution::Convolution(size_t inputs, size_t channels, size_t filter_size, size_t filters, std::string name_) :
+	Layer(inputs * channels, filters * (sqrt(inputs) - filter_size + 1) * (sqrt(inputs) - filter_size + 1), 1, LayerTypes::Convolution, name_),
 	input_channels(channels), output_channels(filters), kernel_size(filter_size),
 	output_map_size((sqrt(inputs) - filter_size + 1) * (sqrt(inputs) - filter_size + 1)) {
 
@@ -282,14 +282,6 @@ void Convolution::applyGrads(double alpha, double decay) {
 
 }
 
-
-void Convolution::save_to_files(std::string prefix) {
-
-	Layer::save_to_files(prefix);
-	save_matrix_to_file(W, prefix + "_W.txt");
-	// save_matrix_to_file(b, prefix + "_b.txt");
-
-}
 
 } /* convolution */
 } /* namespace mlnn */

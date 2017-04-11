@@ -100,8 +100,12 @@ public:
 	 */
 	virtual void backward() = 0;
 
-	//this is mainly for debugging - TODO: proper serialization of layers and object NN
-	virtual void save_to_files(std::string prefix);
+
+	/*!
+	 * Changes the size of the batch. By default it resizes
+	 * @param New size of the batch.
+	 */
+	virtual void resizeBatch(size_t batch_size_);
 
 	/*!
 	 * Reset gradients.
@@ -115,9 +119,6 @@ public:
 	 * Virtual destructor - required for the correct destruction of objects of derived classes.
 	 */
 	virtual ~Layer() {};
-
-	// Duplicated entries fix, TO BE REMOVED when "proper serialization" will be implemented.
-	void save_matrix_to_file(Eigen::MatrixXf& m, std::string filename);
 
 	/// Returns size (length) of inputs.
 	size_t inputsSize();

@@ -12,8 +12,8 @@ namespace mlnn {
 namespace convolution {
 
 
-Padding::Padding(size_t inputs_, size_t channels_, size_t batch_size_, size_t padding_, std::string name_) :
-	Layer(inputs_, channels_ * (sqrt(inputs_ / channels_) + padding_ * 2) * (sqrt(inputs_ / channels_) + padding_ * 2), batch_size_, LayerTypes::Padding, name_),
+Padding::Padding(size_t inputs_, size_t channels_, size_t padding_, std::string name_) :
+	Layer(inputs_, channels_ * (sqrt(inputs_ / channels_) + padding_ * 2) * (sqrt(inputs_ / channels_) + padding_ * 2), 1, LayerTypes::Padding, name_),
 	channels(channels_),
 	padding(padding_)
 {

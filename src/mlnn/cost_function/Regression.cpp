@@ -12,8 +12,8 @@ namespace mlnn {
 namespace cost_function {
 
 
-Regression::Regression(size_t inputs_, size_t outputs_, size_t batch_size_, std::string name_) :
-	Layer(inputs_, outputs_, batch_size_, LayerTypes::Regression, name_) {
+Regression::Regression(size_t inputs_, std::string name_) :
+	Layer(inputs_, inputs_, 1, LayerTypes::Regression, name_) {
 
 }
 

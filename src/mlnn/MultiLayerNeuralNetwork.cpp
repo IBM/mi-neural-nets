@@ -51,7 +51,7 @@ void MultiLayerNeuralNetwork::forward(mic::types::MatrixXf& input_data, bool ski
 
 	//assert((layers[0]->s['x'])->cols() == input_data.cols());
 	// Change the size of batch - if required.
-	setBatchSize(input_data.cols());
+	resizeBatch(input_data.cols());
 
 	// Copy inputs to the lowest point in the network.
 	(*(layers[0]->s['x'])) = input_data;
@@ -158,19 +158,15 @@ void MultiLayerNeuralNetwork::resetGrads() {
 }
 
 
-void MultiLayerNeuralNetwork::setBatchSize(size_t batch_size_) {
-	if ((size_t)(layers[0]->s['x'])->cols() != batch_size_) {
-		(layers[0]->s['x'])->resize((layers[0]->s['x'])->rows(), batch_size_);
-		//... and all outputs.
-		for (size_t i = 0; i < layers.size(); i++) {
-			// Change the "value". (depricated)
-			layers[i]->batch_size = batch_size_;
-			// Reshape the inputs...
-			(layers[i]->s['x'])->resize((layers[i]->s['x'])->rows(), batch_size_);
-			// ... and outputs.
-			(layers[i]->g['y'])->resize((layers[i]->s['y'])->rows(), batch_size_);
-		}//: for
-	}
+void MultiLayerNeuralNetwork::resizeBatch(size_t batch_size_) {
+	// If current batch size is ok.
+	if ((size_t)(layers[0]->s['x'])->cols() == batch_size_)
+		return;
+
+	// Else - resize.
+	for (size_t i = 0; i < layers.size(); i++) {
+		layers[i]->resizeBatch(batch_size_);
+	}//: for
 }
 
 

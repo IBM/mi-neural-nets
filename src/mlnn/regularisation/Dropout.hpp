@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_DROPOUT_HPP_
 #define SRC_MLNN_DROPOUT_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -17,12 +17,15 @@ namespace regularisation {
 
 /*!
  * \brief Droput layer - a layer used for the regularization of neural network by randomly dropping neurons during training.
- * \author krocki
+ * \author tkornuta/krocki
  */
 class Dropout : public Layer {
 public:
 
-	Dropout(size_t inputs, size_t outputs, size_t batch_size, float _ratio, std::string name = "Dropout");
+	/*!
+	 * @param ratio_ Keep ratio.
+	 */
+	Dropout(size_t inputs, float ratio_, std::string name = "Dropout");
 
 	virtual ~Dropout() {};
 

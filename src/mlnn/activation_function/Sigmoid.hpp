@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_SIGMOID_HPP_
 #define SRC_MLNN_SIGMOID_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -19,7 +19,7 @@ namespace activation_function {
  */
 class Sigmoid : public mic::mlnn::Layer {
 public:
-	Sigmoid(size_t inputs, size_t outputs, size_t batch_size, std::string name_ = "Sigmoid");
+	Sigmoid(size_t inputs, std::string name_ = "Sigmoid");
 
 	virtual ~Sigmoid() {};
 

@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_ELU_HPP_
 #define SRC_MLNN_ELU_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -22,7 +22,7 @@ namespace activation_function {
 class ELU : public mic::mlnn::Layer {
 public:
 
-	ELU(size_t inputs, size_t outputs, size_t batch_size, std::string name_ = "ELU");
+	ELU(size_t inputs, std::string name_ = "ELU");
 
 	virtual ~ELU() {};
 

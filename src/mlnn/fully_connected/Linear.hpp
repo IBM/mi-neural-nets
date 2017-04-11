@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_LINEAR_HPP_
 #define SRC_MLNN_LINEAR_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -21,25 +21,37 @@ namespace fully_connected {
 class Linear : public mic::mlnn::Layer {
 public:
 	/*!
-	 * Default constructor used for creation of the layer.
+	 * Creates the linear (i.e fully connected) layer.
 	 * @param inputs_ Length of the input vector.
 	 * @param outputs_ Length of the output vector.
-	 * @param batch_size_ Size of the batch.
 	 * @param name_ Name of the layer.
 	 */
-	Linear(size_t inputs_, size_t outputs_, size_t batch_size_, std::string name_ = "Linear");
+	Linear(size_t inputs_, size_t outputs_, std::string name_ = "Linear");
 
+	/*!
+	 * Virtual destructor - empty.
+	 */
 	virtual ~Linear() {};
 
+	/*!
+	 * Forward pass.
+	 * @param test_ It ise set to true in test mode (network verification).
+	 */
 	void forward(bool test_ = false);
 
+	/*!
+	 * Backward pass.
+	 */
 	void backward();
 
 	/*!
-	 * Reset gradients - empty, to be overridden by the inherited classes.
+	 * Resets the gradients - empty, to be overridden by the inherited classes.
 	 */
 	void resetGrads();
 
+	/*!
+	 * Applies the gradient update.
+	 */
 	void applyGrads(double alpha_, double decay_ = 0);
 
 private:

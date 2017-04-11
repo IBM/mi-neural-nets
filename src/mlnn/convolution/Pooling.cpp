@@ -11,14 +11,22 @@ namespace mic {
 namespace mlnn {
 namespace convolution {
 
-Pooling::Pooling(size_t inputs_, size_t window_size_, size_t channels_, size_t batch_size_, std::string name_) :
-	Layer(inputs_, channels_ * (sqrt(inputs_ / channels_) / window_size_) * (sqrt(inputs_ / channels_) / window_size_), batch_size_, LayerTypes::Pooling, name_),
+Pooling::Pooling(size_t inputs_, size_t window_size_, size_t channels_, std::string name_) :
+	Layer(inputs_, channels_ * (sqrt(inputs_ / channels_) / window_size_) * (sqrt(inputs_ / channels_) / window_size_), 1, LayerTypes::Pooling, name_),
 	channels(channels_), window_size(window_size_) {
 
-	// cache = mic::types::MatrixXf::Zero(x.rows(), x.cols());
-	cache = mic::types::MatrixXf::Zero(inputs_size, batch_size);
-
+	// Alloc cache.
+	cache = mic::types::MatrixXf::Zero(inputs_size, 1);
 };
+
+void Pooling::resizeBatch(size_t batch_size_) {
+	// Call base Layer resize.
+	Layer::resizeBatch(batch_size_);
+
+	// Reshape cache.
+	cache.resize(cache.rows(), batch_size_);
+
+}
 
 void Pooling::forward(bool test_) {
 
@@ -173,14 +181,6 @@ void Pooling::unpoolDisjoint2D(mic::types::MatrixXf& dx, mic::types::MatrixXf& c
 
 		}
 	}
-
-}
-
-
-void Pooling::save_to_files(std::string prefix) {
-
-	Layer::save_to_files(prefix);
-	save_matrix_to_file(cache, prefix + "_cache.txt");
 
 }
 

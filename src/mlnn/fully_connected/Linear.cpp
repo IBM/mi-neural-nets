@@ -5,39 +5,38 @@
  * \date Mar 31, 2016
  */
 
-#include <mlnn/fully_connected/Linear.hpp>
+#include <fully_connected/Linear.hpp>
 
 namespace mic {
 namespace mlnn {
 namespace fully_connected {
 
 
-Linear::Linear(size_t inputs_, size_t outputs_, size_t batch_size_, std::string name_) :
-	Layer(inputs_, outputs_, batch_size_, LayerTypes::Linear, name_) {
+Linear::Linear(size_t inputs_, size_t outputs_, std::string name_) :
+	Layer(inputs_, outputs_, 1, LayerTypes::Linear, name_) {
 
-	//W = mic::types::MatrixXf(outputs_, inputs_);
-	p.add (std::make_tuple ( "W", outputs_, inputs_ ));
+	// Create the weights matrix.
+	p.add ("W", outputs_, inputs_);
 
-	//b = (Eigen::VectorXf)Eigen::VectorXf::Zero(outputs_);
-	p.add (std::make_tuple ( "b", outputs_, 1 ));
+	// Create the bias vector.
+	p.add ("b", outputs_, 1);
 
 	// Initialize weights of the W matrix.
 	double range = sqrt(6.0 / double(inputs_ + outputs_));
 
-	//W.rand(-range, range);
 	p['W']->rand(-range, range);
 	p['b']->rand(-range, range);// setZero();
 
 	//mW = (Eigen::MatrixXf)Eigen::MatrixXf::Zero(W.rows(), W.cols());
-	m.add (std::make_tuple ( "W", outputs_, inputs_ ));
+	m.add ("W", outputs_, inputs_);
 
 
 	//mb = mic::types::VectorXf::Zero(b.rows());
-	m.add (std::make_tuple ( "b", outputs_, 1 ));
+	m.add ("b", outputs_, 1);
 
 	// Add W and b gradients.
-	g.add (std::make_tuple ( "W", outputs_, inputs_ ));
-	g.add (std::make_tuple ( "b", outputs_, 1 ));
+	g.add ("W", outputs_, inputs_);
+	g.add ("b", outputs_, 1 );
 
 };
 

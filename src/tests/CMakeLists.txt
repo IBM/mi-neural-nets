@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_TEST_BATCH_TRAINING_MLNN ON CACHE BOOL "Build the application for ttesting batch training of a multi-layer neural network")
 
 if(${BUILD_TEST_BATCH_TRAINING_MLNN})
-	# Create exeutable.
+	# Create executable.
 	ADD_EXECUTABLE(mlnn_batch_training_test mlnn_batch_training_test.cpp)
 	# Link it with shared libraries.
 	target_link_libraries(mlnn_batch_training_test 

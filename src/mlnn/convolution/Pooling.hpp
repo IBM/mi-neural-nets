@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_POOLING_HPP_
 #define SRC_MLNN_POOLING_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -21,9 +21,15 @@ namespace convolution {
 class Pooling : public mic::mlnn::Layer {
 public:
 
-	Pooling(size_t inputs_, size_t window_size_, size_t channels_, size_t batch_size_, std::string name_ = "Pooling");
+	Pooling(size_t inputs_, size_t window_size_, size_t channels_, std::string name_ = "Pooling");
 
 	virtual ~Pooling() {};
+
+	/*!
+	 * Changes the size of the batch - calls base Layer class resize and additionally resizes the cache size.
+	 * @param New size of the batch.
+	 */
+	virtual void resizeBatch(size_t batch_size_);
 
 	void forward(bool test_ = false);
 
@@ -61,9 +67,6 @@ public:
 	 * @param dy
 	 */
 	void unpoolDisjoint2D(mic::types::MatrixXf& dx, mic::types::MatrixXf& cache, mic::types::MatrixXf& dy);
-
-	//this is mainly for debugging - TODO: proper serialization of layers
-	void save_to_files(std::string prefix);
 
 protected:
 

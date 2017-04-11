@@ -12,8 +12,8 @@ namespace mlnn {
 namespace fully_connected {
 
 
-Identity::Identity(size_t inputs, size_t outputs, size_t batch_size, std::string name_) :
-	Layer(inputs, outputs, batch_size, LayerTypes::Identity, name_) {
+Identity::Identity(size_t inputs, size_t batch_size, std::string name_) :
+	Layer(inputs, inputs, batch_size, LayerTypes::Identity, name_) {
 
 }
 

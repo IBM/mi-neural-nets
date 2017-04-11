@@ -1,37 +1,73 @@
 # Include current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Get list of subdirectories.
-FILE(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
-FOREACH(child ${children})
-    IF(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${child})
-        LIST(APPEND mlnn_INCLUDE_DIRS ${child})
-    ENDIF()
-ENDFOREACH()
-
-# Iterate through subdirectories...,
-foreach (dir ${mlnn_INCLUDE_DIRS})
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/${dir})
-    # Get list of headers.
-    FILE(GLOB mlnn_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.hpp)
-    # ... and install headers.
-    install(FILES ${mlnn_HEADERS} DESTINATION include/mlnn/${dir})
-endforeach()
-# And finally install selected headers from the "main" directory.
+# Install Layer headers.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/layer)
 install(FILES
-	MultiLayerNeuralNetwork.hpp
-	Layer.hpp
-  DESTINATION include/mlnn)
+	layer/Layer.hpp
+	layer/LayerTypes.hpp
+	DESTINATION include/mlnn/layer)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/activation_function)
+install(FILES
+	activation_function/ELU.hpp
+	activation_function/ReLU.hpp
+	activation_function/Sigmoid.hpp
+	DESTINATION include/mlnn/activation_function)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/convolution)
+install(FILES
+	convolution/Convolution.hpp
+	convolution/Padding.hpp
+	convolution/Pooling.hpp
+	DESTINATION include/mlnn/convolution)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cost_function)
+install(FILES
+	cost_function/Regression.hpp
+	cost_function/Softmax.hpp
+	DESTINATION include/mlnn/cost_function)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/fully_connected)
+install(FILES
+	fully_connected/Identity.hpp
+	fully_connected/Linear.hpp
+	fully_connected/SparseLinear.hpp
+	DESTINATION include/mlnn/fully_connected)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/regularisation)
+install(FILES
+	regularisation/Dropout.hpp
+	DESTINATION include/mlnn/regularisation)
+
+# Install MLNN headers.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+install(FILES MultiLayerNeuralNetwork.hpp DESTINATION include/mlnn)
 
 
 # Create MLNN shared library using all cpp files.
 FILE(GLOB mlnn_SRC 
+	MultiLayerNeuralNetwork.hpp
 	MultiLayerNeuralNetwork.cpp
-	Layer.cpp
+	layer/Layer.hpp
+	layer/Layer.cpp
+	layer/LayerTypes.hpp
+	activation_function/ELU.hpp
+	activation_function/ReLU.hpp
+	activation_function/Sigmoid.hpp
 	activation_function/*.cpp
+	convolution/Convolution.hpp
+	convolution/Padding.hpp
+	convolution/Pooling.hpp
 	convolution/*.cpp
+	cost_function/Regression.hpp
+	cost_function/Softmax.hpp
 	cost_function/*.cpp
+	fully_connected/Identity.hpp
+	fully_connected/Linear.hpp
+	fully_connected/SparseLinear.hpp
 	fully_connected/*.cpp
+	regularisation/Dropout.hpp
 	regularisation/*.cpp)
 	
 add_library(mlnn SHARED
@@ -62,6 +98,7 @@ if(GTEST_FOUND AND BUILD_UNIT_TESTS)
 	add_executable(mlnnTestsRunner MultiLayerNeuralNetworkTests.cpp)
 	target_link_libraries(mlnnTestsRunner
 		logger
+		types
 		mlnn
 		${Boost_LIBRARIES}
 		${GTEST_LIBRARIES})

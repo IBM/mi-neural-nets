@@ -30,18 +30,20 @@ public:
 		nn("simple_linear_network")
 	{
 		// Add
-		nn.pushLayer(new mic::mlnn::Linear(10, 20, 1, "First Linear"));
-		nn.pushLayer(new mic::mlnn::ReLU(20, 20, 1, "ReLU"));
-		nn.pushLayer(new mic::mlnn::Linear(20, 4, 1, "Second Linear"));
-		nn.pushLayer(new mic::mlnn::ReLU(4, 4, 1, "ReLU"));
-		nn.pushLayer(new mic::mlnn::Regression(4, 4, 1, "Final Regression"));
+		nn.pushLayer(new mic::mlnn::Linear(10, 20, "First Linear"));
+		nn.pushLayer(new mic::mlnn::ReLU(20, "First ReLU"));
+		nn.pushLayer(new mic::mlnn::Linear(20, 4, "Second Linear"));
+		nn.pushLayer(new mic::mlnn::ReLU(4, "Second ReLU"));
+		nn.pushLayer(new mic::mlnn::Regression(4, "Final Regression"));
 
 	}
 
 protected:
 	virtual void SetUp() {
-		// Only goal: reset the gradients.
+		// Reset the gradients.
 		nn.resetGrads();
+		// Set batch size to 1.
+		nn.resizeBatch(1);
 	}
 
 private:

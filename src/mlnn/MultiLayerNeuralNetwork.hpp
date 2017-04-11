@@ -9,7 +9,7 @@
 #define SRC_MLNN_MULTILAYERNEURALNETWORK_HPP_
 
 #include <types/MatrixTypes.hpp>
-#include <mlnn/LayerTypes.hpp>
+#include "mlnn/layer/LayerTypes.hpp"
 
 #include <fstream>
 // Include headers that implement a archive in simple text format
@@ -147,7 +147,7 @@ public:
 	 * Changes the size of the batch.
 	 * @param New size of the batch.
 	 */
-	void setBatchSize(size_t batch_size_);
+	void resizeBatch(size_t batch_size_);
 
 	/*!
 	 * Calculates the loss function according to the selected function type.

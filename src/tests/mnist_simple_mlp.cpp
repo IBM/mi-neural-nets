@@ -58,12 +58,13 @@ int main() {
 	// Create a simple NN for classification (should give around 95.3% accuracy)
 	//MNIST - 28x28 -> 256 -> 100 -> 10
 	MultiLayerNeuralNetwork nn;
-	nn.pushLayer(new Linear(28 * 28, 256, batch_size));
-	nn.pushLayer(new ReLU(256, 256, batch_size));
-	nn.pushLayer(new Linear(256, 100, batch_size));
-	nn.pushLayer(new ReLU(100, 100, batch_size));
-	nn.pushLayer(new Linear(100, 10, batch_size));
-	nn.pushLayer(new Softmax(10, 10, batch_size));
+	nn.pushLayer(new Linear(28 * 28, 256));
+	nn.pushLayer(new ReLU(256));
+	nn.pushLayer(new Linear(256, 100));
+	nn.pushLayer(new ReLU(100));
+	nn.pushLayer(new Linear(100, 10));
+	nn.pushLayer(new ReLU(10));
+	nn.pushLayer(new Softmax(10));
 
 
 	// LOG(LSTATUS) << "Before training..." << std::endl;

@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_RELU_HPP_
 #define SRC_MLNN_RELU_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -20,7 +20,7 @@ namespace activation_function {
 class ReLU : public mic::mlnn::Layer {
 public:
 
-	ReLU(size_t inputs, size_t outputs, size_t batch_size, std::string name_ = "ReLU");
+	ReLU(size_t inputs, std::string name_ = "ReLU");
 
 	virtual ~ReLU() {};
 

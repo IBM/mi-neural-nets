@@ -8,7 +8,7 @@
 #ifndef SRC_MLNN_REGRESSION_HPP_
 #define SRC_MLNN_REGRESSION_HPP_
 
-#include <mlnn/Layer.hpp>
+#include <mlnn/layer/Layer.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -22,7 +22,7 @@ namespace cost_function {
 class Regression : public mic::mlnn::Layer {
 public:
 
-	Regression(size_t inputs_, size_t outputs_, size_t batch_size_, std::string name_ = "Regression");
+	Regression(size_t inputs_, std::string name_ = "Regression");
 
 	~Regression() {};
 
