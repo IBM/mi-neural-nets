@@ -19,27 +19,38 @@ namespace fully_connected {
  * \brief Identity layer - passes inputs/gradients without any modifications.
  * Implemented for testing purposes.
  * \author krocki
+ * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
-class Identity : public mic::mlnn::Layer {
+template <typename eT=float>
+class Identity : public mic::mlnn::Layer <eT> {
 public:
 
-	Identity(size_t inputs, size_t batch_size = 1, std::string name_ = "Identity");
+	Identity<eT>(size_t inputs, size_t batch_size = 1, std::string name_ = "Identity") :
+		Layer<eT>(inputs, inputs, batch_size, LayerTypes::Identity, name_) {
+
+	}
 
 	virtual ~Identity() {};
 
-	void forward(bool test = false);
+	void forward(bool test = false) {
+		// y = x;
+		(*s['y']) = (*s['x']);
+	}
 
-	void backward();
+	void backward() {
+		// dx = dy;
+		(*g['x']) = (*g['y']);
+	}
 
 private:
 
 	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
+	//friend class mic::mlnn::MultiLayerNeuralNetwork<eT>;
 
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */
-	Identity() : Layer () { }
+	Identity<eT>() : Layer<eT> () { }
 
 };
 

@@ -30,11 +30,11 @@ public:
 		nn("simple_linear_network")
 	{
 		// Add
-		nn.pushLayer(new mic::mlnn::Linear(10, 20, "First Linear"));
-		nn.pushLayer(new mic::mlnn::ReLU(20, "First ReLU"));
-		nn.pushLayer(new mic::mlnn::Linear(20, 4, "Second Linear"));
-		nn.pushLayer(new mic::mlnn::ReLU(4, "Second ReLU"));
-		nn.pushLayer(new mic::mlnn::Regression(4, "Final Regression"));
+		nn.pushLayer(new mic::mlnn::fully_connected::Linear<double>(10, 20, "First Linear"));
+		nn.pushLayer(new mic::mlnn::activation_function::ReLU<double>(20, "First ReLU"));
+		nn.pushLayer(new mic::mlnn::fully_connected::Linear<double>(20, 4, "Second Linear"));
+		nn.pushLayer(new mic::mlnn::activation_function::ReLU<double>(4, "Second ReLU"));
+		nn.pushLayer(new mic::mlnn::cost_function::Regression<double>(4, "Final Regression"));
 
 	}
 
@@ -48,7 +48,7 @@ protected:
 
 private:
 	// Neural network.
-	mic::mlnn::MultiLayerNeuralNetwork nn;
+	mic::mlnn::MultiLayerNeuralNetwork<double> nn;
 };
 
 

@@ -18,27 +18,42 @@ namespace cost_function {
 /*!
  * \brief Regression layer
  * \author tkornuta
+ * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
-class Regression : public mic::mlnn::Layer {
+template <typename eT=float>
+class Regression : public mic::mlnn::Layer<eT> {
 public:
 
-	Regression(size_t inputs_, std::string name_ = "Regression");
+	Regression<eT>(size_t inputs_, std::string name_ = "Regression") :
+		Layer<eT>(inputs_, inputs_, 1, LayerTypes::Regression, name_) {
 
-	~Regression() {};
+	}
 
-	void forward(bool test_ = false);
+	virtual ~Regression() {};
 
-	void backward();
+	void forward(bool test_ = false) {
+		// Pass inputs to outputs.
+		(*s['y']) = (*s['x']);
+	}
+
+	void backward() {
+		// dx = 2*(dy - y);
+		(*g['x']) = 2 *((*g['y']) - (*s['y']));
+	}
+
+protected:
+	// Unhiding the template inherited fields via "using" statement.
+    using Layer<eT>::g;
+    using Layer<eT>::s;
 
 private:
-
 	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
+	//friend class mic::mlnn::MultiLayerNeuralNetwork<eT>;
 
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */
-	Regression() : Layer () { }
+	Regression<eT>() : Layer<eT> () { }
 
 };
 

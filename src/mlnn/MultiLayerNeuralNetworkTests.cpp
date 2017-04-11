@@ -19,14 +19,14 @@ TEST_F(Simple2LayerRegressionNN, Dimensions) {
 	// Number of layers.
 	ASSERT_EQ(nn.layers.size(), 5);
 	// First fully connected dimensions.
-	ASSERT_EQ(nn.layers[0]->inputsSize(), 10);
+	ASSERT_EQ(nn.layers[0]->inputSize(), 10);
 	ASSERT_EQ(nn.layers[0]->batchSize(), 1);
-	ASSERT_EQ(nn.layers[0]->outputsSize(), 20);
+	ASSERT_EQ(nn.layers[0]->outputSize(), 20);
 
 	// Second fully connected dimensions.
-	ASSERT_EQ(nn.layers[2]->inputsSize(), 20);
+	ASSERT_EQ(nn.layers[2]->inputSize(), 20);
 	ASSERT_EQ(nn.layers[2]->batchSize(), 1);
-	ASSERT_EQ(nn.layers[2]->outputsSize(), 4);
+	ASSERT_EQ(nn.layers[2]->outputSize(), 4);
 
 }
 
@@ -60,7 +60,7 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 
 
 	// Load network from file.
-	mic::mlnn::MultiLayerNeuralNetwork restored_nn("simple_linear_network_loaded");
+	mic::mlnn::MultiLayerNeuralNetwork<double> restored_nn("simple_linear_network_loaded");
 	restored_nn.load(fileName);
 	//std::cout << "Restored network: \n" << restored_nn;
 
@@ -71,8 +71,8 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 	for (size_t i=0; i< nn.layers.size(); i++) {
 		// Compare sizes and types.
 		ASSERT_EQ(nn.layers[i]->batchSize(), restored_nn.layers[i]->batchSize());
-		ASSERT_EQ(nn.layers[i]->inputsSize(), restored_nn.layers[i]->inputsSize());
-		ASSERT_EQ(nn.layers[i]->outputsSize(), restored_nn.layers[i]->outputsSize());
+		ASSERT_EQ(nn.layers[i]->inputSize(), restored_nn.layers[i]->inputSize());
+		ASSERT_EQ(nn.layers[i]->outputSize(), restored_nn.layers[i]->outputSize());
 		ASSERT_EQ(nn.layers[i]->layer_type, restored_nn.layers[i]->layer_type);
 	}//: for
 

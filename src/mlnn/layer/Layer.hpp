@@ -1,6 +1,6 @@
 /*!
  * \file Layer.hpp
- * \brief 
+ * \brief Contains a template class representing a layer.
  * \author tkornut
  * \date Mar 31, 2016
  */
@@ -52,42 +52,56 @@ enum class LayerTypes : short
 	SparseLinear
 };
 
-
-/*class Linear;
-class Pooling;
-class Convolution;
-class Sigmoid;
-class Identity;
-class ReLU;
-class ELU;
-class Softmax;
-class Dropout;
-class Padding;
-class Regression;*/
-
-
 // Forward declaration of MultiLayerNeuralNetwork
-class MultiLayerNeuralNetwork;
+//class MultiLayerNeuralNetwork;
 
-inline float sqrt_eps(const float x) {
-	return sqrtf(x + 1e-6);
+template <typename eT=float>
+inline eT sqrt_eps(const eT x) {
+	return sqrt(x + 1e-6);
 }
 
 /*!
- * abstract
- * \author krocki/tkornuta
+ * Template base (abstract) class representing a layer.
+ * \author tkornuta/krocki
+ * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
+template <typename eT=float>
 class Layer {
 public:
 	/*!
 	 * Default constructor of the layer parent class. Sets the input-output dimensions, layer type and name.
-	 * @param inputs_size_ Size of the input vector.
-	 * @param outputs_size_ Size of the output vector.
+	 * @param input_size_ Size of the input vector.
+	 * @param output_size_ Size of the output vector.
 	 * @param batch_size_ Size of the batch.
 	 * @param layer_type_ Type of the layer.
 	 * @param name_ Name of the layer.
 	 */
-	Layer(size_t inputs_size_, size_t outputs_size_, size_t batch_size_, LayerTypes layer_type_, std::string name_ = "layer");
+	Layer(size_t input_size_, size_t output_size_, size_t batch_size_, LayerTypes layer_type_, std::string name_ = "layer") :
+			input_size(input_size_),
+			output_size(output_size_),
+			batch_size(batch_size_),
+			layer_type(layer_type_),
+			layer_name(name_),
+			s("state"),
+			g("gradients"),
+			p("parameters"),
+			m("memory")
+
+	{
+		// State.
+		s.add ( "x", input_size, batch_size ); 	// inputs
+		s.add ( "y", output_size, batch_size); 	// outputs
+
+		// Gradients.
+		g.add ( "x", input_size, batch_size ); 	// inputs
+		g.add ( "y", output_size, batch_size); 	// outputs
+
+	};
+
+	/*!
+	 * Virtual destructor - required for the correct destruction of objects of derived classes.
+	 */
+	virtual ~Layer() {};
 
 	/*!
 	 * Abstract method responsible for processing the data from the inputs to outputs. To be overridden in the derived classes.
@@ -96,38 +110,73 @@ public:
 	virtual void forward(bool test = false) = 0;
 
 	/*!
+	 * Forwards the activations of the neural network.
+	 */
+	mic::types::MatrixPtr<eT> forward(mic::types::MatrixPtr<eT> x_, bool test = false) {
+		// Copy "input" sample/batch.
+		(*s["x"]) = (*x_);
+
+		// Call the (abstract, implemented by a given layer) forward pass.
+		forward();
+
+		// Return "output".
+		return s["y"];
+	}
+
+	/*!
 	 * Abstract method responsible for processing the gradients from outputs to inputs (i.e. in the opposite direction). To be overridden in the derived classes.
 	 */
 	virtual void backward() = 0;
 
+	/*!
+	 * Backward pass - backpropagation.
+	 */
+	mic::types::MatrixPtr<eT> backward(mic::types::MatrixPtr<eT> dy_) {
+		// Copy "output" sample/batch gradient.
+		(*g["y"]) = (*dy_);
 
+		// Call the (abstract, implemented by a given layer) backward pass.
+		backward();
+
+		// Return "input" gradient.
+		return g["x"];
+	}
 	/*!
 	 * Changes the size of the batch. By default it resizes
 	 * @param New size of the batch.
 	 */
-	virtual void resizeBatch(size_t batch_size_);
+	virtual void resizeBatch(size_t batch_size_) {
+		// Change the "value". (depricated)
+		batch_size = batch_size_;
+		// Reshape the inputs...
+		s['x']->resize(s['x']->rows(), batch_size_);
+		g['x']->resize(g['x']->rows(), batch_size_);
+		// ... and outputs.
+		s['y']->resize(s['y']->rows(), batch_size_);
+		g['y']->resize(g['y']->rows(), batch_size_);
+	}
 
 	/*!
 	 * Reset gradients.
 	 */
 	virtual void resetGrads() {};
 
-
 	virtual void applyGrads(double alpha_, double decay_) {};
 
-	/*!
-	 * Virtual destructor - required for the correct destruction of objects of derived classes.
-	 */
-	virtual ~Layer() {};
-
 	/// Returns size (length) of inputs.
-	size_t inputsSize();
+	size_t inputSize() {
+		return input_size;
+	}
 
 	/// Returns size (length) of outputs.
-	size_t outputsSize();
+	size_t outputSize() {
+		return output_size;
+	}
 
 	/// Returns size (length) of (mini)batch.
-	size_t batchSize();
+	size_t batchSize() {
+		return batch_size;
+	}
 
 	/// Returns name of the layer.
 	const std::string name() const {
@@ -135,10 +184,24 @@ public:
 	}
 
 	/*!
-	 * Returns the pointer to a parameter (matrix of floats) (or throws an exception!)
+	 * Returns the pointer to a parameter (matrix) (or throws an exception!)
 	 */
-	mic::types::MatrixXfPtr getParam(std::string name_) {
+	mic::types::MatrixPtr<eT> getParam(std::string name_) {
 		return p[name_];
+	}
+
+	/*!
+	 * Returns the pointer to state (matrix) (or throws an exception!)
+	 */
+	mic::types::MatrixPtr<eT> getState(std::string name_) {
+		return s[name_];
+	}
+
+	/*!
+	 * Returns the pointer to state (matrix) (or throws an exception!)
+	 */
+	void setState(std::string name_, mic::types::MatrixPtr<eT> mat_ptr_) {
+		(*s[name_]) = (*mat_ptr_);
 	}
 
 	/*!
@@ -180,7 +243,7 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& os_, Layer& obj_) {
 		// Display dimensions.
-		os_ << "  [" << obj_.type() << "]: " << obj_.layer_name << ": " << obj_.inputs_size << "x" << obj_.batch_size << " -> " << obj_.outputs_size << "x" << obj_.batch_size << "\n";
+		os_ << "  [" << obj_.type() << "]: " << obj_.layer_name << ": " << obj_.input_size << "x" << obj_.batch_size << " -> " << obj_.output_size << "x" << obj_.batch_size << "\n";
 		// Display inputs.
 		os_ << "    [" << obj_.s.name() << "]:\n";
 		for (auto& i: obj_.s.keys()) {
@@ -219,10 +282,10 @@ public:
 protected:
 
 	/// Size (length) of inputs.
-	size_t inputs_size;
+	size_t input_size;
 
 	/// Size (length) of outputs.
-	size_t outputs_size;
+	size_t output_size;
 
 	/// Size (length) of (mini)batch.
 	size_t batch_size;
@@ -235,19 +298,19 @@ protected:
 
 
 	/// States - contains input [x] and output [y] matrices.
-	mic::types::MatrixArray<float> s;
+	mic::types::MatrixArray<eT> s;
 
 	/// Gradients - contains input [x] and output [y] matrices.
-	mic::types::MatrixArray<float> g;
+	mic::types::MatrixArray<eT> g;
 
 	/// Parameters - parameters of the layer, to be used by the derived classes.
-	mic::types::MatrixArray<float> p;
+	mic::types::MatrixArray<eT> p;
 
 	/// Memory - a list of temporal parameters, to be used by the derived classes.
-	mic::types::MatrixArray<float> m;
+	mic::types::MatrixArray<eT> m;
 
 	// Adds the nn class the access to protected fields of class layer.
-	friend class MultiLayerNeuralNetwork;
+	//friend class MultiLayerNeuralNetwork<eT>;
 
 	/*!
 	 * Protected constructor, used only by the derived classes during the serialization. Empty!!
@@ -267,8 +330,8 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
         // Archive parameters.
-        ar & inputs_size;
-        ar & outputs_size;
+        ar & input_size;
+        ar & output_size;
         ar & batch_size;
         ar & layer_type;
         ar & layer_name;
@@ -285,5 +348,14 @@ private:
 
 } /* namespace mlnn */
 } /* namespace mic */
+
+
+// Just in the case that something important will change in the Layer class - set version.
+BOOST_CLASS_VERSION(mic::mlnn::Layer<bool>, 2)
+BOOST_CLASS_VERSION(mic::mlnn::Layer<short>, 2)
+BOOST_CLASS_VERSION(mic::mlnn::Layer<int>, 2)
+BOOST_CLASS_VERSION(mic::mlnn::Layer<long>, 2)
+BOOST_CLASS_VERSION(mic::mlnn::Layer<float>, 2)
+BOOST_CLASS_VERSION(mic::mlnn::Layer<double>, 2)
 
 #endif /* SRC_MLNN_LAYER_HPP_ */

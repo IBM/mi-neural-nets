@@ -15,27 +15,54 @@ namespace mlnn {
 namespace activation_function {
 
 /*!
- * \author krocki
+ * \author tkornuta/krocki
+ * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
-class Sigmoid : public mic::mlnn::Layer {
+template <typename eT=float>
+class Sigmoid : public mic::mlnn::Layer<eT> {
 public:
-	Sigmoid(size_t inputs, std::string name_ = "Sigmoid");
+	Sigmoid<eT>(size_t inputs, std::string name_ = "Sigmoid") :
+		Layer<eT>(inputs, inputs, 1, LayerTypes::Sigmoid, name_) {
+
+	};
 
 	virtual ~Sigmoid() {};
 
-	void forward(bool test = false);
+	void forward(bool test = false) {
+		// Access the data of both matrices.
+		eT* x = s['x']->data();
+		eT* y = s['y']->data();
 
-	void backward();
+		for (size_t i = 0; i < s['x']->rows() * s['x']->cols(); i++) {
+			y[i] = 1.0f / (1.0f +::exp(-x[i])); //: float -> expf
+		}//: for
+	}
+
+	void backward() {
+		// Access the data of matrices.
+		eT* gx = g['x']->data();
+		eT* gy = g['y']->data();
+		eT* y = s['y']->data();
+
+		for (size_t i = 0; i < g['x']->rows() * g['x']->cols(); i++) {
+			// Calculate the gradient.
+			gx[i] = gy[i] * y[i] * (1.0 - y[i]);
+		}//: for
+	}
+
+protected:
+	// Unhiding the template inherited fields via "using" statement.
+    using Layer<eT>::g;
+    using Layer<eT>::s;
 
 private:
-
 	// Adds the nn class the access to protected fields of class layer.
 	friend class mic::mlnn::MultiLayerNeuralNetwork;
 
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */
-	Sigmoid() : Layer () { }
+	Sigmoid<eT>() : Layer<eT> () { }
 
 
 };
