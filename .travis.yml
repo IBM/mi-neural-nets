@@ -12,9 +12,9 @@ branches:
 # Environment variables
 env:
   global:
-    - GH_REPO_NAME: cal-c
-    - DOXYFILE: $TRAVIS_BUILD_DIR/cal-c.doxyfile
-    - GH_REPO_REF: github.ibm.com:CAL/cal-c.git
+    - GH_REPO_NAME: mi-neural-nets
+    - DOXYFILE: $TRAVIS_BUILD_DIR/mi-neural-nets.doxyfile
+    - GH_REPO_REF: github.ibm.com:tkornut/mi-neural-nets.git
   matrix:
    # Workaround for https://github.com/travis-ci/travis-ci/issues/4681
    - TRAVIS_4681_WORKAROUND=1
@@ -37,9 +37,9 @@ matrix:
             # - ubuntu-toolchain-r-test
             - sourceline: 'ppa:ubuntu-toolchain-r/test'
             # Add PPA ppa:kzemek/boost to system's Software Sources - boost 1.58
-            - sourceline: 'deb http://ppa.launchpad.net/kzemek/boost/ubuntu trusty main'
+            # - sourceline: 'deb http://ppa.launchpad.net/kzemek/boost/ubuntu trusty main'
           packages:
-            - libboost1.58-all-dev
+            - libboost-all-dev
             - libeigen3-dev
             - libarmadillo-dev
             - libhdf5-dev
@@ -58,40 +58,6 @@ matrix:
       - cd $TRAVIS_BUILD_DIR
       - chmod +x generateDocumentationAndDeploy.sh
       - ./generateDocumentationAndDeploy.sh
-
-#   # 2. OS X 10.11 clang++ - doesn't work - cannot switch to OSX!
-#    - os: osx
-#      osx_image: xcode8.0
-#      compiler: clang
-#      env:
-#        - OS=OSX-10.11
-#        - COMPILER=clang++
-#      addons:
-#        apt:
-#          packages: ['libboost-all-dev', 'libeigen3-dev', 'freeglut3-dev', 'libxmu-dev', 'libxi-dev']
-
-   # 3. Ubuntu 14.04 clang++
-    - os: linux
-      dist: trusty
-      compiler: clang
-      env:
-        - OS=Ubuntu-14.04
-        - COMPILER=clang++
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5']
-          packages: ['libboost-all-dev', 'libeigen3-dev', 'libarmadillo-dev', 'libhdf5-dev']
-
-
-#   # 4. Ubuntu 14.04 clang-3.8 - doesn't work - not supporting openMP
-#    - os: linux
-#      compiler: clang++
-#      addons:
-#        apt:
-#          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8']
-#          packages: ['clang-3.8', 'libboost-all-dev', 'libeigen3-dev', 'freeglut3-dev', 'libxmu-dev', 'libxi-dev']
-#      env: COMPILER=clang++-3.8
-
 
 # Configure cmake and prepare installation dir.
 before_script:
