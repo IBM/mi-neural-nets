@@ -115,8 +115,8 @@ public:
 
 	/*!
 	 * Performs the network training by update all layers parameters according to gradients computed by backprob.
-	 * @param alpha
-	 * @param decay
+	 * @param alpha Learning rate
+	 * @param decay Weight decay - factor for
 	 */
 	void update(float alpha, float decay);
 

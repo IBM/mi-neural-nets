@@ -1,6 +1,6 @@
 /*!
- * \file mlnn_batch_training_test.cpp
- * \brief Contains program for testing batch training of a multi-layer neural network.
+ * \file mlnn_sample_training_test.cpp
+ * \brief Contains program for testing of training of a multi-layer neural network.
  * \author tkornut
  * \date Feb 17, 2016
  */
@@ -13,10 +13,8 @@ using namespace mic::logger;
 
 #include <mlnn/MultiLayerNeuralNetwork.hpp>
 
-#include <encoders/MatrixXfMatrixXfEncoder.hpp>
-#include <encoders/UIntMatrixXfEncoder.hpp>
-
 #include <types/Batch.hpp>
+
 
 
 // Using multi-layer neural networks
@@ -39,7 +37,7 @@ int main() {
 	Batch<MatrixXf, MatrixXf> dataset;
 	for(size_t i=0; i< dataset_size; i++) {
 		// Generate "pose".
-		MatrixXfPtr pose (new MatrixXf(10, 1));
+		MatrixXfPtr pose (new MatrixXf(dataset_size, 1));
 		pose->setZero();
 		(*pose)(i,0)=1;
 		dataset.data().push_back(pose);
@@ -53,31 +51,20 @@ int main() {
 		// Add index.
 		dataset.indices().push_back(i);
 	}//: for
-	dataset.setBatchSize(5);
-
-	// Initialize the encoders.
-	mic::encoders::MatrixXfMatrixXfEncoder data_encoder(dataset_size, 1);
-	mic::encoders::MatrixXfMatrixXfEncoder label_encoder(4, 1);
 
 	// Training.
 	size_t iteration = 0;
 	while (iteration < 100000) {
-		Batch <MatrixXf, MatrixXf> batch = dataset.getRandomBatch();
+		Sample <MatrixXf, MatrixXf> sample = dataset.getRandomSample();
 		//std::cout << "[" << iteration++ << "]: sample (" << sample.index() << "): "<< sample.data()->transpose() << "->" << sample.label()->transpose() << std::endl;
 
-		MatrixXfPtr encoded_batch, encoded_targets;
-		encoded_batch  = data_encoder.encodeBatch(batch.data());
-		encoded_targets  = label_encoder.encodeBatch(batch.labels());
+		float loss = nn.train(sample.data(), sample.label(), 0.005, 0.0);
 
-		// Train network with batch.
-		float loss = nn.train (encoded_batch, encoded_targets, 0.005, 0.0);
-
+		// Compare results
+		MatrixXf predictions = (*nn.getPredictions());
 		if (iteration % 1000 == 0){
 			std::cout<<"[" << iteration << "]: Loss        : " << loss << std::endl;
 		}
-
-		// Compare results
-		// MatrixXf predictions = (*nn.getPredictions());
 		//std::cout<<"Targets     : " << sample.label()->transpose() << std::endl;
 		//std::cout<<"Predictions : " << predictions.transpose() << std::endl << std::endl;
 		iteration++;

@@ -1,8 +1,6 @@
 /*
-* @Author: kmrocki
+* @Author: kmrocki/tkornuta
 * @Date:   2016-02-24 09:43:05
-* @Last Modified by:   kmrocki
-* @Last Modified time: 2016-02-24 15:30:27
 */
 
 #include <logger/Log.hpp>
@@ -65,10 +63,6 @@ int main() {
 	nn.pushLayer(new Linear(100, 10));
 	nn.pushLayer(new ReLU(10));
 	nn.pushLayer(new Softmax(10));
-
-
-	// LOG(LSTATUS) << "Before training..." << std::endl;
-	// nn.test(test_data);
 
 	LOG(LSTATUS) << "Starting the training of neural network...";
 	double 	learning_rate = 0.005;

@@ -85,19 +85,9 @@ void MultiLayerNeuralNetwork::backward(mic::types::MatrixXf& targets_) {
 
 	// Back-propagate the error.
 	for (int i = layers.size() - 1; i >= 0; i--) {
-
 		layers[i]->resetGrads();
 		layers[i]->backward();
-
-		//dy(previous layer) = dx(current layer)
-/*		if (i > 0) {
-
-//			layers[i - 1]->dy = layers[i]->dx;
-			(*(layers[i - 1]->g['y'])) = (*(layers[i]->g['x']));
-
-		}*/
-
-	}
+	}//: for
 
 }
 
@@ -105,10 +95,8 @@ void MultiLayerNeuralNetwork::update(float alpha, float decay) {
 
 	// update all layers according to gradients
 	for (size_t i = 0; i < layers.size(); i++) {
-
 		layers[i]->applyGrads(alpha, decay);
-
-	}
+	}//: for
 
 }
 
@@ -176,11 +164,11 @@ float MultiLayerNeuralNetwork::calculateLossFunction(mic::types::MatrixXfPtr enc
 	switch (loss_type) {
 		case LossFunctionType::RegressionQuadratic:
 			diff = (Eigen::MatrixXf)((*encoded_predictions_) - (*encoded_targets_));
-			return (diff * diff.transpose()).sum();
+			return (diff * diff.transpose()).sum()/encoded_targets_->cols();
 			break;
 		case LossFunctionType::ClassificationEntropy:
-			return encoded_predictions_->calculateCrossEntropy(*encoded_targets_);
-			 break;
+			return encoded_predictions_->calculateCrossEntropy(*encoded_targets_)/encoded_targets_->cols();
+			break;
 		case LossFunctionType::Undefined:
 		default:
 			LOG(LERROR)<<"Loss function not set! Possible reason: the network lacks the regression/classification layer. This may cause problems with the convergence during learning!";
