@@ -37,8 +37,11 @@ public:
 	void forward(bool test_ = false) {
 		// Calculate the e matrix.
 		mic::types::MatrixPtr<eT> e = m["e"];
-		(*e) = ((*s['x']).unaryExpr(std::ptr_fun(::exp)));
+		//(*e) = ((*s['x']).unaryExpr(std::ptr_fun<eT>(std::exp)));
+		for (size_t i = 0; i < (size_t)e->size(); i++)
+			(*e)[i] = std::exp((*s['x'])[i]);
 
+		// Colwise sum - sum the values in columns, one by one.
 		mic::types::MatrixPtr<eT> sum = m["sum"];
 		(*sum) = e->colwise().sum();
 
@@ -49,8 +52,8 @@ public:
 		for (size_t i = 0; i < (size_t)e->rows(); i++) {
 			for (size_t j = 0; j < (size_t)e->cols(); j++) {
 				(*y)(i, j) = (*e)(i, j) / (*sum)(j);
-			}
-		}
+			}//: for
+		}//: for
 
 	}
 

@@ -40,8 +40,9 @@ using namespace regularisation;
  * \brief Class representing a multi-layer neural network.
  * \author tkornuta/kmrocki
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
+ * \tparam LossFunction Template parameter denoting the loss function type (e.g. mic::neural_nets::loss::CrossEntropyLoss<eT>).
  */
-template <typename eT=float, typename LossFunction=mic::neural_nets::loss::CrossEntropyLoss<float> >
+template <typename eT, typename LossFunction >
 class MultiLayerNeuralNetwork {
 public:
 
@@ -423,7 +424,6 @@ private:
     void save(Archive & ar, const unsigned int version) const {
     	// Serialize name.
         ar & name;
-		//ar & loss_type;
 
 		// Serialize number of layers.
         size_t size = layers.size();
@@ -451,11 +451,10 @@ private:
     	layers.clear();
     	connected = false;
 
-    	// Deserialize name and loss function type.
+    	// Deserialize name.
 		ar & name;
-		//ar & loss;
 
-		// Deserialize number of layers.
+		// Deserialize the number of layers.
 		size_t size;
 		ar & size;
 
@@ -536,29 +535,6 @@ private:
      BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 };
-
-
-/*!
- * Adds layer to neural network - template method specialization for the Regression layer - sets the adequate loss function.
- * @param layer_ptr_ Pointer to the newly created layer.
- * @tparam layer_ptr_ Pointer to the newly created layer.
- */
-/*template <>
-void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Regression<float> >( mic::mlnn::cost_function::Regression<float>* layer_ptr_){
-	layers.push_back(std::shared_ptr <mic::mlnn::cost_function::Regression<float> > (layer_ptr_));
-	loss_type = LossFunctionType::RegressionQuadratic;
-}*/
-
-/*!
- * Adds layer to neural network - template method specialization for the Softmax layer - sets the adequate loss function.
- * @param layer_ptr_ Pointer to the newly created layer.
- * @tparam layer_ptr_ Pointer to the newly created layer.
- */
-/*template <>
-void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Softmax<float> >( mic::mlnn::cost_function::Softmax<float>* layer_ptr_){
-	layers.push_back(std::shared_ptr <mic::mlnn::cost_function::Softmax<float> > (layer_ptr_));
-	loss_type = LossFunctionType::ClassificationEntropy;
-}*/
 
 
 } /* namespace mlnn */

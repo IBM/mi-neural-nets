@@ -18,7 +18,7 @@ namespace fully_connected {
 /*!
  * \brief Identity layer - passes inputs/gradients without any modifications.
  * Implemented for testing purposes.
- * \author krocki
+ * \author krocki/tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
@@ -33,12 +33,10 @@ public:
 	virtual ~Identity() {};
 
 	void forward(bool test = false) {
-		// y = x;
 		(*s['y']) = (*s['x']);
 	}
 
 	void backward() {
-		// dx = dy;
 		(*g['x']) = (*g['y']);
 	}
 

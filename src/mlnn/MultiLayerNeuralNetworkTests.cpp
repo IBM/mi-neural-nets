@@ -60,7 +60,7 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 
 
 	// Load network from file.
-	mic::mlnn::MultiLayerNeuralNetwork<double> restored_nn("simple_linear_network_loaded");
+	mic::mlnn::MultiLayerNeuralNetwork<double, mic::neural_nets::loss::RegressionLoss<double> > restored_nn("simple_linear_network_loaded");
 	restored_nn.load(fileName);
 	//std::cout << "Restored network: \n" << restored_nn;
 

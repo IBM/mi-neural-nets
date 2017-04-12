@@ -55,14 +55,14 @@ int main() {
 
 	// Create a simple NN for classification (should give around 95.3% accuracy)
 	//MNIST - 28x28 -> 256 -> 100 -> 10
-	MultiLayerNeuralNetwork<float> nn("3layerReLUSofmax", mic::neural_nets::loss::CrossEntropyLoss<float>);
-	nn.pushLayer(new Linear(28 * 28, 256));
-	nn.pushLayer(new ReLU(256));
-	nn.pushLayer(new Linear(256, 100));
-	nn.pushLayer(new ReLU(100));
-	nn.pushLayer(new Linear(100, 10));
-	nn.pushLayer(new ReLU(10));
-	nn.pushLayer(new Softmax(10));
+	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::CrossEntropyLoss<float> > nn("3layerReLUSofmax");
+	nn.pushLayer(new Linear<float>(28 * 28, 256));
+	nn.pushLayer(new ReLU<float>(256));
+	nn.pushLayer(new Linear<float>(256, 100));
+	nn.pushLayer(new ReLU<float>(100));
+	nn.pushLayer(new Linear<float>(100, 10));
+	nn.pushLayer(new ReLU<float>(10));
+	nn.pushLayer(new Softmax<float>(10));
 
 	LOG(LSTATUS) << "Starting the training of neural network...";
 	double 	learning_rate = 0.005;
@@ -98,11 +98,11 @@ int main() {
 
 		// Test network response.
 		// Skip dropout layers at test time
-		nn.forward(*encoded_batch, true);
+		nn.forward(encoded_batch, true);
 		// Get predictions.
 		mic::types::MatrixXfPtr encoded_predictions = nn.getPredictions();
 		// Calculate the loss and correct predictions.
-		loss += nn.calculateLossFunction(encoded_targets, encoded_predictions);
+		loss += nn.calculateMeanLossFunction(encoded_targets, encoded_predictions);
 		correct += nn.countCorrectPredictions(encoded_targets, encoded_predictions);
 
 	}//: while
@@ -123,11 +123,11 @@ int main() {
 
 		// Test network response.
 		// Skip dropout layers at test time
-		nn.forward(*encoded_batch, true);
+		nn.forward(encoded_batch, true);
 		// Get predictions.
 		mic::types::MatrixXfPtr encoded_predictions = nn.getPredictions();
 		// Calculate the loss and correct predictions.
-		loss += nn.calculateLossFunction(encoded_targets, encoded_predictions);
+		loss += nn.calculateMeanLossFunction(encoded_targets, encoded_predictions);
 		correct += nn.countCorrectPredictions(encoded_targets, encoded_predictions);
 	}
 	double train_acc = (double)correct / (double)(training.size());
