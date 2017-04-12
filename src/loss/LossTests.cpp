@@ -8,8 +8,7 @@
  */
 
 #include "LossTests.hpp"
-#include "RegressionLoss.hpp"
-#include "CrossEntropyLoss.hpp"
+#include "LossTypes.hpp"
 
 
 /*!

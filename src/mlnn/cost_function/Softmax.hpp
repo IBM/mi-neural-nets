@@ -27,20 +27,28 @@ public:
 	Softmax<eT>(size_t inputs_, std::string name_ = "Softmax") :
 		Layer<eT>(inputs_, inputs_, 1, LayerTypes::Softmax, name_) {
 
+		// Add "temporary" parameters.
+		m.add("e", inputs_, inputs_);
+		m.add("sum", inputs_, inputs_);
 	}
 
 	virtual ~Softmax() {};
 
 	void forward(bool test_ = false) {
 		// Calculate the e matrix.
-		mic::types::Matrix<eT> e = (Eigen::Matrix<eT>)((*s['x']).unaryExpr(std::ptr_fun<eT>(::expf)));
+		mic::types::MatrixPtr<eT> e = m["e"];
+		(*e) = ((*s['x']).unaryExpr(std::ptr_fun(::exp)));
 
-		mic::types::Vector<eT> sum = e.colwise().sum();
+		mic::types::MatrixPtr<eT> sum = m["sum"];
+		(*sum) = e->colwise().sum();
 
-		for (size_t i = 0; i < e.rows(); i++) {
-			for (size_t j = 0; j < e.cols(); j++) {
+		// Get output.
+		mic::types::MatrixPtr<eT> y = s["y"];
 
-				(*s['y'])(i, j) = e(i, j) / sum(j);
+		// Iterate through elements.
+		for (size_t i = 0; i < (size_t)e->rows(); i++) {
+			for (size_t j = 0; j < (size_t)e->cols(); j++) {
+				(*y)(i, j) = (*e)(i, j) / (*sum)(j);
 			}
 		}
 
@@ -55,6 +63,7 @@ protected:
 	// Unhiding the template inherited fields via "using" statement.
     using Layer<eT>::g;
     using Layer<eT>::s;
+    using Layer<eT>::m;
 
 
 private:

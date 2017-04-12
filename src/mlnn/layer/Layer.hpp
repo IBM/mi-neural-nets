@@ -38,27 +38,38 @@ namespace mlnn {
  */
 enum class LayerTypes : short
 {
-	Linear = 0,
-	Pooling,
-	Convolution,
-	Sigmoid,
-	Identity,
+	// activation
+	ELU = 0,
 	ReLU,
-	ELU,
-	Softmax,
-	Dropout,
+	Sigmoid,
+	// convolution
+	Convolution,
 	Padding,
+	Pooling,
+	// cost_function
 	Regression,
-	SparseLinear
+	Softmax,
+	// fully_connected
+	Identity,
+	Linear,
+	SparseLinear,
+	// regularization
+	Dropout
 };
 
-// Forward declaration of MultiLayerNeuralNetwork
-//class MultiLayerNeuralNetwork;
 
+/*!
+ * Template inline function returning square root from (x + eps).
+ * \author kmrocki/tkornuta
+ */
 template <typename eT=float>
 inline eT sqrt_eps(const eT x) {
 	return sqrt(x + 1e-6);
 }
+
+// Forward declaration of MultiLayerNeuralNetwork - required for "lazy connection".
+template <typename eT>
+class MultiLayerNeuralNetwork;
 
 /*!
  * Template base (abstract) class representing a layer.
@@ -157,10 +168,45 @@ public:
 	}
 
 	/*!
-	 * Reset gradients.
+	 * Calculates the numerical gradient.
+	 * @param x_ Input vector.
+	 * @param target_y_ Target (desired) output.
+	 * @param loss_ Loss function.
+	 * @param delta_ Delta.
+	 * @tparam loss Loss function type.
+	 */
+	template<typename loss>
+	mic::types::MatrixPtr<eT> calculateNumericalGradient(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> target_y_, mic::types::MatrixPtr<eT> param_, loss loss_, eT delta_) {
+		// Allocate memory.
+		mic::types::MatrixPtr<eT> nGrad = MAKE_MATRIX_PTR(eT, param_->size(), 1);
+		for (size_t i=0; i<(size_t)param_->size(); i++) {
+			// Add delta.
+			(*param_)[i] += delta_;
+			// Calculate loss.
+			eT p = loss_.calculateLoss(forward(x_), target_y_);
+			// Substract delta.
+			(*param_)[i] -= 2*delta_;
+			// Calculate loss.
+			eT m = loss_.calculateLoss(forward(x_), target_y_);
+
+			// Store numerical gradient.
+			(*nGrad)[i] = (p-m)/(2*delta_);
+			// Set original value.
+			(*param_)[i] += delta_;
+
+		}//: for
+		return nGrad;
+	}
+
+
+	/*!
+	 * Reset gradients. Virtual empty method - to be implemented by the inherited classes.
 	 */
 	virtual void resetGrads() {};
 
+	/*!
+	 * Performs the update according to the calculated gradients and injected optimization method.
+	 */
 	virtual void applyGrads(double alpha_, double decay_) {};
 
 	/// Returns size (length) of inputs.
@@ -318,6 +364,8 @@ protected:
 	Layer () { }
 
 private:
+	// Friend class - required for using boost serialization.
+	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;
@@ -351,10 +399,10 @@ private:
 
 
 // Just in the case that something important will change in the Layer class - set version.
-BOOST_CLASS_VERSION(mic::mlnn::Layer<bool>, 2)
-BOOST_CLASS_VERSION(mic::mlnn::Layer<short>, 2)
-BOOST_CLASS_VERSION(mic::mlnn::Layer<int>, 2)
-BOOST_CLASS_VERSION(mic::mlnn::Layer<long>, 2)
+//BOOST_CLASS_VERSION(mic::mlnn::Layer<bool>, 2)
+//BOOST_CLASS_VERSION(mic::mlnn::Layer<short>, 2)
+//BOOST_CLASS_VERSION(mic::mlnn::Layer<int>, 2)
+//BOOST_CLASS_VERSION(mic::mlnn::Layer<long>, 2)
 BOOST_CLASS_VERSION(mic::mlnn::Layer<float>, 2)
 BOOST_CLASS_VERSION(mic::mlnn::Layer<double>, 2)
 

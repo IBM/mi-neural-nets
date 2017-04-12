@@ -12,8 +12,6 @@ add_subdirectory(optimization)
 
 add_subdirectory(loss)
 
-add_subdirectory(feed_forward)
-
 add_subdirectory(mlnn)
 
 add_subdirectory(tests)

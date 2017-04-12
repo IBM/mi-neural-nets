@@ -42,11 +42,22 @@ public:
 		(*g['x']) = (*g['y']);
 	}
 
+
+	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
+	using Layer<eT>::forward;
+	using Layer<eT>::backward;
+
+protected:
+	// Unhide the fields inherited from the template class Layer via "using" statement.
+    using Layer<eT>::g;
+    using Layer<eT>::s;
+    using Layer<eT>::p;
+    using Layer<eT>::m;
+    using Layer<eT>::input_size;
+    using Layer<eT>::output_size;
+    using Layer<eT>::batch_size;
+
 private:
-
-	// Adds the nn class the access to protected fields of class layer.
-	//friend class mic::mlnn::MultiLayerNeuralNetwork<eT>;
-
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

@@ -163,53 +163,53 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 /*!
  * Numerical gradient test dW, size of layer is 2x3.
  */
-/*TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
+TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
 	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.dW);
+	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.g["W"]);
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.W, loss, delta);
+	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["W"], loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
 	for (size_t i=0; i<(size_t)dW->size(); i++)
 		EXPECT_LE(((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
-}*/
+}
 
 
 /*!
  * Numerical gradient test db, size of layer is 2x3.
  */
-/*TEST_F(Linear2x3Double, NumericalGradientCheck_db) {
+TEST_F(Linear2x3Double, NumericalGradientCheck_db) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
 	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.db);
+	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.g["b"]);
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.b, loss, delta);
+	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["b"], loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
 	for (size_t i=0; i<(size_t)db->size(); i++)
 		EXPECT_LE(((*db)[i] - (*nb)[i]), eps) << "Too big difference between db and numerical db at position i=" << i;
-}*/
+}
 
 
 /*!
  * Numerical gradient test dx, size of layer is 2x3.
  */
-/*TEST_F(Linear2x3Double, NumericalGradientCheck_dx) {
+TEST_F(Linear2x3Double, NumericalGradientCheck_dx) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
@@ -225,27 +225,27 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 	double eps = 1e-8;
 	for (size_t i=0; i<(size_t)dx->size(); i++)
 		EXPECT_LE(((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
-}*/
+}
 
 
 
 /*!
  * Numerical gradient test dW, size of layer is 50x100.
  */
-/*TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
+TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
 	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.dW);
+	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.g["W"]);
 
-//	(*layer.W)[0] = 50000.0;
+	//(*layer.p["W"])[0] = 50000.0;
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.W, loss, delta);
+	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["W"], loss, delta);
 
 
 	// Compare gradients.
@@ -254,38 +254,38 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 		//std::cout << "i=" << i << " (*dW)[i]= " << (*dW)[i] << " (*nW)[i]= " << (*nW)[i] << std::endl;
 		ASSERT_LE(((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
 	}
-}*/
+}
 
 
 /*!
  * Numerical gradient test db, size of layer is 50x100.
  */
-/*TEST_F(Linear50x100Double, NumericalGradientCheck_db) {
+TEST_F(Linear50x100Double, NumericalGradientCheck_db) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
 	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
-	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.db);
+	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.g["b"]);
 
-//	(*layer.W)[0] = 50000.0;
+	//(*layer.p["W"])[0] = 50000.0;
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.b, loss, delta);
+	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["b"], loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;
 	for (size_t i=0; i<(size_t)db->size(); i++)
 		ASSERT_LE(((*db)[i] - (*nb)[i]), eps) << "Too big difference between db and numerical db at position i=" << i;
-}*/
+}
 
 
 /*!
  * Numerical gradient test dx, size of layer is 50x100.
  */
-/*TEST_F(Linear50x100Double, NumericalGradientCheck_dx) {
+TEST_F(Linear50x100Double, NumericalGradientCheck_dx) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
@@ -293,7 +293,7 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 	// Store resulting gradients - make a copy!
 	mic::types::MatrixPtr<double> dx = MAKE_MATRIX_PTR(double, *layer.backward(dy));
 
-//	(*layer.W)[0] = 50000.0;
+	//(*layer.p["W"])[0] = 50000.0;
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
@@ -303,7 +303,7 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 	double eps = 1e-6;
 	for (size_t i=0; i<(size_t)dx->size(); i++)
 		ASSERT_LE(((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
-}*/
+}
 
 
 int main(int argc, char **argv) {

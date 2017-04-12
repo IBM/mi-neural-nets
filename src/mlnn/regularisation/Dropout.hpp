@@ -27,29 +27,32 @@ public:
 	/*!
 	 * @param ratio_ Keep ratio denoting the probability of activations to be passed.
 	 */
-	Dropout<eT>(size_t inputs, float ratio_, std::string name = "Dropout") :
-		Layer<eT>(inputs, inputs, 1, LayerTypes::Dropout, name_),  keep_ratio(ratio_)
+	Dropout<eT>(size_t inputs_, float ratio_, std::string name_ = "Dropout") :
+		Layer<eT>(inputs_, inputs_, 1, LayerTypes::Dropout, name_),  keep_ratio(ratio_)
 	{
-
+		// Create matrices with temporary variables: random and dropout.
+		m.add ("random", inputs_, inputs_);
+		m.add ("dropout_mask", inputs_, inputs_);
 	}
 
 	virtual ~Dropout() {};
 
 	void forward(bool test = false) {
 		if (test) {
-			// Copy data as it is.
+			// In test run copy data as it is.
 			(*s['y']) = (*s['x']);
 
 		} else {
 			// Generate random matrix.
-			mic::types::Matrix<eT> rands = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(s['y']->rows(), s['y']->cols());
-			rands.rand(0.0f, 1.0f);
+			m["random"]->rand(0.0f, 1.0f);
 
 			// Generate the dropout mask.
-			dropout_mask = (rands.array() < keep_ratio).cast <eT> ();
+			//m["dropout_mask"]->array() = (m["random"]->array() < keep_ratio).cast<eT> ();
+			for(size_t i=0; i< (size_t)m["dropout_mask"]->size(); i++)
+				(*m["dropout_mask"])[i] = (*m["random"])[i] < keep_ratio;
 
 			// Apply the dropout_mask - discard the elements where mask is 0.
-			s['y']->array() = s['x']->array() * dropout_mask.array();
+			(*s['y']) = (*s['x']) * (*m["dropout_mask"]);
 
 			// Normalize, so that we don't have to do anything at test time.
 			(*s['y']) /= keep_ratio;
@@ -58,20 +61,29 @@ public:
 	}
 
 	void backward() {
-		// TODO: fix bug!!
-		g['x']->array() = g['y']->array() * dropout_mask.array();
+		// Always use dropout mask as backward pass is used only during learning.
+		(*g['x']) = (*g['y']) * (*m["dropout_mask"]);
 	}
 
+	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
+	using Layer<eT>::forward;
+	using Layer<eT>::backward;
+
 protected:
-	// Unhiding the template inherited fields via "using" statement.
+	// Unhide the fields inherited from the template class Layer via "using" statement.
     using Layer<eT>::g;
     using Layer<eT>::s;
+    using Layer<eT>::p;
+    using Layer<eT>::m;
+    using Layer<eT>::input_size;
+    using Layer<eT>::output_size;
+    using Layer<eT>::batch_size;
 
 
 	/*!
 	 * Ratio denoting the probability of activations to be passed.
 	 */
-	float keep_ratio;
+	eT keep_ratio;
 
 	/*!
 	 * Dropout mask - computed in forward() method in every pass, do not have to be serialized, thus not included in the parameters vector (p).
@@ -79,9 +91,6 @@ protected:
 	mic::types::Matrix<eT> dropout_mask;
 
 private:
-	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
-
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

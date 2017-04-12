@@ -31,9 +31,9 @@ namespace mlnn {
 
 using namespace activation_function;
 //using namespace convolution;
-//using namespace cost_function;
+using namespace cost_function;
 using namespace fully_connected;
-//using namespace regularisation;
+using namespace regularisation;
 
 /*!
  * \brief Enumeration of possible loss function types.
@@ -147,8 +147,8 @@ public:
 		// Compute the forward activations.
 		for (size_t i = 0; i < layers.size(); i++) {
 			LOG(LDEBUG) << "Layer [" << i << "] " << layers[i]->name() << ": (" <<
-					layers[i]->inputsSize() << "x" << layers[i]->batchSize() << ") -> (" <<
-					layers[i]->outputsSize() << "x" << layers[i]->batchSize() << ")";
+					layers[i]->inputSize() << "x" << layers[i]->batchSize() << ") -> (" <<
+					layers[i]->outputSize() << "x" << layers[i]->batchSize() << ")";
 
 			// Perform the forward computation: y = f(x).
 			layers[i]->forward(skip_dropout);
@@ -435,7 +435,7 @@ private:
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;
 
-    /// Flag denoting whether the layers are interconnected, thus no copying between inputs and outputs of the neighbouring layers will be required.
+    /// Flag denoting whether the layers are interconnected, thus no copying between inputs and outputs of the neighboring layers will be required.
     bool connected;
 
     /*!
@@ -481,70 +481,70 @@ private:
 		size_t size;
 		ar & size;
 
-/*		// Serialize layers one by one.
+		// Serialize layers one by one.
 		for (size_t i = 0; i < size; i++) {
 			LayerTypes lt;
 			// Get layer type
 			ar & lt;
 
-			std::shared_ptr<Layer> layer_ptr;
+			std::shared_ptr<Layer<eT> > layer_ptr;
 			switch(lt) {
 			// activation_function
 			case(LayerTypes::ELU):
-				layer_ptr = std::make_shared<ELU>(ELU());
+				layer_ptr = std::make_shared<ELU<eT> >(ELU<eT>());
 				LOG(LDEBUG) <<  "ELU";
 				break;
 			case(LayerTypes::ReLU):
-				layer_ptr = std::make_shared<ReLU>(ReLU());
+				layer_ptr = std::make_shared<ReLU<eT> >(ReLU<eT>());
 				LOG(LDEBUG) <<  "ReLU";
 				break;
 			case(LayerTypes::Sigmoid):
-				layer_ptr = std::make_shared<Sigmoid>(Sigmoid());
+				layer_ptr = std::make_shared<Sigmoid<eT> >(Sigmoid<eT>());
 				LOG(LDEBUG) <<  "Sigmoid";
 				break;
 
 			// convolution
-			case(LayerTypes::Padding):
-				layer_ptr = std::make_shared<Padding>(Padding());
+/*			case(LayerTypes::Padding):
+				layer_ptr = std::make_shared<Padding<eT> >(Padding<eT>());
 				LOG(LERROR) <<  "Padding Layer serialization not implemented (some params are not serialized)!";
 				break;
 			case(LayerTypes::Pooling):
-				layer_ptr = std::make_shared<Pooling>(Pooling());
+				layer_ptr = std::make_shared<Pooling<eT> >(Pooling<eT>());
 				LOG(LERROR) <<  "Pooling Layer serialization not implemented (some params are not serialized)!";
 				break;
 			case(LayerTypes::Convolution):
-				layer_ptr = std::make_shared<Convolution>(Convolution());
+				layer_ptr = std::make_shared<Convolution<eT> >(Convolution<eT>());
 				LOG(LERROR) <<  "Convolution Layer serialization not implemented (some params are not serialized)!";
-				break;
+				break;*/
 
 			// cost_function
 			case(LayerTypes::Softmax):
-				layer_ptr = std::make_shared<Softmax>(Softmax());
+				layer_ptr = std::make_shared<Softmax<eT> >(Softmax<eT>());
 				LOG(LDEBUG) <<  "Softmax";
 				break;
 			case(LayerTypes::Regression):
-				layer_ptr = std::make_shared<Regression>(Regression());
+				layer_ptr = std::make_shared<Regression<eT> >(Regression<eT>());
 				LOG(LDEBUG) <<  "Regression";
 				break;
 
 			// fully_connected
 			case(LayerTypes::Linear):
 				//ar.template register_type<mic::mlnn::Linear>();
-				layer_ptr = std::make_shared<Linear>(Linear());
+				layer_ptr = std::make_shared<Linear<eT> >(Linear<eT>());
 				LOG(LDEBUG) <<  "Linear";
 				break;
 			case(LayerTypes::SparseLinear):
-				layer_ptr = std::make_shared<SparseLinear>(SparseLinear());
+				layer_ptr = std::make_shared<SparseLinear<eT> >(SparseLinear<eT>());
 				LOG(LDEBUG) <<  "SparseLinear";
 				break;
 			case(LayerTypes::Identity):
-				layer_ptr = std::make_shared<Identity>(Identity());
+				layer_ptr = std::make_shared<Identity<eT> >(Identity<eT>());
 				LOG(LDEBUG) <<  "Identity";
 				break;
 
 			// regularisation
 			case(LayerTypes::Dropout):
-				layer_ptr = std::make_shared<Dropout>(Dropout());
+				layer_ptr = std::make_shared<Dropout<eT> >(Dropout<eT>());
 				LOG(LERROR) <<  "Dropout Layer serialization not implemented (some params are not serialized)!";
 				break;
 
@@ -555,7 +555,7 @@ private:
 			ar & (*layer_ptr);
 			layers.push_back(layer_ptr);
 		}//: for
-*/
+
     }
 
      // The serialization must be splited as load requires to allocate the memory.
@@ -570,8 +570,8 @@ private:
  * @tparam layer_ptr_ Pointer to the newly created layer.
  */
 /*template <>
-void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Regression>( mic::mlnn::cost_function::Regression* layer_ptr_){
-	layers.push_back(std::shared_ptr <Regression> (layer_ptr_));
+void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Regression<float> >( mic::mlnn::cost_function::Regression<float>* layer_ptr_){
+	layers.push_back(std::shared_ptr <mic::mlnn::cost_function::Regression<float> > (layer_ptr_));
 	loss_type = LossFunctionType::RegressionQuadratic;
 }*/
 
@@ -581,8 +581,8 @@ void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Regression>( m
  * @tparam layer_ptr_ Pointer to the newly created layer.
  */
 /*template <>
-void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Softmax>( mic::mlnn::cost_function::Softmax* layer_ptr_){
-	layers.push_back(std::shared_ptr <Softmax> (layer_ptr_));
+void MultiLayerNeuralNetwork::pushLayer<mic::mlnn::cost_function::Softmax<float> >( mic::mlnn::cost_function::Softmax<float>* layer_ptr_){
+	layers.push_back(std::shared_ptr <mic::mlnn::cost_function::Softmax<float> > (layer_ptr_));
 	loss_type = LossFunctionType::ClassificationEntropy;
 }*/
 

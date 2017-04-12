@@ -37,7 +37,7 @@ public:
 		eT* y = s['y']->data();
 
 		// Iterate through elements.
-		size_t size = s['x']->rows() * s['x']->cols();
+		size_t size = (size_t) s['x']->rows() * s['x']->cols();
 		for (size_t i = 0; i < size;  i++) {
 			y[i] = x[i] > 0.0f ? x[i] : (expf(x[i]) - 1.0f);
 		}//: for
@@ -50,7 +50,7 @@ public:
 		eT* y = s['y']->data();
 
 		// Iterate through elements.
-		size_t size = g['x']->rows() * g['x']->cols();
+		size_t size = (size_t) g['x']->rows() * g['x']->cols();
 		for (size_t i = 0; i < size;  i++) {
 			// Calculate the ELU y derivative.
 			float dy = y[i] > 0.0f ? 1.0f : expf(y[i]);
@@ -58,7 +58,6 @@ public:
 			gx[i] = dy * gy[i];
 
 		}//: for
-
 	}
 
 protected:
@@ -67,9 +66,6 @@ protected:
     using Layer<eT>::s;
 
 private:
-	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
-
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

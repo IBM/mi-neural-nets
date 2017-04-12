@@ -1,6 +1,17 @@
 # Include current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+install(FILES
+	AdaDelta.hpp
+	AdaGrad.hpp
+	Adam.hpp
+	GradientDescent.hpp
+	Momentum.hpp
+	OptimizationFunction.hpp
+	RMSProp.hpp
+	DESTINATION include/optimization)
+
+
 # =======================================================================
 # Build artificial landscapes and optimization functions tests
 # =======================================================================

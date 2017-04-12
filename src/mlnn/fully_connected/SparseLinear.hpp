@@ -100,10 +100,10 @@ public:
 		(*m['b']) += (*g['b']).cwiseProduct((*g['b']));
 
 		//W = (1 - decay_) * W + alpha_ * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
-		(*p['W']) = (1.0f - decay_) * (*p['W']) + alpha_ * (*g['W']).cwiseQuotient((*m['W']).unaryExpr(std::ptr_fun(sqrt_eps)));
+		//(*p['W']) = (1.0f - decay_) * (*p['W']) + alpha_ * (*g['W']).cwiseQuotient((*m['W']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
 
 		//b += alpha_ * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));
-		(*p['b']) += alpha_ * (*g['b']).cwiseQuotient((*m['b']).unaryExpr(std::ptr_fun(sqrt_eps)));
+		//(*p['b']) += alpha_ * (*g['b']).cwiseQuotient((*m['b']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
 
 		// 'plain' fixed learning rate update
 		// b += alpha * db;
@@ -111,12 +111,22 @@ public:
 
 	}
 
+	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
+	using Layer<eT>::forward;
+	using Layer<eT>::backward;
+
+protected:
+	// Unhide the fields inherited from the template class Layer via "using" statement.
+    using Layer<eT>::g;
+    using Layer<eT>::s;
+    using Layer<eT>::p;
+    using Layer<eT>::m;
+    using Layer<eT>::input_size;
+    using Layer<eT>::output_size;
+    using Layer<eT>::batch_size;
+
 private:
-
-	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
-
-	/*!
+    /*!
 	 * Private constructor, used only during the deserialization.
 	 */
 	SparseLinear<eT>() : Layer<eT> () { }

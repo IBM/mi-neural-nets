@@ -33,7 +33,7 @@ public:
 		eT* x = s['x']->data();
 		eT* y = s['y']->data();
 
-		for (size_t i = 0; i < s['x']->rows() * s['x']->cols(); i++) {
+		for (size_t i = 0; i < (size_t)s['x']->rows() * s['x']->cols(); i++) {
 			y[i] = 1.0f / (1.0f +::exp(-x[i])); //: float -> expf
 		}//: for
 	}
@@ -44,7 +44,7 @@ public:
 		eT* gy = g['y']->data();
 		eT* y = s['y']->data();
 
-		for (size_t i = 0; i < g['x']->rows() * g['x']->cols(); i++) {
+		for (size_t i = 0; i < (size_t)g['x']->rows() * g['x']->cols(); i++) {
 			// Calculate the gradient.
 			gx[i] = gy[i] * y[i] * (1.0 - y[i]);
 		}//: for
@@ -56,9 +56,6 @@ protected:
     using Layer<eT>::s;
 
 private:
-	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
-
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

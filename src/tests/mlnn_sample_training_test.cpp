@@ -25,12 +25,12 @@ int main() {
 	// Set console output.
 	LOGGER->addOutput(new ConsoleOutput());
 
-	MultiLayerNeuralNetwork nn("simple_linear_network");
-	nn.pushLayer(new Linear(10, 20, "First Linear"));
-	nn.pushLayer(new ReLU(20, "ReLU"));
-	nn.pushLayer(new Linear(20, 4, "Second Linear"));
-	nn.pushLayer(new ReLU(4, "ReLU"));
-	nn.pushLayer(new Regression(4, "Final Regression"));
+	MultiLayerNeuralNetwork<float> nn("simple_linear_network");
+	nn.pushLayer(new Linear<float>(10, 20, "First Linear"));
+	nn.pushLayer(new ReLU<float>(20, "ReLU"));
+	nn.pushLayer(new Linear<float>(20, 4, "Second Linear"));
+	nn.pushLayer(new ReLU<float>(4, "ReLU"));
+	nn.pushLayer(new Regression<float>(4, "Final Regression"));
 
 	// Generate a dataset.
 	size_t dataset_size = 10;
@@ -60,7 +60,7 @@ int main() {
 
 		float loss = nn.train(sample.data(), sample.label(), 0.005, 0.0);
 
-		// Compare results
+		// Compare results.
 		MatrixXf predictions = (*nn.getPredictions());
 		if (iteration % 1000 == 0){
 			std::cout<<"[" << iteration << "]: Loss        : " << loss << std::endl;

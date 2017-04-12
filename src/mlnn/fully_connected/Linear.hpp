@@ -143,9 +143,6 @@ protected:
     using Layer<eT>::batch_size;
 
 private:
-	// Adds the nn class the access to protected fields of class layer.
-	//friend class mic::mlnn::MultiLayerNeuralNetwork<eT>;
-
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

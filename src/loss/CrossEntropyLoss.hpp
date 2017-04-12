@@ -20,7 +20,7 @@ namespace neural_nets {
 namespace loss {
 
 /*!
- * \brief Class representing a cross-entropy loss function (regression).
+ * \brief Class representing a cross-entropy loss function (classification).
  * \author tkornuta
  * \tparam dtype Template parameter denoting precision of variables.
  */
@@ -43,7 +43,7 @@ public:
 	}
 
 	/*!
-	 * \brief Function calculating gradient - for cross-entropy.
+	 * \brief Gradient calculation for cross-entropy.
 	 */
 	mic::types::MatrixPtr<dtype> calculateGradient (mic::types::MatrixPtr<dtype> predicted_y_, mic::types::MatrixPtr<dtype> target_y_) {
 		// Sizes must match.

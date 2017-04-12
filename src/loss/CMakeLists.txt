@@ -1,8 +1,15 @@
 # Include current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+install(FILES
+	Loss.hpp
+	CrossEntropyLoss.hpp
+	RegressionLoss.hpp
+	LossTypes.hpp
+	DESTINATION include/loss)
+
 # =======================================================================
-# Build linear layer tests
+# Build loss function unit tests
 # =======================================================================
 
 # Link tests with GTest

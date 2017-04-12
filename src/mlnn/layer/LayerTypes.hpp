@@ -10,11 +10,11 @@
 
 // Activation functions - implemented as layers.
 
-//#include <mlnn/activation_function/ELU.hpp>
+#include <mlnn/activation_function/ELU.hpp>
 
 #include <mlnn/activation_function/ReLU.hpp>
 
-//#include <mlnn/activation_function/Sigmoid.hpp>
+#include <mlnn/activation_function/Sigmoid.hpp>
 
 // Convolution-related lyers.
 
@@ -27,7 +27,7 @@
 
 // Cost functions - implemented as layers.
 
-//#include <mlnn/cost_function/Softmax.hpp>
+#include <mlnn/cost_function/Softmax.hpp>
 
 #include <mlnn/cost_function/Regression.hpp>
 
@@ -35,12 +35,12 @@
 
 #include <mlnn/fully_connected/Linear.hpp>
 
-//#include <mlnn/fully_connected/SparseLinear.hpp>
+#include <mlnn/fully_connected/SparseLinear.hpp>
 
-//#include <mlnn/fully_connected/Identity.hpp>
+#include <mlnn/fully_connected/Identity.hpp>
 
 // Regularisation layers.
 
-//#include <mlnn/regularisation/Dropout.hpp>
+#include <mlnn/regularisation/Dropout.hpp>
 
 #endif /* SRC_MLNN_LAYERTYPES_HPP_ */
