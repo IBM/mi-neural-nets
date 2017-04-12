@@ -162,7 +162,7 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["W"], loss, delta);
+	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.p["W"], loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
@@ -185,7 +185,7 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_db) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["b"], loss, delta);
+	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.p["b"], loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
@@ -207,7 +207,7 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dx) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, const_x, loss, delta);
+	mic::types::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-8;
@@ -233,7 +233,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["W"], loss, delta);
+	mic::types::MatrixPtr<double> nW = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.p["W"], loss, delta);
 
 
 	// Compare gradients.
@@ -261,7 +261,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_db) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, layer.p["b"], loss, delta);
+	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, layer.p["b"], loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;
@@ -287,7 +287,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dx) {
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::RegressionLoss<double> >(const_x, target_y, const_x, loss, delta);
+	mic::types::MatrixPtr<double> nx = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(const_x, target_y, const_x, loss, delta);
 
 	// Compare gradients.
 	double eps = 1e-6;

@@ -55,8 +55,8 @@ public:
 		Layer<eT>::g.add ("b", outputs_, 1 );
 
 		// Create optimization functions.
-		opt_W = std::make_shared<mic::neural_nets::optimization::Adam<eT> > (mic::neural_nets::optimization::Adam<eT> ( outputs_ * inputs_, 0.00001));
-		opt_b = std::make_shared<mic::neural_nets::optimization::Adam<eT> > (mic::neural_nets::optimization::Adam<eT> ( outputs_, 0.00001));
+		opt_W = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (0.5));
+		opt_b = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (0.5));
 	};
 
 

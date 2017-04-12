@@ -12,6 +12,6 @@
 
 #include <loss/CrossEntropyLoss.hpp>
 
-#include <loss/RegressionLoss.hpp>
+#include <loss/SquaredErrorLoss.hpp>
 
 #endif /* LOSSTYPES_HPP_ */

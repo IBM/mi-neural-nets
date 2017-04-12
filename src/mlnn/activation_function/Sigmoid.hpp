@@ -45,8 +45,8 @@ public:
 		eT* y = s['y']->data();
 
 		for (size_t i = 0; i < (size_t)g['x']->rows() * g['x']->cols(); i++) {
-			// Calculate the gradient.
-			gx[i] = gy[i] * y[i] * (1.0 - y[i]);
+			// "Pass" the gradient multiplied by the sigmoid derivative.
+			gx[i] = gy[i]* (y[i] * (1.0 - y[i]));
 		}//: for
 	}
 

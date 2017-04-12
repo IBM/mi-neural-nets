@@ -16,7 +16,7 @@
 #define private public
 #define protected public
 #include <mlnn/fully_connected/Linear.hpp>
-#include <loss/RegressionLoss.hpp>
+#include <loss/SquaredErrorLoss.hpp>
 
 /*!
  * \brief Test Fixture - layer of size 1x1, floats, sets W[0] = 1.0 and b[0] = 1.0.
@@ -102,7 +102,7 @@ private:
 	mic::types::MatrixPtr<float> target_y;
 
 	// Loss function.
-	mic::neural_nets::loss::RegressionLoss<float> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<float> loss;
 };
 
 
@@ -152,7 +152,7 @@ private:
 	mic::types::MatrixPtr<double> target_y;
 
 	// Loss function.
-	mic::neural_nets::loss::RegressionLoss<double> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
 };
 
 
@@ -213,6 +213,6 @@ private:
 	mic::types::MatrixPtr<double> target_y;
 
 	// Loss function.
-	mic::neural_nets::loss::RegressionLoss<double> loss;
+	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
 };
 #endif /* LINEARLAYERTESTS_HPP_ */

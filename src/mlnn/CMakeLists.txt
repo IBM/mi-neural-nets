@@ -58,6 +58,9 @@ if(GTEST_FOUND AND BUILD_UNIT_TESTS)
 		mlnn
 		${Boost_LIBRARIES}
 		${GTEST_LIBRARIES})
+	if(OpenBLAS_FOUND)
+		target_link_libraries(mlnnTestsRunner  ${OpenBLAS_LIB} )
+	endif(OpenBLAS_FOUND)
 	add_test(mlnnTestsRunner ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mlnnTestsRunner)
 
 endif(GTEST_FOUND AND BUILD_UNIT_TESTS)

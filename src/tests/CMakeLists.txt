@@ -19,6 +19,9 @@ if(${BUILD_TEST_SAMPLE_TRAINING_MLNN})
 		mlnn
 		${Boost_LIBRARIES}
 		)
+	if(OpenBLAS_FOUND)
+		target_link_libraries(mlnn_sample_training_test  ${OpenBLAS_LIB} )
+	endif(OpenBLAS_FOUND)
 
 	# install test to bin directory
 	install(TARGETS mlnn_sample_training_test RUNTIME DESTINATION bin)
@@ -45,6 +48,9 @@ if(${BUILD_TEST_BATCH_TRAINING_MLNN})
 		mlnn
 		${Boost_LIBRARIES}
 		)
+	if(OpenBLAS_FOUND)
+		target_link_libraries(mlnn_batch_training_test  ${OpenBLAS_LIB} )
+	endif(OpenBLAS_FOUND)
 
 	# install test to bin directory
 	install(TARGETS mlnn_batch_training_test RUNTIME DESTINATION bin)

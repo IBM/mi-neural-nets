@@ -542,9 +542,9 @@ private:
 
 // Just in the case that something important will change in the MLNN class - set version.
 BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<float BOOST_PP_COMMA() mic::neural_nets::loss::CrossEntropyLoss<float> >, 2)
-BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<float BOOST_PP_COMMA() mic::neural_nets::loss::RegressionLoss<float> >, 2)
+BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<float BOOST_PP_COMMA() mic::neural_nets::loss::SquaredErrorLoss<float> >, 2)
 BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<double BOOST_PP_COMMA() mic::neural_nets::loss::CrossEntropyLoss<double> >, 2)
-BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<double BOOST_PP_COMMA() mic::neural_nets::loss::RegressionLoss<double> >, 2)
+BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<double BOOST_PP_COMMA() mic::neural_nets::loss::SquaredErrorLoss<double> >, 2)
 
 
 #endif /* SRC_MLNN_MULTILAYERNEURALNETWORK_HPP_ */

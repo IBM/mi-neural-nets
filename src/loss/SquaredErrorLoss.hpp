@@ -1,5 +1,5 @@
 /*!
- * @file: RegressionLoss.hpp
+ * @file: SquaredErrorLoss.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
  * @Date:   Nov 8, 2016
  *
@@ -18,12 +18,12 @@ namespace neural_nets {
 namespace loss {
 
 /*!
- * \brief Class representing a squared error loss function (regression).
+ * \brief Class representing a squared error loss function (regression). L = 1/2 sum (t - p)^2.
  * \author tkornuta
  * \tparam dtype Template parameter denoting precision of variables.
  */
 template <typename dtype=float>
-class RegressionLoss : public Loss<dtype> {
+class SquaredErrorLoss : public Loss<dtype> {
 public:
 	/*!
 	 * \brief Function calculates squared difference loss (regression) and returns squared error (SE).
@@ -39,7 +39,7 @@ public:
 		}
 		// Return squared error (SE).
 		// The mean squared error (MSE) is calculated by dividing the SE by the size of a batch.
-		return loss;
+		return loss/2.0;
 	}
 
 	/*!
@@ -52,7 +52,7 @@ public:
 		// Calculate gradient.
 		mic::types::MatrixPtr<dtype> dy = MAKE_MATRIX_PTR(dtype, predicted_y_->rows(), predicted_y_->cols());
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
-			(*dy)[i] = 2.0*((*target_y_)[i] - (*predicted_y_)[i]);
+			(*dy)[i] = -((*target_y_)[i] - (*predicted_y_)[i]);
 		}
 		return dy;
 	}
