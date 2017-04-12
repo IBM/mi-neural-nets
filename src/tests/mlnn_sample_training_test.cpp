@@ -57,7 +57,7 @@ int main() {
 		Sample <MatrixXf, MatrixXf> sample = dataset.getRandomSample();
 		std::cout << "[" << iteration++ << "]: sample (" << sample.index() << "): "<< sample.data()->transpose() << "->" << sample.label()->transpose() << std::endl;
 
-		float loss = nn.train(sample.data(), sample.label(), 0.005, 0.0);
+		float loss = nn.train(sample.data(), sample.label(), 0.005);
 
 		//if (iteration % 1000 == 0)
 			std::cout<<"[" << iteration << "]: Loss        : " << loss << std::endl;
@@ -67,7 +67,7 @@ int main() {
 		std::cout<<"Targets     : " << sample.label()->transpose() << std::endl;
 		std::cout<<"Predictions : " << predictions.transpose() << std::endl << std::endl;
 		iteration++;
-		//return 0;
+		return 0;
 	}//: while
 
 	// Test network

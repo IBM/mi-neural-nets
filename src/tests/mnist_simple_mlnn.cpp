@@ -66,7 +66,6 @@ int main() {
 
 	LOG(LSTATUS) << "Starting the training of neural network...";
 	double 	learning_rate = 0.005;
-	double 	weight_decay = 0;
 	MatrixXfPtr encoded_batch, encoded_targets;
 
 	// Perform the training.
@@ -79,7 +78,7 @@ int main() {
 		encoded_targets  = label_encoder.encodeBatch(rand_batch.labels());
 
 		// Train network with batch.
-		nn.train (encoded_batch, encoded_targets, learning_rate, weight_decay);
+		nn.train (encoded_batch, encoded_targets, learning_rate);
 
 	}//: for
 	LOG(LSTATUS) << "Training finished";

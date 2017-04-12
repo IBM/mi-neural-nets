@@ -69,7 +69,7 @@ int main() {
 		encoded_targets  = label_encoder.encodeBatch(batch.labels());
 
 		// Train network with batch.
-		float loss = nn.train (encoded_batch, encoded_targets, 0.005, 0.0);
+		float loss = nn.train (encoded_batch, encoded_targets, 0.005);
 
 		if (iteration % 1000 == 0){
 			std::cout<<"[" << iteration << "]: Loss        : " << loss << std::endl;

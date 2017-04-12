@@ -188,10 +188,9 @@ public:
 	 * @param encoded_batch_ Batch encoded in the form of matrix of size [sample_size x batch_size].
 	 * @param encoded_targets_ Targets (labels) encoded in the form of matrix of size [label_size x batch_size].
 	 * @param learning_rate_ The learning rate.
-	 * @param weight_decay_ Weight decay.
 	 * @return Loss computed according to the selected loss function. If function not set - returns INF.
 	 */
-	eT train(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_, eT learning_rate_, eT weight_decay_) {
+	eT train(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_, eT learning_rate_) {
 
 		// Forward propagate the activations from first layer to the last.
 		forward(encoded_batch_);
