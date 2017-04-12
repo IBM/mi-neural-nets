@@ -62,7 +62,11 @@ private:
 class Linear2x3Float : public ::testing::Test {
 public:
 	// Constructor. Sets layer size.
-	Linear2x3Float () : layer(2,3) { }
+	Linear2x3Float () : layer(2,3) {
+		const_x = MAKE_MATRIX_PTR(float, 2, 1);
+		const_dy = MAKE_MATRIX_PTR(float, 3, 1);
+		target_y = MAKE_MATRIX_PTR(float, 3, 1);
+	}
 
 protected:
 	// Sets values
@@ -70,15 +74,17 @@ protected:
 		(*layer.p["W"]) << 1, 2, 3, 5, 6, 9;
 		(*layer.p["b"]) << -3, -2, -1;
 
-		const_x = MAKE_MATRIX_PTR(float, 2, 1);
 		(*const_x) << -1, 1;
 
-		const_dy = MAKE_MATRIX_PTR(float, 3, 1);
 		(*const_dy) << -1, -2, 1;
 
-		target_y = MAKE_MATRIX_PTR(float, 3, 1);
 		(*target_y) << -1, -2, 1;
 
+		// Reset state and gradients.
+		layer.s["x"]->setZero();
+		layer.s["y"]->setZero();
+		layer.g["x"]->setZero();
+		layer.g["y"]->setZero();
 	}
 
 
@@ -107,7 +113,11 @@ private:
 class Linear2x3Double : public ::testing::Test {
 public:
 	// Constructor. Sets layer size.
-	Linear2x3Double () : layer(2,3) { }
+	Linear2x3Double () : layer(2,3) {
+		const_x = MAKE_MATRIX_PTR(double, 2, 1);
+		const_dy = MAKE_MATRIX_PTR(double, 3, 1);
+		target_y = MAKE_MATRIX_PTR(double, 3, 1);
+	}
 
 protected:
 	// Sets values
@@ -115,14 +125,17 @@ protected:
 		(*layer.p["W"]) << 1, 2, 3, 5, 6, 9;
 		(*layer.p["b"]) << -3, -2, -1;
 
-		const_x = MAKE_MATRIX_PTR(double, 2, 1);
 		(*const_x) << -1, 1;
 
-		const_dy = MAKE_MATRIX_PTR(double, 3, 1);
 		(*const_dy) << -1, -2, 1;
 
-		target_y = MAKE_MATRIX_PTR(double, 3, 1);
 		(*target_y) << -1, -2, 1;
+
+		// Reset state and gradients.
+		layer.s["x"]->setZero();
+		layer.s["y"]->setZero();
+		layer.g["x"]->setZero();
+		layer.g["y"]->setZero();
 	}
 
 private:
@@ -150,7 +163,10 @@ private:
 class Linear50x100Double : public ::testing::Test {
 public:
 	// Constructor. Sets layer size.
-	Linear50x100Double () : layer(50,100) { }
+	Linear50x100Double () : layer(50,100) {
+		const_x = MAKE_MATRIX_PTR (double, layer.input_size, 1);
+		target_y = MAKE_MATRIX_PTR (double, layer.output_size, 1);
+	}
 
 protected:
 	// Sets values
@@ -173,13 +189,17 @@ protected:
 
 		// Initialize x and y.
 		std::uniform_real_distribution<double> distxy(-5.0, 5.0);
-		const_x = MAKE_MATRIX_PTR (double, layer.input_size, 1);
 		for (size_t i = 0; i <layer.input_size; i++)
 			(*const_x)[i] = (double)distxy(rd);
 
-		target_y = MAKE_MATRIX_PTR (double, layer.output_size, 1);
 		for (size_t i = 0; i < layer.output_size; i++)
 			(*target_y)[i] = (double)distxy(rd);
+
+		// Reset state and gradients.
+		layer.s["x"]->setZero();
+		layer.s["y"]->setZero();
+		layer.g["x"]->setZero();
+		layer.g["y"]->setZero();
 	}
 
 private:

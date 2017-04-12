@@ -211,8 +211,8 @@ public:
 		// Apply the changes - according to the optimization function.
 		update(learning_rate_, weight_decay_);
 
-		// Calculate value of the loss function.
-		eT loss_value = loss.calculateLoss(encoded_targets_, encoded_predictions);
+		// Calculate mean value of the loss function (i.e. loss divided by the batch size).
+		eT loss_value = loss.calculateMeanLoss(encoded_targets_, encoded_predictions);
 
 		//eT correct = countCorrectPredictions(encoded_targets_, encoded_predictions);
 		//LOG(LDEBUG) << " Loss = " << std::setprecision(2) << std::setw(6) << loss_value << " | " << std::setprecision(1) << std::setw(4) << std::fixed << 100.0 * (eT)correct / (eT)encoded_batch_->cols() << "% batch correct";
@@ -236,10 +236,8 @@ public:
 		// Get predictions.
 		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
 
-		// Calculate the loss.
-		return calculateLossFunction(encoded_targets_, encoded_predictions);
-	//	return countCorrectPredictions(*(getPredictions()), *encoded_targets_);
-
+		// Calculate the mean loss.
+		return loss.calculateMeanLoss(encoded_targets_, encoded_predictions);
 	}
 
 	/*!
@@ -266,14 +264,14 @@ public:
 	}
 
 	/*!
-	 * Calculates the loss function according to the selected function type.
+	 * Calculates the loss function according to the selected loss function.
 	 * @param encoded_targets_ Targets (labels) encoded in the form of pointer to matrix of size [label_size x batch_size].
 	 * @param encoded_predictions_ Predicted outputs of the network encoded in the form of pointer to matrix of size [label_size x batch_size].
-	 * @return Loss computed according to the selected loss function. If function not set - returns INF.
+	 * @return Loss computed according to the selected loss function.
 	 */
-	eT calculateLossFunction(mic::types::MatrixPtr<eT> encoded_targets_, mic::types::MatrixPtr<eT> encoded_predictions_)  {
+	eT calculateMeanLossFunction(mic::types::MatrixPtr<eT> encoded_targets_, mic::types::MatrixPtr<eT> encoded_predictions_)  {
 
-		return loss.calculateLoss(encoded_targets_, encoded_predictions_);
+		return loss.calculateMeanLoss(encoded_targets_, encoded_predictions_);
 	}
 
 	/*!

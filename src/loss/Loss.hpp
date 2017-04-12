@@ -31,6 +31,13 @@ public:
 	virtual dtype calculateLoss (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) = 0;
 
 	/*!
+	 * \brief Calculates mean loss (i.e. divides the loss by the size of batch) - ACE for cross-entropy or MSE for regression.
+	 */
+	virtual dtype calculateMeanLoss (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) {
+		return calculateLoss(target_y_, predicted_y_) / predicted_y_->cols();
+	}
+
+	/*!
 	 * \brief Function calculating gradient - abstract.
 	 */
 	virtual mic::types::MatrixPtr<dtype> calculateGradient (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) = 0;

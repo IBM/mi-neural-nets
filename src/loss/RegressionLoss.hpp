@@ -26,7 +26,7 @@ template <typename dtype=float>
 class RegressionLoss : public Loss<dtype> {
 public:
 	/*!
-	 * \brief Function calculates squared difference loss (regression) and returns mean squared error (MSE)
+	 * \brief Function calculates squared difference loss (regression) and returns squared error (SE).
 	 */
 	dtype calculateLoss (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) {
 		// Sizes must match.
@@ -37,8 +37,9 @@ public:
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
 			loss += ((*target_y_)[i] - (*predicted_y_)[i])*((*target_y_)[i] - (*predicted_y_)[i]);
 		}
-		// Return mean squared error (MSE).
-		return loss/predicted_y_->size();
+		// Return squared error (SE).
+		// The mean squared error (MSE) is calculated by dividing the SE by the size of a batch.
+		return loss;
 	}
 
 	/*!

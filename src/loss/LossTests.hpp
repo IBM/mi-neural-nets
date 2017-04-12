@@ -93,7 +93,7 @@ protected:
 	// Sets values.
 	virtual void SetUp() {
 		(*target_y)  << 0.1, 0.2, 0.3, 0.5, 0.6, 0.1;
-		(*predicted_y) << 0.0, 0.2, 0.4, 0.4, 0.5, 0.6;
+		(*predicted_y) << 0.2, 0.2, 0.4, 0.4, 0.5, 0.6;
 	}
 
 private:

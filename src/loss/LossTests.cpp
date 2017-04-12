@@ -12,13 +12,23 @@
 
 
 /*!
- * Tests squared error loss function on vectors with four floats.
+ * Tests squared error loss function on vector with four floats.
  */
 TEST_F(Vectors4x1Float, RegressionLoss) {
 	// Loss function.
 	mic::neural_nets::loss::RegressionLoss<float> loss;
 
-	ASSERT_EQ(loss.calculateLoss(target_y, predicted_y), (float)1.0);
+	ASSERT_EQ(loss.calculateLoss(target_y, predicted_y), (float)4.0);
+}
+
+/*!
+ * Tests mean squared error (MSE) loss function on vector with four floats.
+ */
+TEST_F(Vectors4x1Float, RegressionMSELoss) {
+	// Loss function.
+	mic::neural_nets::loss::RegressionLoss<float> loss;
+
+	ASSERT_EQ(loss.calculateMeanLoss(target_y, predicted_y), (float)4.0);
 }
 
 /*!
@@ -43,10 +53,25 @@ TEST_F(Vectors4x1Float2, RegressionLoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(target_y, predicted_y1);
-	EXPECT_LE(std::abs(l1-0.01125), eps);
+	EXPECT_LE(std::abs(l1-0.045), eps);
 
 	float l2 = loss.calculateLoss(target_y, predicted_y2);
-	EXPECT_LE(std::abs(l2-0.01125), eps);
+	EXPECT_LE(std::abs(l2-0.045), eps);
+}
+
+/*!
+ * Tests mean squared error loss function on 2 different predicted vectors with four floats.
+ */
+TEST_F(Vectors4x1Float2, RegressionMSELoss) {
+	// Loss function.
+	mic::neural_nets::loss::RegressionLoss<float> loss;
+	float eps = 1e-5;
+
+	float l1 = loss.calculateMeanLoss(target_y, predicted_y1);
+	EXPECT_LE(std::abs(l1-0.045), eps);
+
+	float l2 = loss.calculateMeanLoss(target_y, predicted_y2);
+	EXPECT_LE(std::abs(l2-0.045), eps);
 }
 
 /*!
@@ -81,10 +106,25 @@ TEST_F(Vectors4x1Float2, CrossEntropyLoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(target_y, predicted_y1);
-	EXPECT_LE(std::abs(l1 - 0.5), eps);
+	EXPECT_LE(std::abs(l1 - 2.0), eps);
 
 	float l2 = loss.calculateLoss(target_y, predicted_y2);
-	EXPECT_LE(std::abs(l2 - 0.5054825), eps);
+	EXPECT_LE(std::abs(l2 - 2.02193), eps);
+}
+
+/*!
+ * Tests cross-entropy loss function on 2 different predicted vectors with four floats.
+ */
+TEST_F(Vectors4x1Float2, CrossEntropyACELoss) {
+	// Loss function.
+	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
+	float eps = 1e-5;
+
+	float l1 = loss.calculateMeanLoss(target_y, predicted_y1);
+	EXPECT_LE(std::abs(l1 - 2.0), eps);
+
+	float l2 = loss.calculateMeanLoss(target_y, predicted_y2);
+	EXPECT_LE(std::abs(l2 - 2.02193), eps);
 }
 
 
@@ -111,6 +151,31 @@ TEST_F(Vectors4x1Float2, CrossEntropyGradient) {
 
 
 /*!
+ * Tests cross-entropy loss function on 2 different predicted vectors with four floats.
+ */
+TEST_F(Vectors3x2Float, RegressionLoss) {
+	// Loss function.
+	mic::neural_nets::loss::RegressionLoss<float> loss;
+	float eps = 1e-5;
+
+	float l1 = loss.calculateLoss(target_y, predicted_y);
+	EXPECT_LE(std::abs(l1 - 0.29), eps);
+}
+
+/*!
+ * Tests cross-entropy loss function on 2 different predicted vectors with four floats.
+ */
+TEST_F(Vectors3x2Float, RegressionACELoss) {
+	// Loss function.
+	mic::neural_nets::loss::RegressionLoss<float> loss;
+	float eps = 1e-5;
+
+	float l1 = loss.calculateMeanLoss(target_y, predicted_y);
+	EXPECT_LE(std::abs(l1 - 0.145), eps);
+}
+
+
+/*!
  * Tests squared error loss function on vectors with four elements.
  */
 TEST_F(Vectors3x2Float, RegressionGradient) {
@@ -120,7 +185,7 @@ TEST_F(Vectors3x2Float, RegressionGradient) {
 
 	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
 
-	EXPECT_LE(std::abs((*dy)(0,0) - 0.2), eps) << "Gradient error at position (0,0)";
+	EXPECT_LE(std::abs((*dy)(0,0) + 0.2), eps) << "Gradient error at position (0,0)";
 	EXPECT_LE(std::abs((*dy)(0,1) - 0.0), eps) << "Gradient error at position (0,1)";
 	EXPECT_LE(std::abs((*dy)(1,0) + 0.2), eps) << "Gradient error at position (1,0)";
 	EXPECT_LE(std::abs((*dy)(1,1) - 0.2), eps) << "Gradient error at position (1,1)";
@@ -128,6 +193,32 @@ TEST_F(Vectors3x2Float, RegressionGradient) {
 	EXPECT_LE(std::abs((*dy)(2,1) + 1.0), eps) << "Gradient error at position (2,1)";
 }
 
+
+
+/*!
+ * Tests cross-entropy loss function on 2 different predicted vectors with four floats.
+ */
+TEST_F(Vectors3x2Float, CrossEntropyLoss) {
+	// Loss function.
+	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
+	float eps = 1e-5;
+
+	float l1 = loss.calculateLoss(target_y, predicted_y);
+	EXPECT_LE(std::abs(l1 - 2.42782), eps);
+
+}
+
+/*!
+ * Tests cross-entropy loss function on 2 different predicted vectors with four floats.
+ */
+TEST_F(Vectors3x2Float, CrossEntropyACELoss) {
+	// Loss function.
+	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
+	float eps = 1e-5;
+
+	float l1 = loss.calculateMeanLoss(target_y, predicted_y);
+	EXPECT_LE(std::abs(l1 - 1.21391), eps);
+}
 
 /*!
  * Tests squared error loss function on vectors with four elements.
@@ -139,7 +230,7 @@ TEST_F(Vectors3x2Float, CrossEntropyGradient) {
 
 	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
 
-	EXPECT_LE(std::abs((*dy)(0,0) - 0.1), eps) << "Gradient error at position (0,0)";
+	EXPECT_LE(std::abs((*dy)(0,0) + 0.1), eps) << "Gradient error at position (0,0)";
 	EXPECT_LE(std::abs((*dy)(0,1) - 0.0), eps) << "Gradient error at position (0,1)";
 	EXPECT_LE(std::abs((*dy)(1,0) + 0.1), eps) << "Gradient error at position (1,0)";
 	EXPECT_LE(std::abs((*dy)(1,1) - 0.1), eps) << "Gradient error at position (1,1)";

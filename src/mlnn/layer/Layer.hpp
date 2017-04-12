@@ -176,16 +176,16 @@ public:
 	template<typename loss>
 	mic::types::MatrixPtr<eT> calculateNumericalGradient(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> target_y_, mic::types::MatrixPtr<eT> param_, loss loss_, eT delta_) {
 		// Allocate memory.
-		mic::types::MatrixPtr<eT> nGrad = MAKE_MATRIX_PTR(eT, param_->size(), 1);
+		mic::types::MatrixPtr<eT> nGrad = MAKE_MATRIX_PTR(eT, param_->rows(), param_->cols());
 		for (size_t i=0; i<(size_t)param_->size(); i++) {
 			// Add delta.
 			(*param_)[i] += delta_;
 			// Calculate loss.
-			eT p = loss_.calculateLoss(target_y_, forward(x_));
+			eT m = loss_.calculateLoss(target_y_, forward(x_));
 			// Substract delta.
 			(*param_)[i] -= 2*delta_;
 			// Calculate loss.
-			eT m = loss_.calculateLoss(target_y_, forward(x_));
+			eT p = loss_.calculateLoss(target_y_, forward(x_));
 
 			// Store numerical gradient.
 			(*nGrad)[i] = (p-m)/(2*delta_);
