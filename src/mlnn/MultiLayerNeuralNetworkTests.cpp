@@ -52,12 +52,10 @@ TEST_F(Simple2LayerRegressionNN, BatchResize) {
  */
 TEST_F(Simple2LayerRegressionNN, Serialization) {
 
-
 	// Save network to file.
 	const char* fileName = "saved.txt";
 	nn.save(fileName);
 	//std::cout << "Saved network: \n" << nn;
-
 
 	// Load network from file.
 	mic::mlnn::MultiLayerNeuralNetwork<double, mic::neural_nets::loss::RegressionLoss<double> > restored_nn("simple_linear_network_loaded");

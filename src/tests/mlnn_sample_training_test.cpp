@@ -25,12 +25,6 @@ int main() {
 	// Set console output.
 	LOGGER->addOutput(new ConsoleOutput());
 
-	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::RegressionLoss<float> > nn("simple_linear_network");
-	nn.pushLayer(new Linear<float>(10, 20, "First Linear"));
-	nn.pushLayer(new ReLU<float>(20, "ReLU"));
-	nn.pushLayer(new Linear<float>(20, 4, "Second Linear"));
-	nn.pushLayer(new ReLU<float>(4, "ReLU"));
-
 	// Generate a dataset.
 	size_t dataset_size = 10;
 	Batch<MatrixXf, MatrixXf> dataset;
@@ -51,22 +45,29 @@ int main() {
 		dataset.indices().push_back(i);
 	}//: for
 
+	// Neural net.
+	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::CrossEntropyLoss<float> > nn("simple_linear_network");
+	nn.pushLayer(new Linear<float>(dataset_size, 4, "Linear1"));
+	nn.pushLayer(new ReLU<float>(4, "ReLU1"));
+	nn.pushLayer(new Softmax<float>(4, "Softmax"));
+
 	// Training.
 	size_t iteration = 0;
 	while (iteration < 100000) {
 		Sample <MatrixXf, MatrixXf> sample = dataset.getRandomSample();
-		//std::cout << "[" << iteration++ << "]: sample (" << sample.index() << "): "<< sample.data()->transpose() << "->" << sample.label()->transpose() << std::endl;
+		std::cout << "[" << iteration++ << "]: sample (" << sample.index() << "): "<< sample.data()->transpose() << "->" << sample.label()->transpose() << std::endl;
 
 		float loss = nn.train(sample.data(), sample.label(), 0.005, 0.0);
 
+		//if (iteration % 1000 == 0)
+			std::cout<<"[" << iteration << "]: Loss        : " << loss << std::endl;
+
 		// Compare results.
 		MatrixXf predictions = (*nn.getPredictions());
-		if (iteration % 1000 == 0){
-			std::cout<<"[" << iteration << "]: Loss        : " << loss << std::endl;
-		}
-		//std::cout<<"Targets     : " << sample.label()->transpose() << std::endl;
-		//std::cout<<"Predictions : " << predictions.transpose() << std::endl << std::endl;
+		std::cout<<"Targets     : " << sample.label()->transpose() << std::endl;
+		std::cout<<"Predictions : " << predictions.transpose() << std::endl << std::endl;
 		iteration++;
+		return 0;
 	}//: while
 
 	// Test network

@@ -34,7 +34,6 @@ public:
 		nn.pushLayer(new mic::mlnn::activation_function::ReLU<double>(20, "First ReLU"));
 		nn.pushLayer(new mic::mlnn::fully_connected::Linear<double>(20, 4, "Second Linear"));
 		nn.pushLayer(new mic::mlnn::activation_function::ReLU<double>(4, "Second ReLU"));
-
 	}
 
 protected:

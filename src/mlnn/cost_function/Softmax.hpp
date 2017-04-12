@@ -28,8 +28,8 @@ public:
 		Layer<eT>(inputs_, inputs_, 1, LayerTypes::Softmax, name_) {
 
 		// Add "temporary" parameters.
-		m.add("e", inputs_, inputs_);
-		m.add("sum", inputs_, inputs_);
+		m.add("e", inputs_, 1);
+		m.add("sum", 1, 1);
 	}
 
 	virtual ~Softmax() {};
@@ -37,6 +37,7 @@ public:
 	void forward(bool test_ = false) {
 		// Calculate the e matrix.
 		mic::types::MatrixPtr<eT> e = m["e"];
+
 		//(*e) = ((*s['x']).unaryExpr(std::ptr_fun<eT>(std::exp)));
 		for (size_t i = 0; i < (size_t)e->size(); i++)
 			(*e)[i] = std::exp((*s['x'])[i]);
@@ -49,8 +50,8 @@ public:
 		mic::types::MatrixPtr<eT> y = s["y"];
 
 		// Iterate through elements.
-		for (size_t i = 0; i < (size_t)e->rows(); i++) {
-			for (size_t j = 0; j < (size_t)e->cols(); j++) {
+		for (size_t i = 0; i < (size_t)y->rows(); i++) {
+			for (size_t j = 0; j < (size_t)y->cols(); j++) {
 				(*y)(i, j) = (*e)(i, j) / (*sum)(j);
 			}//: for
 		}//: for
@@ -62,6 +63,19 @@ public:
 		(*g['x']) = (*g['y']) - (*s['y']);
 	}
 
+	/*!
+	 * Changes the size of the batch - resizes e and sum.
+	 * @param New size of the batch.
+	 */
+	virtual void resizeBatch(size_t batch_size_) {
+		// Call parent resize.
+		Layer<eT>::resizeBatch(batch_size_);
+
+		// Reshape the temporary matrices.
+		m["e"]->resize(m["e"]->rows(), batch_size_);
+		m["sum"]->resize(m["sum"]->rows(), batch_size_);
+	}
+
 protected:
 	// Unhiding the template inherited fields via "using" statement.
     using Layer<eT>::g;
@@ -70,9 +84,6 @@ protected:
 
 
 private:
-	// Adds the nn class the access to protected fields of class layer.
-	//friend class mic::mlnn::MultiLayerNeuralNetwork;
-
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

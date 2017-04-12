@@ -44,15 +44,19 @@ public:
 		Layer<eT>::p['b']->rand(-range, range);// setZero();
 
 		//mW = (Eigen::MatrixXf)Eigen::MatrixXf::Zero(W.rows(), W.cols());
-		Layer<eT>::m.add ("W", outputs_, inputs_);
+		//Layer<eT>::m.add ("W", outputs_, inputs_);
 
 
 		//mb = mic::types::VectorXf::Zero(b.rows());
-		Layer<eT>::m.add ("b", outputs_, 1);
+		//Layer<eT>::m.add ("b", outputs_, 1);
 
 		// Add W and b gradients.
 		Layer<eT>::g.add ("W", outputs_, inputs_);
 		Layer<eT>::g.add ("b", outputs_, 1 );
+
+		// Create optimization functions.
+		opt_W = std::make_shared<mic::neural_nets::optimization::Adam<eT> > (mic::neural_nets::optimization::Adam<eT> ( outputs_ * inputs_, 0.00001));
+		opt_b = std::make_shared<mic::neural_nets::optimization::Adam<eT> > (mic::neural_nets::optimization::Adam<eT> ( outputs_, 0.00001));
 	};
 
 
@@ -111,13 +115,20 @@ public:
 	void applyGrads(double alpha_, double decay_ = 0) {
 		//adagrad
 		//mW += dW.cwiseProduct(dW);
-		(*m['W']) += (*g['W']).cwiseProduct((*g['W']));
+		//(*m['W']) += (*g['W']).cwiseProduct((*g['W']));
 
 		//mb += db.cwiseProduct(db);
-		(*m['b']) += (*g['b']).cwiseProduct((*g['b']));
+		//(*m['b']) += (*g['b']).cwiseProduct((*g['b']));
 
 		//W = (1 - decay_) * W + alpha_ * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
 		//(*p['W']) = (1.0f - decay_) * (*p['W']) + alpha_ * (*g['W']).cwiseQuotient((*m['W']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
+		//std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
+		//std::cout << "g['W'] = \n" << (*g['W']) << std::endl;
+
+		opt_W->update(p['W'], g['W']);
+		opt_b->update(p['b'], g['b']);
+
+		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 
 		//b += alpha_ * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));
 		//(*p['b']) += alpha_ * (*g['b']).cwiseQuotient((*m['b']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
@@ -147,6 +158,16 @@ private:
 	 * Private constructor, used only during the serialization.
 	 */
 	Linear<eT>() : Layer<eT> () { }
+
+	/*!
+	 * Optimization function for W.
+	 */
+	std::shared_ptr<mic::neural_nets::optimization::OptimizationFunction<eT> > opt_W;
+
+	/*!
+	 * Optimization function for b.
+	 */
+	std::shared_ptr<mic::neural_nets::optimization::OptimizationFunction<eT> > opt_b;
 
 };
 

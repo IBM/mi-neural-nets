@@ -13,6 +13,8 @@
 
 #include<types/MatrixTypes.hpp>
 #include<types/MatrixArray.hpp>
+#include <optimization/OptimizationFunctionTypes.hpp>
+
 
 #include <boost/serialization/serialization.hpp>
 // include this header to serialize vectors
@@ -150,19 +152,20 @@ public:
 		// Return "input" gradient.
 		return g["x"];
 	}
+
 	/*!
-	 * Changes the size of the batch. By default it resizes
+	 * Changes the size of the batch. By default it resizes state (x,y) and gradients (x,y).
 	 * @param New size of the batch.
 	 */
 	virtual void resizeBatch(size_t batch_size_) {
 		// Change the "value". (depricated)
 		batch_size = batch_size_;
 		// Reshape the inputs...
-		s['x']->resize(s['x']->rows(), batch_size_);
-		g['x']->resize(g['x']->rows(), batch_size_);
+		s["x"]->resize(s["x"]->rows(), batch_size_);
+		g["x"]->resize(g["x"]->rows(), batch_size_);
 		// ... and outputs.
-		s['y']->resize(s['y']->rows(), batch_size_);
-		g['y']->resize(g['y']->rows(), batch_size_);
+		s["y"]->resize(s["y"]->rows(), batch_size_);
+		g["y"]->resize(g["y"]->rows(), batch_size_);
 	}
 
 	/*!
@@ -402,10 +405,6 @@ private:
 
 
 // Just in the case that something important will change in the Layer class - set version.
-//BOOST_CLASS_VERSION(mic::mlnn::Layer<bool>, 2)
-//BOOST_CLASS_VERSION(mic::mlnn::Layer<short>, 2)
-//BOOST_CLASS_VERSION(mic::mlnn::Layer<int>, 2)
-//BOOST_CLASS_VERSION(mic::mlnn::Layer<long>, 2)
 BOOST_CLASS_VERSION(mic::mlnn::Layer<float>, 2)
 BOOST_CLASS_VERSION(mic::mlnn::Layer<double>, 2)
 

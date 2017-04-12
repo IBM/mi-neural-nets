@@ -27,12 +27,6 @@ int main() {
 	// Set console output.
 	LOGGER->addOutput(new ConsoleOutput());
 
-	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::RegressionLoss<float> > nn("simple_linear_network");
-	nn.pushLayer(new Linear<float>(10, 20, "First Linear"));
-	nn.pushLayer(new ReLU<float>(20, "ReLU"));
-	nn.pushLayer(new Linear<float>(20, 4, "Second Linear"));
-	nn.pushLayer(new ReLU<float>(4, "ReLU"));
-
 	// Generate a dataset.
 	size_t dataset_size = 10;
 	Batch<MatrixXf, MatrixXf> dataset;
@@ -53,6 +47,12 @@ int main() {
 		dataset.indices().push_back(i);
 	}//: for
 	dataset.setBatchSize(5);
+
+	// Neural net.
+	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::CrossEntropyLoss<float> > nn("simple_linear_network");
+	nn.pushLayer(new Linear<float>(dataset_size, 4, "Linear1"));
+	nn.pushLayer(new ReLU<float>(4, "ReLU1"));
+	nn.pushLayer(new Softmax<float>(4, "Softmax"));
 
 	// Initialize the encoders.
 	mic::encoders::MatrixXfMatrixXfEncoder data_encoder(dataset_size, 1);
