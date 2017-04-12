@@ -53,8 +53,8 @@ public:
 		size_t size = (size_t) g['x']->rows() * g['x']->cols();
 		for (size_t i = 0; i < size;  i++) {
 			// Calculate the ELU y derivative.
-			float dy = y[i] > 0.0f ? 1.0f : expf(y[i]);
-			// Calculate the gradient.
+			eT dy = y[i] > 0.0f ? 1.0f : exp(y[i]);
+			// Pass the gradient.
 			gx[i] = dy * gy[i];
 
 		}//: for

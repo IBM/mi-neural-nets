@@ -166,8 +166,10 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
 
 	// Compare gradients.
 	double eps = 1e-8;
-	for (size_t i=0; i<(size_t)dW->size(); i++)
+	for (size_t i=0; i<(size_t)dW->size(); i++){
+//		std::cout << "i=" << i << " (*dW)[i]= " << (*dW)[i] << " (*nW)[i]= " << (*nW)[i] << std::endl;
 		EXPECT_LE( abs((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
+	}//: for
 }
 
 

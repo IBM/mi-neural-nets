@@ -20,21 +20,30 @@ namespace optimization {
  * \brief Update using RMSProp - adaptive gradient descent with running average E[g^2].
  * \author tkornuta
  */
-template <typename dtype=float>
-class RMSProp : public OptimizationFunction<dtype> {
+template <typename eT=float>
+class RMSProp : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor.
-	RMSProp(size_t dims_, dtype learning_rate_=0.001, dtype decay_ = 0.9, dtype eps_ = 1e-8) : learning_rate(learning_rate_), decay(decay_), eps(eps_) {
-		EG = MAKE_MATRIX_PTR(dtype, dims_, 1);
-		delta = MAKE_MATRIX_PTR(dtype, dims_, 1);
+	/*!
+	 * Constructor. Sets dimensions, values of decay (default=0.9) and eps (default=1e-8).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	RMSProp(size_t rows_, size_t cols_, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
+		EG = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		// Reset EG and delta.
 		EG->zeros();
 		delta->zeros();
 	}
 
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<dtype> x_, mic::types::MatrixPtr<dtype> dx_) {
+	/*!
+	 * Performs update according to the RMSProp update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001). NOT USED!
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == EG->size());
 
@@ -46,7 +55,7 @@ public:
 
 		// Calculate updates - and store as previous (already) = - RMS(ED)/(RMS(G) * dx
 		for (size_t i=0; i<(size_t)x_->size(); i++){
-			(*delta)[i] = - (learning_rate / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
+			(*delta)[i] = - (learning_rate_ / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
 			assert(std::isfinite((*delta)[i]));
 		}
 
@@ -57,20 +66,17 @@ public:
 	}
 
 protected:
-	/// Learning rate.
-	dtype learning_rate;
-
 	/// Decay ratio, similar to momentum.
-	dtype decay;
+	eT decay;
 
 	/// Smoothing term that avoids division by zero.
-	dtype eps;
+	eT eps;
 
 	/// Decaying average of the squares of gradients up to time t ("diagonal matrix") - E[g^2].
-	mic::types::MatrixPtr<dtype> EG;
+	mic::types::MatrixPtr<eT> EG;
 
 	/// Calculated update.
-	mic::types::MatrixPtr<dtype> delta;
+	mic::types::MatrixPtr<eT> delta;
 };
 
 } //: optimization

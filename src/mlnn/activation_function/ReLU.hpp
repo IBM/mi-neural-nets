@@ -52,7 +52,7 @@ public:
 		for (size_t i = 0; i < size; i++) {
 			// Calculate the ReLU y derivative.
 			eT dy = (eT)(y[i] > 0.0);
-			// Calculate the gradient.
+			// Pass the gradient.
 			gx[i] = dy * gy[i];
 
 		}//: for

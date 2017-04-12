@@ -174,17 +174,13 @@ public:
 	}
 
 	/*!
-	 * Performs the network training by update all layers parameters according to gradients computed by backprob.
-	 * @param alpha Learning rate
-	 * @param decay Weight decay - factor for
+	 * Performs the network training by updating parameters of all layers according to gradients computed by back-propagation.
+	 * @param alpha Learning rate - passed to the optimization functions of all layers.
 	 */
-	void update(eT alpha, eT decay) {
-
-		// update all layers according to gradients
+	void update(eT alpha) {
 		for (size_t i = 0; i < layers.size(); i++) {
-			layers[i]->applyGrads(alpha, decay);
+			layers[i]->applyGrads(alpha);
 		}//: for
-
 	}
 
 	/*!
@@ -210,7 +206,7 @@ public:
 		backward(dy);
 
 		// Apply the changes - according to the optimization function.
-		update(learning_rate_, weight_decay_);
+		update(learning_rate_);
 
 		// Calculate mean value of the loss function (i.e. loss divided by the batch size).
 		eT loss_value = loss.calculateMeanLoss(encoded_targets_, encoded_predictions);

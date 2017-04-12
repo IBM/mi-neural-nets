@@ -24,7 +24,7 @@
  */
 TEST_F(Sphere1DLandscape, AdamID_Convergence) {
 	// Optimization function - 1d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::AdamID<double> opt(1);
+	mic::neural_nets::optimization::AdamID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -52,7 +52,7 @@ TEST_F(Sphere1DLandscape, AdamID_Convergence) {
  */
 TEST_F(Sphere20DLandscape, AdamID_Convergence) {
 	// Optimization function - 20d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::AdamID<double> opt(20);
+	mic::neural_nets::optimization::AdamID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -79,7 +79,7 @@ TEST_F(Sphere20DLandscape, AdamID_Convergence) {
  */
 TEST_F(Beale2DLandscape, AdamID_Convergence) {
 	// Optimization function.
-	mic::neural_nets::optimization::AdamID<double> opt(2);
+	mic::neural_nets::optimization::AdamID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -107,7 +107,7 @@ TEST_F(Beale2DLandscape, AdamID_Convergence) {
  */
 TEST_F(Rosenbrock2DLandscape, AdamID_Convergence) {
 	// Optimization function.
-	mic::neural_nets::optimization::AdamID<double> opt(2);
+	mic::neural_nets::optimization::AdamID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;

@@ -184,11 +184,11 @@ public:
 			// Add delta.
 			(*param_)[i] += delta_;
 			// Calculate loss.
-			eT m = loss_.calculateLoss(target_y_, forward(x_));
+			eT p = loss_.calculateLoss(target_y_, forward(x_));
 			// Substract delta.
 			(*param_)[i] -= 2*delta_;
 			// Calculate loss.
-			eT p = loss_.calculateLoss(target_y_, forward(x_));
+			eT m = loss_.calculateLoss(target_y_, forward(x_));
 
 			// Store numerical gradient.
 			(*nGrad)[i] = (p-m)/(2*delta_);
@@ -208,7 +208,7 @@ public:
 	/*!
 	 * Performs the update according to the calculated gradients and injected optimization method.
 	 */
-	virtual void applyGrads(double alpha_, double decay_) {};
+	virtual void applyGrads(double alpha_) {};
 
 	/// Returns size (length) of inputs.
 	size_t inputSize() {

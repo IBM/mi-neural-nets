@@ -24,21 +24,29 @@ template <typename eT=float>
 class AdaDelta : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor.
-	AdaDelta(size_t dims_, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
-		EG = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*EG)[i] = 0.0;
-		ED = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*ED)[i] = 0.0;
-		delta = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*delta)[i] = 0.0;
+	/*!
+	 * Constructor. Sets dimensions, values of decay (default=0.9) and eps (default=1e-8).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	AdaDelta(size_t rows_, size_t cols_, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
+		EG = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		EG->zeros();
+
+		ED = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		ED->zeros();
+
+		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		delta->zeros();
 	}
 
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
+	/*!
+	 * Performs update according to the AdaDelta update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001). NOT USED!
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == EG->size());
 

@@ -91,7 +91,7 @@ public:
 	/*!
 	 * Apply the gradient update.
 	 */
-	void applyGrads(double alpha_, double decay_ = 0) {
+	void applyGrads(double alpha_) {
 		//adagrad
 		//mW += dW.cwiseProduct(dW);
 		(*m['W']) += (*g['W']).cwiseProduct((*g['W']));

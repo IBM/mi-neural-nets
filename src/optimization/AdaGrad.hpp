@@ -24,15 +24,24 @@ template <typename eT=float>
 class AdaGrad : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor.
-	AdaGrad(size_t dims_, eT learning_rate_ = 0.01, eT eps_ = 1e-8) : learning_rate(learning_rate_), eps(eps_) {
-		G = MAKE_MATRIX_PTR(eT, dims_, 1);
+	/*!
+	 * Constructor. Sets dimensions and eps (default=1e-8).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	AdaGrad(size_t rows_, size_t cols_, eT eps_ = 1e-8) : eps(eps_) {
+		G = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		// Reset G.
 		G->zeros();
 	}
 
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
+	/*!
+	 * Performs update according to the AdaGrad update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001).
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == G->size());
 
@@ -42,13 +51,10 @@ public:
 
 		// W = W - alpha * dW.
 		for (size_t i=0; i<(size_t)x_->size(); i++)
-			(*x_)[i] -= learning_rate * (*dx_)[i] / (std::sqrt((*G)[i] + eps));
+			(*x_)[i] -= learning_rate_ * (*dx_)[i] / (std::sqrt((*G)[i] + eps));
 	}
 
 protected:
-	/// Learning rate.
-	eT learning_rate;
-
 	/// Smoothing term that avoids division by zero.
 	eT eps;
 

@@ -290,7 +290,7 @@ public:
 
 	}
 
-	void applyGrads(double alpha, double decay = 0)  {
+	void applyGrads(double alpha)  {
 
 		//adagrad
 		mW += dW.cwiseProduct(dW);

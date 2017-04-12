@@ -24,21 +24,30 @@ template <typename eT=float>
 class Momentum : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor. Sets learning rate and momentum.
-	Momentum(size_t dims_, eT learning_rate_, eT momentum_ = 0.9) : learning_rate(learning_rate_), momentum(momentum_){
-		v = MAKE_MATRIX_PTR(eT, dims_, 1);
+	/*!
+	 * Constructor. Sets dimensions and momentum (default=0.9).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	Momentum(size_t rows_, size_t cols_, eT momentum_ = 0.9) : momentum(momentum_) {
+		v = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		// Reset momentum.
 		v->zeros();
 	}
 
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
+	/*!
+	 * Performs update according to the Momentum update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001). NOT USED!
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == v->size());
 
 		// Update the update vector.
 		for (size_t i=0; i<(size_t)x_->size(); i++)
-			(*v)[i] = momentum * (*v)[i] + learning_rate * (*dx_)[i];
+			(*v)[i] = momentum * (*v)[i] + learning_rate_ * (*dx_)[i];
 
 		// Theta = Theta - update.
 		for (size_t i=0; i<(size_t)x_->size(); i++)
@@ -48,9 +57,6 @@ public:
 protected:
 	/// Update vector.
 	mic::types::MatrixPtr<eT> v;
-
-	/// Learning rate.
-	eT learning_rate;
 
 	/// Momentum rate.
 	eT momentum;

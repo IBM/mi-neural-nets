@@ -25,43 +25,47 @@ template <typename eT=float>
 class GradPID : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor.
-	GradPID(size_t dims_, eT learning_rate_=0.01, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
+	/*!
+	 * Constructor. Sets dimensions, values of decay (default=0.9) and eps (default=1e-8).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	GradPID(size_t rows_, size_t cols_, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
 
-		Edx = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*Edx)[i] = 0.0;
+		Edx = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		Edx->zeros();
 
-		dx_prev = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*dx_prev)[i] = 0.0;
+		dx_prev = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		dx_prev->zeros();
 
-		deltaP = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*deltaP)[i] = 0.0;
+		deltaP = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		deltaP->zeros();
 
-		deltaI = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*deltaI)[i] = 0.0;
+		deltaI = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		deltaI->zeros();
 
-		deltaD = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*deltaD)[i] = 0.0;
+		deltaD = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		deltaD->zeros();
 
-		delta = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*delta)[i] = 0.0;
+		delta = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		delta->zeros();
+
+	}
+
+	/*!
+	 * Performs update according to the GradPID update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001).
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+		assert(x_->size() == dx_->size());
+		assert(x_->size() == Edx->size());
 
 		// Initialize ratios and variables.
 		p_rate = learning_rate_ * learning_rate_ * learning_rate_ * learning_rate_ ;
 		i_rate = learning_rate_;
 		d_rate = learning_rate_ * learning_rate_ * learning_rate_ ;
-	}
-
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
-		assert(x_->size() == dx_->size());
-		assert(x_->size() == Edx->size());
 
 		// Update decaying sum of gradients - up to time t.
 		for (size_t i=0; i< (size_t)Edx->size(); i++) {
@@ -164,51 +168,51 @@ template <typename eT=float>
 class AdaGradPID : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor.
-	AdaGradPID(size_t dims_, eT learning_rate_=0.01, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
-		Edx = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*Edx)[i] = 0.0;
+	/*!
+	 * Constructor. Sets dimensions, values of decay (default=0.9) and eps (default=1e-8).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	AdaGradPID(size_t rows_, size_t cols_, eT decay_ = 0.9, eT eps_ = 1e-8) : decay(decay_), eps(eps_) {
+		Edx = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		Edx->zeros();
 
-		dx_prev = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*dx_prev)[i] = 0.0;
+		dx_prev = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		dx_prev->zeros();
 
-		deltaP = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*deltaP)[i] = 0.0;
+		deltaP = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		deltaP->zeros();
 
-		deltaI = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*deltaI)[i] = 0.0;
+		deltaI = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		deltaI->zeros();
 
-		deltaD = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*deltaD)[i] = 0.0;
+		deltaD = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		deltaD->zeros();
 
-		delta = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*delta)[i] = 0.0;
+		delta = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		delta->zeros();
 
 		// Initialize ratios and variables.
-		p_rate = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*p_rate)[i] = learning_rate_;
+		p_rate = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		p_rate->zeros();
 
 		// Initialize ratios and variables.
-		i_rate = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*i_rate)[i] = learning_rate_;
+		i_rate = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		i_rate->zeros();
 
 		// Initialize ratios and variables.
-		d_rate = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*d_rate)[i] = learning_rate_;
+		d_rate = MAKE_MATRIX_PTR(eT, rows_,  cols_);
+		d_rate->zeros();
 
 	}
 
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
+	/*!
+	 * Performs update according to the AdaGradPID update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001).
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == Edx->size());
 

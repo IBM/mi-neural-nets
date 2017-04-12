@@ -126,7 +126,7 @@ TEST_F(Tutorial2LayerNN, Backpropagation) {
 	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[3] - (*bwpass1_lin1_dW)[3]), eps);
 
 	// Apply changes.
-	nn.update(0.5 , 0.0);
+	nn.update(0.5);
 
 	// Check weight gradients after the update.
 	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[0] - (*bwpass1_lin2_dW_updated)[0]), eps);

@@ -38,7 +38,7 @@ int main() {
 		// Generate desired target.
 		MatrixXfPtr target (new MatrixXf(4, 1));
 		target->setZero();
-		(*target)(i%4,0)= (i%4);
+		(*target)(i%4,0)= 1;//(i%4);
 		dataset.labels().push_back(target);
 
 		// Add index.
@@ -67,7 +67,7 @@ int main() {
 		std::cout<<"Targets     : " << sample.label()->transpose() << std::endl;
 		std::cout<<"Predictions : " << predictions.transpose() << std::endl << std::endl;
 		iteration++;
-		return 0;
+		//return 0;
 	}//: while
 
 	// Test network

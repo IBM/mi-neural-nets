@@ -28,14 +28,15 @@
  */
 TEST_F(Sphere1DLandscape, DISABLED_AdaGrad_Convergence) {
 	// Optimization function - 1d AdaGrad with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::AdaGrad<double> opt(1);
+	mic::neural_nets::optimization::AdaGrad<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		// Update with learning rate = 0.1.
+		opt.update(x, dx, 0.1);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -55,14 +56,15 @@ TEST_F(Sphere1DLandscape, DISABLED_AdaGrad_Convergence) {
  * \author tkornuta
  */
 TEST_F(Sphere20DLandscape, DISABLED_AdaGrad_Convergence) {
-	// Optimization function - 20d AdaGrad (with default values).
-	mic::neural_nets::optimization::AdaGrad<double> opt(20);
+	// Optimization function - 20d AdaGrad.
+	mic::neural_nets::optimization::AdaGrad<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
+		// Update with default learning rate.
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.

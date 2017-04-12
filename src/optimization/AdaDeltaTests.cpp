@@ -28,13 +28,14 @@
  */
 TEST_F(Sphere1DLandscape, AdaDelta_Convergence) {
 	// Optimization function - 1d AdaGrad with default values.
-	mic::neural_nets::optimization::AdaDelta<double> opt(1);
+	mic::neural_nets::optimization::AdaDelta<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
+		// Update with default learning rate.
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.
@@ -56,13 +57,14 @@ TEST_F(Sphere1DLandscape, AdaDelta_Convergence) {
  */
 TEST_F(Sphere20DLandscape, AdaDelta_Convergence) {
 	// Optimization function - 20d AdaDelta (with default values).
-	mic::neural_nets::optimization::AdaDelta<double> opt(20);
+	mic::neural_nets::optimization::AdaDelta<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
+		// Update with default learning rate.
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.
@@ -84,13 +86,14 @@ TEST_F(Sphere20DLandscape, AdaDelta_Convergence) {
  */
 TEST_F(Beale2DLandscape, DISABLED_AdaDelta_Convergence) {
 	// Optimization AdaDelta.
-	mic::neural_nets::optimization::AdaDelta<double> opt(2);
+	mic::neural_nets::optimization::AdaDelta<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
+		// Update with default learning rate.
 		opt.update(x, dx);
 
 		// Check whether value of the function is finite.

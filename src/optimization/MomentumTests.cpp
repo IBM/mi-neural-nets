@@ -30,14 +30,14 @@
  */
 TEST_F(Sphere1DLandscape, Momentum_Convergence) {
 	// Optimization function - 1d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::Momentum<double> opt(1, 0.1);
+	mic::neural_nets::optimization::Momentum<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.1);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -58,14 +58,14 @@ TEST_F(Sphere1DLandscape, Momentum_Convergence) {
  */
 TEST_F(Sphere20DLandscape, Momentum_Convergence) {
 	// Optimization function - 20d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::Momentum<double> opt(20, 0.01);
+	mic::neural_nets::optimization::Momentum<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.01);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -86,14 +86,14 @@ TEST_F(Sphere20DLandscape, Momentum_Convergence) {
  */
 TEST_F(Beale2DLandscape, Momentum_Convergence) {
 	// Optimization function - 2d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::Momentum<double> opt(2, 0.01);
+	mic::neural_nets::optimization::Momentum<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.01);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -113,15 +113,15 @@ TEST_F(Beale2DLandscape, Momentum_Convergence) {
  * \author tkornuta
  */
 TEST_F(Rosenbrock2DLandscape, Momentum_Convergence) {
-	// Optimization function - 2d momentum with learning rate = 0.1 (and default 0.9 momentum).
-	mic::neural_nets::optimization::Momentum<double> opt(2, 0.00001);
+	// Optimization function - 2d momentum with learning rate = 0.00001 (and default 0.9 momentum).
+	mic::neural_nets::optimization::Momentum<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.00001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);

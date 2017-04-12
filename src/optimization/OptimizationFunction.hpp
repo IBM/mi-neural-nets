@@ -25,18 +25,22 @@ namespace optimization {
 template <typename eT=float>
 class OptimizationFunction {
 public:
-	/// Constructor.
+	/*!
+	 * Constructor. Remembers dimensions.
+	 */
 	OptimizationFunction () { }
 
 	/// Virtual destructor - empty.
 	virtual ~OptimizationFunction () { }
 
-	/// Abstract method responsible for performing the update.
-	virtual void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) = 0;
+	/*!
+	 * Abstract method responsible for performing the update.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate.
+	 */
+	virtual void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_) = 0;
 
-protected:
-	/// A temporary variable used for storing the previous value of the input during update.
-	mic::types::MatrixPtr<eT> prev_x;
 };
 
 

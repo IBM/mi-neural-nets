@@ -24,32 +24,37 @@ template <typename eT=float>
 class AdamID : public OptimizationFunction<eT> {
 public:
 
-	/// Constructor.
-	AdamID(size_t dims_, eT learning_rate_ = 0.1, eT beta1_ = 0.9, eT beta2_ = 0.999, eT eps_ = 1e-8)
-		: learning_rate(learning_rate_), beta1(beta1_), beta2(beta2_), eps(eps_)
+	/*!
+	 * Constructor. Sets dimensions, values of decay (beta1=0.9 and beta2=0.999) and eps (default=1e-8).
+	 * @param rows_ Number of rows of the updated matrix/its gradient.
+	 * @param cols_ Number of columns of the updated matrix/its gradient.
+	 */
+	AdamID(size_t rows_, size_t cols_, eT beta1_ = 0.9, eT beta2_ = 0.999, eT eps_ = 1e-8)
+		: beta1(beta1_), beta2(beta2_), eps(eps_)
 {
-		Edx = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*Edx)[i] = 0.0;
+		Edx = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		Edx->zeros();
 
-		Edx2 = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*Edx2)[i] = 0.0;
+		Edx2 = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		Edx2->zeros();
 
-		dx_prev = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*dx_prev)[i] = 0.0;
+		dx_prev = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		dx_prev->zeros();
 
-		delta = MAKE_MATRIX_PTR(eT, dims_, 1);
-		for(size_t i=0; i< dims_; i++)
-			(*delta)[i] = 0.0;
+		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		delta->zeros();
 
 		beta1_powt = beta1;
 		beta2_powt = beta2;
 	}
 
-	/// Performs update in the direction of gradient descent.
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_) {
+	/*!
+	 * Performs update according to the AdamID update rule.
+	 * @param x_ Pointer to the current matrix.
+	 * @param dx_ Pointer to current gradient of that matrix.
+	 * @param learning_rate_ Learning rate (default=0.001).
+	 */
+	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == Edx->size());
 
@@ -70,7 +75,7 @@ public:
 		for(size_t i=0; i< (size_t)delta->size(); i++) {
 			// update = integral + small derivative correction.
 			// i.e. lr * I + lr^2 * D.
-			eT delta_ID =  learning_rate * (*Edx)[i] + learning_rate*learning_rate * ((*dx_)[i] - (*dx_prev)[i]);
+			eT delta_ID =  learning_rate_ * (*Edx)[i] + learning_rate_*learning_rate_ * ((*dx_)[i] - (*dx_prev)[i]);
 			(*delta)[i] = 1.0 / (sqrt( (*Edx2)[i] / (1 - beta2_powt)) + eps) * ( delta_ID  ) / (1 - beta1_powt);
 //			std::cout<< (*delta)[i] << " | ";
 			assert(std::isfinite((*delta)[i]));
@@ -97,10 +102,6 @@ public:
 	}
 
 protected:
-
-	/// Learning rate.
-	eT learning_rate;
-
 	/// Decay rate 1 (momentum for past gradients).
 	eT beta1;
 

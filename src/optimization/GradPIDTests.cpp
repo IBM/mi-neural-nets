@@ -28,7 +28,7 @@
  */
 TEST_F(Sphere1DLandscape, GradPID_Convergence) {
 	// Optimization function - 1d GradPID (with default values).
-	mic::neural_nets::optimization::GradPID<double> opt(1, 0.1);
+	mic::neural_nets::optimization::GradPID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
@@ -37,7 +37,7 @@ TEST_F(Sphere1DLandscape, GradPID_Convergence) {
 	while (abs_diff > eps) {
 		// Calculate gradient.
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.1);
 
 		// Check whether value of the function is finite.
 		value = fun.calculateValue(x);
@@ -61,14 +61,14 @@ TEST_F(Sphere20DLandscape, GradPID_Convergence) {
 	for (size_t i=0; i<20; i++)
 		(*x)[i] = i;
 	// Optimization function - 20d GradPID (with default values).
-	mic::neural_nets::optimization::GradPID<double> opt(20, 0.1);
+	mic::neural_nets::optimization::GradPID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.1);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -91,14 +91,14 @@ TEST_F(Sphere20DLandscape, GradPID_Convergence) {
  */
 TEST_F(Beale2DLandscape, GradPID_Convergence) {
 	// Optimization function - 2d GradPID.
-	mic::neural_nets::optimization::GradPID<double> opt(2, 0.01);
+	mic::neural_nets::optimization::GradPID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.01);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -120,14 +120,14 @@ TEST_F(Beale2DLandscape, GradPID_Convergence) {
 TEST_F(Rosenbrock2DLandscape, GradPID_Convergence) {
 	// Optimization function - 2d GradPID.
 	double ni = 0.0001;
-	mic::neural_nets::optimization::GradPID<double> opt(2, ni);
+	mic::neural_nets::optimization::GradPID<double> opt(x->rows(), x->cols());
 
 	// Simulate a simple gradient descent.
 	size_t iteration = 0;
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, ni);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);

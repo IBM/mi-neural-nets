@@ -55,8 +55,8 @@ public:
 		Layer<eT>::g.add ("b", outputs_, 1 );
 
 		// Create optimization functions.
-		opt_W = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (0.5));
-		opt_b = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (0.5));
+		opt_W = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (outputs_, inputs_));
+		opt_b = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (outputs_, 1));
 	};
 
 
@@ -112,7 +112,7 @@ public:
 	/*!
 	 * Applies the gradient update.
 	 */
-	void applyGrads(double alpha_, double decay_ = 0) {
+	void applyGrads(double alpha_) {
 		//adagrad
 		//mW += dW.cwiseProduct(dW);
 		//(*m['W']) += (*g['W']).cwiseProduct((*g['W']));
@@ -125,8 +125,8 @@ public:
 		//std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
 		//std::cout << "g['W'] = \n" << (*g['W']) << std::endl;
 
-		opt_W->update(p['W'], g['W']);
-		opt_b->update(p['b'], g['b']);
+		opt_W->update(p['W'], g['W'], alpha_);
+		opt_b->update(p['b'], g['b'], alpha_);
 
 		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 
