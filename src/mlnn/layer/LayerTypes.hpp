@@ -29,8 +29,6 @@
 
 #include <mlnn/cost_function/Softmax.hpp>
 
-#include <mlnn/cost_function/Regression.hpp>
-
 // Fully connected layers.
 
 #include <mlnn/fully_connected/Linear.hpp>

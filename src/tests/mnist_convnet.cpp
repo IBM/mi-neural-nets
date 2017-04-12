@@ -68,7 +68,7 @@ int main() {
 
 	size_t  fully_connected_size = 256;
 
-	MultiLayerNeuralNetwork nn;
+	MultiLayerNeuralNetwork<float> nn("ConvNet", mic::neural_nets::loss::CrossEntropyLoss<float>);
 
 	//CONV 3x3 -> CONV 3x3 -> POOL 2x
 	nn.pushLayer(new Convolution(28*28, input_channels, filter_size[0], filters[0]));

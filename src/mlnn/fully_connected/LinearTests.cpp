@@ -148,18 +148,6 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 }
 
 
-/*double calculateLoss (mic::types::MatrixPtr<double> predicted_y_, mic::types::MatrixPtr<double> target_y_) {
-	// Sizes must match.
-	assert(predicted_y_->size() == target_y_->size());
-
-	// Calculate loss.
-	double loss =0;
-	for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
-		loss += ((*predicted_y_)[i] - (*target_y_)[i])*((*predicted_y_)[i] - (*target_y_)[i]);
-	}
-	return loss;
-}*/
-
 /*!
  * Numerical gradient test dW, size of layer is 2x3.
  */
@@ -167,7 +155,7 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
 	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.g["W"]);
@@ -190,7 +178,7 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_db) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
 	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.g["b"]);
@@ -213,7 +201,7 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dx) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
 	// Store resulting gradients - make a copy!
 	mic::types::MatrixPtr<double> dx = MAKE_MATRIX_PTR(double, *layer.backward(dy));
 
@@ -236,7 +224,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(const_x);
-	mic::types::MatrixPtr<double> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
 	layer.backward(dy);
 	// Store resulting gradients - make a copy!
 	mic::types::MatrixPtr<double> dW = MAKE_MATRIX_PTR(double, *layer.g["W"]);
@@ -252,7 +240,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
 	double eps = 1e-6;
 	for (size_t i=0; i<(size_t)dW->size(); i++){
 		//std::cout << "i=" << i << " (*dW)[i]= " << (*dW)[i] << " (*nW)[i]= " << (*nW)[i] << std::endl;
-		ASSERT_LE(((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
+		EXPECT_LE(((*dW)[i] - (*nW)[i]), eps) << "Too big difference between dW and numerical dW at position i=" << i;
 	}
 }
 
@@ -278,7 +266,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_db) {
 	// Compare gradients.
 	double eps = 1e-6;
 	for (size_t i=0; i<(size_t)db->size(); i++)
-		ASSERT_LE(((*db)[i] - (*nb)[i]), eps) << "Too big difference between db and numerical db at position i=" << i;
+		EXPECT_LE(((*db)[i] - (*nb)[i]), eps) << "Too big difference between db and numerical db at position i=" << i;
 }
 
 
@@ -302,7 +290,7 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dx) {
 	// Compare gradients.
 	double eps = 1e-6;
 	for (size_t i=0; i<(size_t)dx->size(); i++)
-		ASSERT_LE(((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
+		EXPECT_LE(((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
 }
 
 

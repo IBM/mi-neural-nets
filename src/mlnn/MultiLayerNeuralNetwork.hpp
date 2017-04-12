@@ -10,6 +10,7 @@
 
 #include <types/MatrixTypes.hpp>
 #include <mlnn/layer/LayerTypes.hpp>
+#include <loss/LossTypes.hpp>
 
 #include <fstream>
 // Include headers that implement a archive in simple text format
@@ -36,22 +37,11 @@ using namespace fully_connected;
 using namespace regularisation;
 
 /*!
- * \brief Enumeration of possible loss function types.
- * \author tkornuta
- */
-enum class LossFunctionType : short
-{
-	Undefined = -1, ///< Loss function undefined!
-	RegressionQuadratic = 0, ///< Quadratic cost function used in regression
-	ClassificationEntropy = 1, ///< Entropy used in classification
-};
-
-/*!
  * \brief Class representing a multi-layer neural network.
  * \author tkornuta/kmrocki
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
-template <typename eT=float>
+template <typename eT=float, typename LossFunction=mic::neural_nets::loss::CrossEntropyLoss<float> >
 class MultiLayerNeuralNetwork {
 public:
 
@@ -61,7 +51,6 @@ public:
 	 */
 	MultiLayerNeuralNetwork(std::string name_ = "mlnn") :
 		name(name_),
-		loss_type(LossFunctionType::Undefined), // Initially the type of loss function is undefined.
 		connected(false) // Initially the network is not connected.
 	{
 
@@ -113,17 +102,17 @@ public:
 	 * @param input_data Input data - a matrix containing [sample_size x batch_size].
 	 * @param skip_dropout Flag for skipping dropouts - which should be set to true during testing.
 	 */
-	void forward(mic::types::Matrix<eT>& input_data, bool skip_dropout = false)  {
+	void forward(mic::types::MatrixPtr<eT> input_data, bool skip_dropout = false)  {
 		// Make sure that there are some layers in the nn!
 		assert(layers.size() != 0);
 
 		// Boost::Matrix is col major!
-		LOG(LDEBUG) << "Inputs size: " << input_data.rows() << "x" << input_data.cols();
+		LOG(LDEBUG) << "Inputs size: " << input_data->rows() << "x" << input_data->cols();
 		LOG(LDEBUG) << "First layer input matrix size: " <<  layers[0]->s['x']->rows() << "x" << layers[0]->s['x']->cols();
 
 		// Make sure that the dimensions are ok.
 		// Check only rows, as cols determine the batch size - and we allow them to be dynamically changing!.
-		assert((layers[0]->s['x'])->rows() == input_data.rows());
+		assert((layers[0]->s['x'])->rows() == input_data->rows());
 		//LOG(LDEBUG) <<" input_data: " << input_data.transpose();
 
 		// Connect layers by setting the input matrices pointers to point the output matrices.
@@ -137,12 +126,12 @@ public:
 			connected = true;
 		}
 
-		//assert((layers[0]->s['x'])->cols() == input_data.cols());
+		//assert((layers[0]->s['x'])->cols() == input_data->cols());
 		// Change the size of batch - if required.
-		resizeBatch(input_data.cols());
+		resizeBatch(input_data->cols());
 
 		// Copy inputs to the lowest point in the network.
-		(*(layers[0]->s['x'])) = input_data;
+		(*(layers[0]->s['x'])) = (*input_data);
 
 		// Compute the forward activations.
 		for (size_t i = 0; i < layers.size(); i++) {
@@ -161,19 +150,19 @@ public:
 	 * Performs the back propagation
 	 * @param targets_ The targer matrix, containing target (desired) outputs of the network [encoded_label_size x batch_size]
 	 */
-	void backward(mic::types::Matrix<eT>& targets_) {
+	void backward(mic::types::MatrixPtr<eT> targets_) {
 		// Make sure that there are some layers in the nn!
 		assert(layers.size() != 0);
 
 		LOG(LDEBUG) << "Last layer output gradient matrix size: " << layers.back()->g['y']->cols() << "x" << layers.back()->g['y']->rows();
-		LOG(LDEBUG) << "Passed target matrix size: " <<  targets_.cols() << "x" << targets_.rows();
+		LOG(LDEBUG) << "Passed target matrix size: " <<  targets_->cols() << "x" << targets_->rows();
 
 		// Make sure that the dimensions are ok.
-		assert((layers.back()->g['y'])->cols() == targets_.cols());
-		assert((layers.back()->g['y'])->rows() == targets_.rows());
+		assert((layers.back()->g['y'])->cols() == targets_->cols());
+		assert((layers.back()->g['y'])->rows() == targets_->rows());
 
 		// Set targets at the top.
-		(*(layers.back()->g['y'])) = targets_;
+		(*(layers.back()->g['y'])) = (*targets_);
 
 		// Back-propagate the error.
 		for (int i = layers.size() - 1; i >= 0; i--) {
@@ -208,23 +197,28 @@ public:
 	eT train(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_, eT learning_rate_, eT weight_decay_) {
 
 		// Forward propagate the activations from first layer to the last.
-		forward(*encoded_batch_);
+		forward(encoded_batch_);
 
 		// Get predictions.
 		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
 
-		// Backpropagate the gradients from last layer to the first.
-		backward(*encoded_targets_);
+		// Calculate gradient according to the loss function.
+		mic::types::MatrixPtr<eT> dy = loss.calculateGradient(encoded_targets_, encoded_predictions);
 
-		// Apply changes
+		// Backpropagate the gradients from last layer to the first.
+		backward(dy);
+
+		// Apply the changes - according to the optimization function.
 		update(learning_rate_, weight_decay_);
 
-		// Calculate the loss.
-		eT loss = calculateLossFunction(encoded_targets_, encoded_predictions);
-		eT correct = countCorrectPredictions(encoded_targets_, encoded_predictions);
-		LOG(LDEBUG) << " Loss = " << std::setprecision(2) << std::setw(6) << loss << " | " << std::setprecision(1) << std::setw(4) << std::fixed << 100.0 * (eT)correct / (eT)encoded_batch_->cols() << "% batch correct";
+		// Calculate value of the loss function.
+		eT loss_value = loss.calculateLoss(encoded_targets_, encoded_predictions);
+
+		//eT correct = countCorrectPredictions(encoded_targets_, encoded_predictions);
+		//LOG(LDEBUG) << " Loss = " << std::setprecision(2) << std::setw(6) << loss_value << " | " << std::setprecision(1) << std::setw(4) << std::fixed << 100.0 * (eT)correct / (eT)encoded_batch_->cols() << "% batch correct";
+
 		// Return loss.
-		return loss;
+		return loss_value;
 	}
 
 	/*!
@@ -237,7 +231,7 @@ public:
 		// skip dropout layers at test time
 		bool skip_dropout = true;
 
-		forward(*encoded_batch_, skip_dropout);
+		forward(encoded_batch_, skip_dropout);
 
 		// Get predictions.
 		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
@@ -278,22 +272,8 @@ public:
 	 * @return Loss computed according to the selected loss function. If function not set - returns INF.
 	 */
 	eT calculateLossFunction(mic::types::MatrixPtr<eT> encoded_targets_, mic::types::MatrixPtr<eT> encoded_predictions_)  {
-		mic::types::Matrix<eT> diff;
-		// Calculate the loss.
-		switch (loss_type) {
-			case LossFunctionType::RegressionQuadratic:
-				diff = ((*encoded_predictions_) - (*encoded_targets_));
-				return (diff * diff.transpose()).sum()/encoded_targets_->cols();
-				break;
-			case LossFunctionType::ClassificationEntropy:
-				return encoded_predictions_->calculateCrossEntropy(*encoded_targets_)/encoded_targets_->cols();
-				break;
-			case LossFunctionType::Undefined:
-			default:
-				LOG(LERROR)<<"Loss function not set! Possible reason: the network lacks the regression/classification layer. This may cause problems with the convergence during learning!";
-				return std::numeric_limits<eT>::infinity();
-		}//: switch
 
+		return loss.calculateLoss(encoded_targets_, encoded_predictions_);
 	}
 
 	/*!
@@ -383,7 +363,6 @@ public:
 			LOG(LERROR) << "Could not write neural network " << name << " to file " << filename_ << "!";
 			// Clear layers - just in case.
 			layers.clear();
-			loss_type = LossFunctionType::Undefined;
 			return false;
 		}
 		return true;
@@ -407,7 +386,6 @@ public:
 			LOG(LERROR) << "Could not load neural network from file " << filename_ << "!";
 			// Clear layers - just in case.
 			layers.clear();
-			loss_type = LossFunctionType::Undefined;
 			return false;
 		}
 		return true;
@@ -427,9 +405,9 @@ protected:
 	std::string name;
 
 	/*!
-	 * Type of the used loss function.
+	 * Loss function.
 	 */
-	LossFunctionType loss_type;
+	LossFunction loss;
 
 private:
 	// Friend class - required for using boost serialization.
@@ -445,8 +423,10 @@ private:
      */
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
+    	// Serialize name.
         ar & name;
-		ar & loss_type;
+		//ar & loss_type;
+
 		// Serialize number of layers.
         size_t size = layers.size();
         ar & size;
@@ -475,7 +455,7 @@ private:
 
     	// Deserialize name and loss function type.
 		ar & name;
-		ar & loss_type;
+		//ar & loss;
 
 		// Deserialize number of layers.
 		size_t size;
@@ -521,10 +501,6 @@ private:
 			case(LayerTypes::Softmax):
 				layer_ptr = std::make_shared<Softmax<eT> >(Softmax<eT>());
 				LOG(LDEBUG) <<  "Softmax";
-				break;
-			case(LayerTypes::Regression):
-				layer_ptr = std::make_shared<Regression<eT> >(Regression<eT>());
-				LOG(LDEBUG) <<  "Regression";
 				break;
 
 			// fully_connected

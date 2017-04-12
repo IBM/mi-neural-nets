@@ -14,60 +14,60 @@
 /*!
  * Tests squared error loss function on vectors with four floats.
  */
-TEST_F(Vectors4Float, SquareErrorLoss) {
+TEST_F(Vectors4x1Float, RegressionLoss) {
 	// Loss function.
 	mic::neural_nets::loss::RegressionLoss<float> loss;
 
-	ASSERT_EQ(loss.calculateLoss(predicted_y, target_y), (float)4.0);
+	ASSERT_EQ(loss.calculateLoss(target_y, predicted_y), (float)1.0);
 }
 
 /*!
  * Tests squared error loss function on vectors with four elements.
  */
-TEST_F(Vectors4Float, SquareErrorGradient) {
+TEST_F(Vectors4x1Float, RegressionGradient) {
 	// Loss function.
 	mic::neural_nets::loss::RegressionLoss<float> loss;
-	mic::types::MatrixPtr<float> dy = loss.calculateGradient(predicted_y, target_y);
+	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
 
 	for (size_t i=0; i<(size_t)dy->size(); i++){
-		ASSERT_EQ((*dy)[i], -2.0) << "Gradient error at position i=" << i;
+		ASSERT_EQ((*dy)[i], 2.0) << "Gradient error at position i=" << i;
 	}
 }
 
 /*!
  * Tests squared error loss function on 2 different predicted vectors with four floats.
  */
-TEST_F(Vectors4Float3, SquareErrorLoss) {
+TEST_F(Vectors4x1Float2, RegressionLoss) {
 	// Loss function.
 	mic::neural_nets::loss::RegressionLoss<float> loss;
 	float eps = 1e-5;
 
-	float l1 = loss.calculateLoss(predicted_y1, target_y);
-	ASSERT_LE(std::abs(l1-0.045), eps);
+	float l1 = loss.calculateLoss(target_y, predicted_y1);
+	EXPECT_LE(std::abs(l1-0.01125), eps);
 
-	float l2 = loss.calculateLoss(predicted_y2, target_y);
-	ASSERT_LE(std::abs(l2-0.045), eps);
+	float l2 = loss.calculateLoss(target_y, predicted_y2);
+	EXPECT_LE(std::abs(l2-0.01125), eps);
 }
 
 /*!
  * Tests squared error gradient on 2 different predicted vectors with four elements.
  */
-TEST_F(Vectors4Float3, SquareErrorGradient) {
+TEST_F(Vectors4x1Float2, RegressionGradient) {
 	// Loss function.
 	mic::neural_nets::loss::RegressionLoss<float> loss;
 	float eps = 1e-5;
 
-	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
-	ASSERT_LE(std::abs((*dy1)[0] + 0.3), eps) << "Gradient error at position i=0";
-	ASSERT_LE(std::abs((*dy1)[1] - 0.3), eps) << "Gradient error at position i=1";
-	ASSERT_LE(std::abs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
-	ASSERT_LE(std::abs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
+	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(target_y, predicted_y1);
+	EXPECT_LE(std::abs((*dy1)[0] - 0.3), eps) << "Gradient error at position i=0";
+	EXPECT_LE(std::abs((*dy1)[1] + 0.3), eps) << "Gradient error at position i=1";
+	EXPECT_LE(std::abs((*dy1)[2] - 0.0), eps) << "Gradient error at position i=2";
+	EXPECT_LE(std::abs((*dy1)[3] - 0.0), eps) << "Gradient error at position i=3";
 
-	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(predicted_y2, target_y);
-	ASSERT_LE(std::abs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
-	ASSERT_LE(std::abs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
-	ASSERT_LE(std::abs((*dy2)[2] + 0.3), eps) << "Gradient error at position i=2";
-	ASSERT_LE(std::abs((*dy2)[3] - 0.3), eps) << "Gradient error at position i=3";
+	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(target_y, predicted_y2);
+	EXPECT_LE(std::abs((*dy2)[0] - 0.0), eps) << "Gradient error at position i=0";
+	EXPECT_LE(std::abs((*dy2)[1] - 0.0), eps) << "Gradient error at position i=1";
+	EXPECT_LE(std::abs((*dy2)[2] - 0.3), eps) << "Gradient error at position i=2";
+	EXPECT_LE(std::abs((*dy2)[3] + 0.3), eps) << "Gradient error at position i=3";
 }
 
 
@@ -75,40 +75,77 @@ TEST_F(Vectors4Float3, SquareErrorGradient) {
 /*!
  * Tests cross-entropy loss function on 2 different predicted vectors with four floats.
  */
-TEST_F(Vectors4Float3, CrossEntropyLoss) {
+TEST_F(Vectors4x1Float2, CrossEntropyLoss) {
 	// Loss function.
 	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
 	float eps = 1e-5;
 
-	float l1 = loss.calculateLoss(predicted_y1, target_y);
-	ASSERT_LE(std::abs(l1 - 2.0), eps);
+	float l1 = loss.calculateLoss(target_y, predicted_y1);
+	EXPECT_LE(std::abs(l1 - 0.5), eps);
 
-	float l2 = loss.calculateLoss(predicted_y2, target_y);
-	ASSERT_LE(std::abs(l2-2.02193), eps);
+	float l2 = loss.calculateLoss(target_y, predicted_y2);
+	EXPECT_LE(std::abs(l2 - 0.5054825), eps);
 }
 
 
 /*!
  * Tests cross-entropy gradient on 2 different predicted vectors with four elements.
  */
-TEST_F(Vectors4Float3, CrossEntropyGradient) {
+TEST_F(Vectors4x1Float2, CrossEntropyGradient) {
 	// Loss function.
 	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
 	double eps = 1e-5;
 
-	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(predicted_y1, target_y);
-	ASSERT_LE(std::abs((*dy1)[0] - 0.15), eps) << "Gradient error at position i=0";
-	ASSERT_LE(std::abs((*dy1)[1] + 0.15), eps) << "Gradient error at position i=1";
-	ASSERT_LE(std::abs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
-	ASSERT_LE(std::abs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
+	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(target_y, predicted_y1);
+	EXPECT_LE(std::abs((*dy1)[0] - 0.15), eps) << "Gradient error at position i=0";
+	EXPECT_LE(std::abs((*dy1)[1] + 0.15), eps) << "Gradient error at position i=1";
+	EXPECT_LE(std::abs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
+	EXPECT_LE(std::abs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
 
-	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(predicted_y2, target_y);
-	ASSERT_LE(std::abs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
-	ASSERT_LE(std::abs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
-	ASSERT_LE(std::abs((*dy2)[2] - 0.15), eps) << "Gradient error at position i=2";
-	ASSERT_LE(std::abs((*dy2)[3] + 0.15), eps) << "Gradient error at position i=3";
+	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(target_y, predicted_y2);
+	EXPECT_LE(std::abs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
+	EXPECT_LE(std::abs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
+	EXPECT_LE(std::abs((*dy2)[2] - 0.15), eps) << "Gradient error at position i=2";
+	EXPECT_LE(std::abs((*dy2)[3] + 0.15), eps) << "Gradient error at position i=3";
 }
 
+
+/*!
+ * Tests squared error loss function on vectors with four elements.
+ */
+TEST_F(Vectors3x2Float, RegressionGradient) {
+	// Loss function.
+	mic::neural_nets::loss::RegressionLoss<float> loss;
+	double eps = 1e-5;
+
+	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
+
+	EXPECT_LE(std::abs((*dy)(0,0) - 0.2), eps) << "Gradient error at position (0,0)";
+	EXPECT_LE(std::abs((*dy)(0,1) - 0.0), eps) << "Gradient error at position (0,1)";
+	EXPECT_LE(std::abs((*dy)(1,0) + 0.2), eps) << "Gradient error at position (1,0)";
+	EXPECT_LE(std::abs((*dy)(1,1) - 0.2), eps) << "Gradient error at position (1,1)";
+	EXPECT_LE(std::abs((*dy)(2,0) - 0.2), eps) << "Gradient error at position (2,0)";
+	EXPECT_LE(std::abs((*dy)(2,1) + 1.0), eps) << "Gradient error at position (2,1)";
+}
+
+
+/*!
+ * Tests squared error loss function on vectors with four elements.
+ */
+TEST_F(Vectors3x2Float, CrossEntropyGradient) {
+	// Loss function.
+	mic::neural_nets::loss::CrossEntropyLoss<float> loss;
+	double eps = 1e-5;
+
+	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
+
+	EXPECT_LE(std::abs((*dy)(0,0) - 0.1), eps) << "Gradient error at position (0,0)";
+	EXPECT_LE(std::abs((*dy)(0,1) - 0.0), eps) << "Gradient error at position (0,1)";
+	EXPECT_LE(std::abs((*dy)(1,0) + 0.1), eps) << "Gradient error at position (1,0)";
+	EXPECT_LE(std::abs((*dy)(1,1) - 0.1), eps) << "Gradient error at position (1,1)";
+	EXPECT_LE(std::abs((*dy)(2,0) - 0.1), eps) << "Gradient error at position (2,0)";
+	EXPECT_LE(std::abs((*dy)(2,1) + 0.5), eps) << "Gradient error at position (2,1)";
+}
 
 
 

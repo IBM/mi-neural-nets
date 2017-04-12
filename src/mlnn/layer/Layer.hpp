@@ -47,7 +47,6 @@ enum class LayerTypes : short
 	Padding,
 	Pooling,
 	// cost_function
-	Regression,
 	Softmax,
 	// fully_connected
 	Identity,
@@ -68,7 +67,7 @@ inline eT sqrt_eps(const eT x) {
 }
 
 // Forward declaration of MultiLayerNeuralNetwork - required for "lazy connection".
-template <typename eT>
+template <typename eT, typename LossFunction>
 class MultiLayerNeuralNetwork;
 
 /*!
@@ -106,7 +105,6 @@ public:
 		// Gradients.
 		g.add ( "x", input_size, batch_size ); 	// inputs
 		g.add ( "y", output_size, batch_size); 	// outputs
-
 	};
 
 	/*!
@@ -183,11 +181,11 @@ public:
 			// Add delta.
 			(*param_)[i] += delta_;
 			// Calculate loss.
-			eT p = loss_.calculateLoss(forward(x_), target_y_);
+			eT p = loss_.calculateLoss(target_y_, forward(x_));
 			// Substract delta.
 			(*param_)[i] -= 2*delta_;
 			// Calculate loss.
-			eT m = loss_.calculateLoss(forward(x_), target_y_);
+			eT m = loss_.calculateLoss(target_y_, forward(x_));
 
 			// Store numerical gradient.
 			(*nGrad)[i] = (p-m)/(2*delta_);
@@ -255,28 +253,33 @@ public:
 	 */
 	const std::string type() const {
 		switch(layer_type) {
-		case(LayerTypes::Linear):
-			return "Linear";
-		case(LayerTypes::Pooling):
-			return "Pooling";
-		case(LayerTypes::Convolution):
-			return "Convolution";
-		case(LayerTypes::Sigmoid):
-			return "Sigmoid";
-		case(LayerTypes::Identity):
-			return "Identity";
-		case(LayerTypes::ReLU):
-			return "ReLU";
+		// activation
 		case(LayerTypes::ELU):
 			return "ELU";
-		case(LayerTypes::Softmax):
-			return "Softmax";
-		case(LayerTypes::Dropout):
-			return "Dropout";
+		case(LayerTypes::ReLU):
+			return "ReLU";
+		case(LayerTypes::Sigmoid):
+			return "Sigmoid";
+		// convolution
+		case(LayerTypes::Convolution):
+			return "Convolution";
 		case(LayerTypes::Padding):
 			return "Padding";
-		case(LayerTypes::Regression):
-			return "Regression";
+		case(LayerTypes::Pooling):
+			return "Pooling";
+		// cost_function
+		case(LayerTypes::Softmax):
+			return "Softmax";
+		// fully_connected
+		case(LayerTypes::Identity):
+			return "Identity";
+		case(LayerTypes::Linear):
+			return "Linear";
+		case(LayerTypes::SparseLinear):
+			return "SparseLinear";
+		// regularization
+		case(LayerTypes::Dropout):
+			return "Dropout";
 		default:
 			return "Undefined";
 		}//: switch
@@ -365,7 +368,7 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp> friend class MultiLayerNeuralNetwork;
+	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
 
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;

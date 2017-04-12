@@ -55,7 +55,7 @@ int main() {
 
 	// Create a simple NN for classification (should give around 95.3% accuracy)
 	//MNIST - 28x28 -> 256 -> 100 -> 10
-	MultiLayerNeuralNetwork nn;
+	MultiLayerNeuralNetwork<float> nn("3layerReLUSofmax", mic::neural_nets::loss::CrossEntropyLoss<float>);
 	nn.pushLayer(new Linear(28 * 28, 256));
 	nn.pushLayer(new ReLU(256));
 	nn.pushLayer(new Linear(256, 100));

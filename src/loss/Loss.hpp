@@ -28,12 +28,12 @@ public:
 	/*!
 	 * \brief Function calculating loss - abstract.
 	 */
-	virtual dtype calculateLoss (mic::types::MatrixPtr<dtype> predicted_y_, mic::types::MatrixPtr<dtype> target_y_) = 0;
+	virtual dtype calculateLoss (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) = 0;
 
 	/*!
 	 * \brief Function calculating gradient - abstract.
 	 */
-	virtual mic::types::MatrixPtr<dtype> calculateGradient (mic::types::MatrixPtr<dtype> predicted_y_, mic::types::MatrixPtr<dtype> target_y_) = 0;
+	virtual mic::types::MatrixPtr<dtype> calculateGradient (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) = 0;
 
 };
 

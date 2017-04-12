@@ -17,7 +17,7 @@
 TEST_F(Simple2LayerRegressionNN, Dimensions) {
 
 	// Number of layers.
-	ASSERT_EQ(nn.layers.size(), 5);
+	ASSERT_EQ(nn.layers.size(), 4);
 	// First fully connected dimensions.
 	ASSERT_EQ(nn.layers[0]->inputSize(), 10);
 	ASSERT_EQ(nn.layers[0]->batchSize(), 1);
