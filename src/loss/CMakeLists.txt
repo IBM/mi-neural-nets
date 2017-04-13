@@ -5,6 +5,7 @@ install(FILES
 	Loss.hpp
 	CrossEntropyLoss.hpp
 	SquaredErrorLoss.hpp
+	LogLikelihoodLoss.hpp
 	LossTypes.hpp
 	DESTINATION include/loss)
 

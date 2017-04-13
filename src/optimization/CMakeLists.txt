@@ -9,6 +9,7 @@ install(FILES
 	Momentum.hpp
 	OptimizationFunction.hpp
 	RMSProp.hpp
+	OptimizationFunctionTypes.hpp
 	DESTINATION include/optimization)
 
 
