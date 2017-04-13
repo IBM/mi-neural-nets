@@ -16,7 +16,7 @@
 // Redefine "private" and "protected" so every class field/method will be accessible for tests.
 #define private public
 #define protected public
-#include "MultiLayerNeuralNetwork.hpp"
+#include <mlnn/MultiLayerNeuralNetwork.hpp>
 
 
 /*!

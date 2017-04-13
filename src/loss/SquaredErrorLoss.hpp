@@ -11,7 +11,7 @@
 #ifndef SQUAREDLOSS_HPP_
 #define SQUAREDLOSS_HPP_
 
-#include <loss/Loss.hpp>
+#include "loss/Loss.hpp"
 
 namespace mic {
 namespace neural_nets {

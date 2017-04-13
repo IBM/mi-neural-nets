@@ -3,8 +3,8 @@ project(MINeuralNets CXX C)
 
 #  Set current version number.
 set (MINeuralNets_VERSION_MAJOR 1)
-set (MINeuralNets_VERSION_MINOR 1)
-set (MINeuralNets_VERSION_PATCH 0)
+set (MINeuralNets_VERSION_MINOR 2)
+set (MINeuralNets_VERSION_PATCH 1)
 set (MINeuralNets_VERSION ${MINeuralNets_VERSION_MAJOR}.${MINeuralNets_VERSION_MINOR}.${MINeuralNets_VERSION_PATCH})
 
 # CMake required version.
@@ -36,13 +36,13 @@ find_package( Eigen3 REQUIRED )
 include_directories( ${EIGEN3_INCLUDE_DIR} )
 
 # Find MIC Toolchain
-find_package(MIToolchain 1.0 REQUIRED)
+find_package(MIToolchain 1.1 REQUIRED)
 
 # Find MIC Algorithms
 find_package(MIAlgorithms 1.1 REQUIRED)
 
 # Find MIC Visualization
-find_package(MIVisualization 1.0 REQUIRED)
+find_package(MIVisualization 1.2 REQUIRED)
 
 # =======================================================================
 # Find optional packages
@@ -72,25 +72,29 @@ endif(NOT GTEST_FOUND)
 # Add additional option to cmake.
 set(BUILD_UNIT_TESTS ON CACHE BOOL "Build unit tests.")
 
+
 # =======================================================================
 # RPATH settings
 # =======================================================================
 # use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+#SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
+#SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+#SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 
 # =======================================================================
 # Add subdirectories
 # =======================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(src)
 

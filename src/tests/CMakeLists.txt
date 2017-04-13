@@ -16,7 +16,6 @@ if(${BUILD_TEST_SAMPLE_TRAINING_MLNN})
 		configuration
 		types
 		data_io
-		mlnn
 		${Boost_LIBRARIES}
 		)
 	if(OpenBLAS_FOUND)
@@ -45,7 +44,6 @@ if(${BUILD_TEST_BATCH_TRAINING_MLNN})
 		types
 		data_io
 		encoders
-		mlnn
 		${Boost_LIBRARIES}
 		)
 	if(OpenBLAS_FOUND)
@@ -74,7 +72,6 @@ if(${BUILD_MNIST_CNN_APP})
 	        types
 			data_io
 			encoders
-			mlnn
 		    ${Boost_LIBRARIES}
 	    )
         if(OpenBLAS_FOUND)
@@ -103,7 +100,6 @@ if(${BUILD_MNIST_MLP_APP})
 	        types
 			data_io
 			encoders
-			mlnn
 	        ${Boost_LIBRARIES}
 	        )
         if(OpenBLAS_FOUND)

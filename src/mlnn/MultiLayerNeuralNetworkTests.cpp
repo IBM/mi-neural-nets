@@ -7,7 +7,7 @@
  *
  */
 
-#include "MultiLayerNeuralNetworkTests.hpp"
+#include <mlnn/MultiLayerNeuralNetworkTests.hpp>
 
 
 
@@ -80,69 +80,108 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 /*!
  * Tests a single iteration of a backpropagation algorithm.
  */
-TEST_F(Tutorial2LayerNN, Backpropagation) {
+TEST_F(Tutorial2LayerNN, BackpropagationSingleStep) {
 	double eps = 1e-5;
 
 	// Forward pass.
 	nn.forward(input_x);
 
 	// Lin1 layer output.
-	ASSERT_LE( abs( (*nn.layers[0]->s["y"])[0] - (*ffpass1_lin1_y)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->s["y"])[1] - (*ffpass1_lin1_y)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->s["y"])[0] - (*ffpass1_lin1_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->s["y"])[1] - (*ffpass1_lin1_y)[1]), eps);
 	// Sig1 layer output.
-	ASSERT_LE( abs( (*nn.layers[1]->s["y"])[0] - (*ffpass1_sig1_y)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[1]->s["y"])[1] - (*ffpass1_sig1_y)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[1]->s["y"])[0] - (*ffpass1_sig1_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[1]->s["y"])[1] - (*ffpass1_sig1_y)[1]), eps);
 	// Lin1 layer output.
-	ASSERT_LE( abs( (*nn.layers[2]->s["y"])[0] - (*ffpass1_lin2_y)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->s["y"])[1] - (*ffpass1_lin2_y)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->s["y"])[0] - (*ffpass1_lin2_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->s["y"])[1] - (*ffpass1_lin2_y)[1]), eps);
 	// Sig1 layer output.
-	ASSERT_LE( abs( (*nn.layers[3]->s["y"])[0] - (*ffpass1_sig2_y)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[3]->s["y"])[1] - (*ffpass1_sig2_y)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[3]->s["y"])[0] - (*ffpass1_sig2_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[3]->s["y"])[1] - (*ffpass1_sig2_y)[1]), eps);
 
 	// Calculate loss.
 	double loss = nn.loss.calculateLoss(target_y, nn.getPredictions());
-	ASSERT_LE( abs( loss - ffpass1_loss), eps);
+	ASSERT_LE( fabs( loss - ffpass1_loss), eps);
 
 	// Calculate gradient.
 	mic::types::MatrixPtr<double> dy = MAKE_MATRIX_PTR(double, 2, 1);
 	(*dy) = (*nn.loss.calculateGradient(target_y, nn.getPredictions()));
 
 	// Check gradient.
-	ASSERT_LE( abs( (*dy)[0] - (*ffpass1_dy)[0]), eps);
-	ASSERT_LE( abs( (*dy)[1] - (*ffpass1_dy)[1]), eps);
+	ASSERT_LE( fabs( (*dy)[0] - (*ffpass1_dy)[0]), eps);
+	ASSERT_LE( fabs( (*dy)[1] - (*ffpass1_dy)[1]), eps);
 
 	// Backpropagate the gradients from last layer to the first.
 	nn.backward(dy);
 
 	// Check weight gradients.
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[0] - (*bwpass1_lin2_dW)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[1] - (*bwpass1_lin2_dW)[1]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[2] - (*bwpass1_lin2_dW)[2]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[3] - (*bwpass1_lin2_dW)[3]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[0] - (*bwpass1_lin2_dW)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[1] - (*bwpass1_lin2_dW)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[2] - (*bwpass1_lin2_dW)[2]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[3] - (*bwpass1_lin2_dW)[3]), eps);
 
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[0] - (*bwpass1_lin1_dW)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[1] - (*bwpass1_lin1_dW)[1]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[2] - (*bwpass1_lin1_dW)[2]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[3] - (*bwpass1_lin1_dW)[3]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[0] - (*bwpass1_lin1_dW)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[1] - (*bwpass1_lin1_dW)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[2] - (*bwpass1_lin1_dW)[2]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[3] - (*bwpass1_lin1_dW)[3]), eps);
 
 	// Apply changes.
 	nn.update(0.5);
 
-	// Check weight gradients after the update.
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[0] - (*bwpass1_lin2_dW_updated)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[1] - (*bwpass1_lin2_dW_updated)[1]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[2] - (*bwpass1_lin2_dW_updated)[2]), eps);
-	ASSERT_LE( abs( (*nn.layers[2]->g["W"])[3] - (*bwpass1_lin2_dW_updated)[3]), eps);
+	std::cout <<"gW =\n" << (*nn.layers[2]->g["W"]) << std::endl;
+	std::cout <<"bwpass1_lin2_dW_updated =\n" << (*bwpass1_lin2_dW_updated) << std::endl;
 
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[0] - (*bwpass1_lin1_dW_updated)[0]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[1] - (*bwpass1_lin1_dW_updated)[1]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[2] - (*bwpass1_lin1_dW_updated)[2]), eps);
-	ASSERT_LE( abs( (*nn.layers[0]->g["W"])[3] - (*bwpass1_lin1_dW_updated)[3]), eps);
+	// Check weight gradients after the update.
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[0] - (*bwpass1_lin2_dW_updated)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[1] - (*bwpass1_lin2_dW_updated)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[2] - (*bwpass1_lin2_dW_updated)[2]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[3] - (*bwpass1_lin2_dW_updated)[3]), eps);
+
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[0] - (*bwpass1_lin1_dW_updated)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[1] - (*bwpass1_lin1_dW_updated)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[2] - (*bwpass1_lin1_dW_updated)[2]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[3] - (*bwpass1_lin1_dW_updated)[3]), eps);
 
 }
 
 
+/*!
+ * Tests a single iteration of a backpropagation algorithm.
+ */
+TEST_F(Tutorial2LayerNN, TrainSingleStep) {
+	double eps = 1e-6;
 
+	// Perform a single training step.
+	double loss = nn.train(input_x, target_y, 0.5);
+
+	// Check loss
+	ASSERT_LE( fabs( loss - ffpass1_loss), eps);
+
+	// Lin1 layer output.
+	ASSERT_LE( fabs( (*nn.layers[0]->s["y"])[0] - (*ffpass1_lin1_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->s["y"])[1] - (*ffpass1_lin1_y)[1]), eps);
+	// Sig1 layer output.
+	ASSERT_LE( fabs( (*nn.layers[1]->s["y"])[0] - (*ffpass1_sig1_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[1]->s["y"])[1] - (*ffpass1_sig1_y)[1]), eps);
+	// Lin1 layer output.
+	ASSERT_LE( fabs( (*nn.layers[2]->s["y"])[0] - (*ffpass1_lin2_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->s["y"])[1] - (*ffpass1_lin2_y)[1]), eps);
+	// Sig1 layer output.
+	ASSERT_LE( fabs( (*nn.layers[3]->s["y"])[0] - (*ffpass1_sig2_y)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[3]->s["y"])[1] - (*ffpass1_sig2_y)[1]), eps);
+
+	// Check weight gradients after the update.
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[0] - (*bwpass1_lin2_dW_updated)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[1] - (*bwpass1_lin2_dW_updated)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[2] - (*bwpass1_lin2_dW_updated)[2]), eps);
+	ASSERT_LE( fabs( (*nn.layers[2]->g["W"])[3] - (*bwpass1_lin2_dW_updated)[3]), eps);
+
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[0] - (*bwpass1_lin1_dW_updated)[0]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[1] - (*bwpass1_lin1_dW_updated)[1]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[2] - (*bwpass1_lin1_dW_updated)[2]), eps);
+	ASSERT_LE( fabs( (*nn.layers[0]->g["W"])[3] - (*bwpass1_lin1_dW_updated)[3]), eps);
+
+}
 
 
 

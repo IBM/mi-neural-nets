@@ -122,13 +122,13 @@ public:
 
 		//W = (1 - decay_) * W + alpha_ * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
 		//(*p['W']) = (1.0f - decay_) * (*p['W']) + alpha_ * (*g['W']).cwiseQuotient((*m['W']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
-		//std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
-		//std::cout << "g['W'] = \n" << (*g['W']) << std::endl;
+		std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
+		std::cout << "g['W'] = \n" << (*g['W']) << std::endl;
 
 		opt_W->update(p['W'], g['W'], alpha_);
 		opt_b->update(p['b'], g['b'], alpha_);
 
-		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
+		std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 
 		//b += alpha_ * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));
 		//(*p['b']) += alpha_ * (*g['b']).cwiseQuotient((*m['b']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));

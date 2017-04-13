@@ -4,7 +4,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 install(FILES
 	Loss.hpp
 	CrossEntropyLoss.hpp
-	RegressionLoss.hpp
+	SquaredErrorLoss.hpp
 	LossTypes.hpp
 	DESTINATION include/loss)
 
