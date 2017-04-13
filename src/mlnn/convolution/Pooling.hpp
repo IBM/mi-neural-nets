@@ -241,16 +241,16 @@ protected:
 	 */
 	size_t window_size;
 
-private:
 protected:
 	// Unhiding the template inherited fields via "using" statement.
     using Layer<eT>::g;
     using Layer<eT>::s;
     using Layer<eT>::inputs_size;
 
+private:
+	// Friend class - required for using boost serialization.
+	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
 
-	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
 
 	/*!
 	 * Private constructor, used only during the serialization.

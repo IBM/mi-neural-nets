@@ -91,6 +91,9 @@ protected:
 	mic::types::Matrix<eT> dropout_mask;
 
 private:
+	// Friend class - required for using boost serialization.
+	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
+
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */

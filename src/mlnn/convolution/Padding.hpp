@@ -116,9 +116,8 @@ protected:
 	size_t padding;
 
 private:
-
-	// Adds the nn class the access to protected fields of class layer.
-	friend class mic::mlnn::MultiLayerNeuralNetwork;
+	// Friend class - required for using boost serialization.
+	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
 
 	/*!
 	 * Private constructor, used only during the serialization.
