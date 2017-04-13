@@ -77,9 +77,9 @@ public:
 		ffpass1_sig2_y = MAKE_MATRIX_PTR(double, 2, 1);
 		ffpass1_dy = MAKE_MATRIX_PTR(double, 2, 1);
 		bwpass1_lin2_dW = MAKE_MATRIX_PTR(double, 2, 2);
-		bwpass1_lin2_dW_updated = MAKE_MATRIX_PTR(double, 2, 2);
+		bwpass1_lin2_pW_updated = MAKE_MATRIX_PTR(double, 2, 2);
 		bwpass1_lin1_dW = MAKE_MATRIX_PTR(double, 2, 2);
-		bwpass1_lin1_dW_updated = MAKE_MATRIX_PTR(double, 2, 2);
+		bwpass1_lin1_pW_updated = MAKE_MATRIX_PTR(double, 2, 2);
 }
 
 protected:
@@ -118,8 +118,8 @@ protected:
 		(*bwpass1_lin1_dW) << 0.000438568, 0.000877135, 0.000497713, 0.000995425;
 
 		// Weights after update with  gradient descent learning rule with learning rate = 0.5 (in this case: delta rule).
-		(*bwpass1_lin2_dW_updated) << 0.358916, 0.408666, 0.511301, 0.56137;
-		(*bwpass1_lin1_dW_updated) << 0.149781, 0.199561, 0.249751, 0.299502;
+		(*bwpass1_lin2_pW_updated) << 0.358916, 0.408666, 0.511301, 0.56137;
+		(*bwpass1_lin1_pW_updated) << 0.149781, 0.199561, 0.249751, 0.299502;
 	}
 
 
@@ -142,9 +142,9 @@ private:
 
 	// Backward pass.
 	mic::types::MatrixPtr<double> bwpass1_lin2_dW;
-	mic::types::MatrixPtr<double> bwpass1_lin2_dW_updated;
+	mic::types::MatrixPtr<double> bwpass1_lin2_pW_updated;
 	mic::types::MatrixPtr<double> bwpass1_lin1_dW;
-	mic::types::MatrixPtr<double> bwpass1_lin1_dW_updated;
+	mic::types::MatrixPtr<double> bwpass1_lin1_pW_updated;
 };
 
 
