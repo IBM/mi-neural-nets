@@ -34,9 +34,10 @@ public:
 		// Sizes must match.
 		assert(predicted_y_->size() == target_y_->size());
 
-		// Calculate loss.
+		// Calculate loss (negative log probability).
 		dtype loss =0;
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
+			// -t * log y
 			loss -= (*target_y_)[i] * std::log2((*predicted_y_)[i]);
 		}
 		// Return cross-entropy error (CE).
@@ -54,6 +55,7 @@ public:
 		// Calculate gradient.
 		mic::types::MatrixPtr<dtype> dy = MAKE_MATRIX_PTR(dtype, predicted_y_->rows(), predicted_y_->cols());
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
+			// y - t
 			(*dy)[i] = (*predicted_y_)[i] - (*target_y_)[i];
 		}
 		return dy;
