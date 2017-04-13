@@ -16,3 +16,5 @@ add_subdirectory(loss)
 add_subdirectory(mlnn)
 
 add_subdirectory(tests)
+
+add_subdirectory(application)

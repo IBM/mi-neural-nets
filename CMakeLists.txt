@@ -72,7 +72,6 @@ endif(NOT GTEST_FOUND)
 # Add additional option to cmake.
 set(BUILD_UNIT_TESTS ON CACHE BOOL "Build unit tests.")
 
-
 # =======================================================================
 # RPATH settings
 # =======================================================================
@@ -93,8 +92,6 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # =======================================================================
 # Add subdirectories
 # =======================================================================
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(src)
 

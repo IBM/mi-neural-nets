@@ -110,3 +110,64 @@ if(${BUILD_MNIST_MLP_APP})
         install(TARGETS mnist_simple_mlnn_app RUNTIME DESTINATION bin)
 
 endif(${BUILD_MNIST_MLP_APP})
+
+
+# =======================================================================
+# Build executables - mnist batch visualization test.
+# =======================================================================
+
+set(BUILD_TEST_MNIST_BATCH_VISUALIZATION ON CACHE BOOL "Build the MNIST batch visualization test application")
+
+if(${BUILD_TEST_MNIST_BATCH_VISUALIZATION})
+	# Create executable.
+	add_executable(mnist_batch_visualization_test mnist_batch_visualization_test.cpp)
+	# Link it with shared libraries.
+	target_link_libraries(mnist_batch_visualization_test 
+		logger
+		application
+		types
+		data_io
+		encoders
+		configuration
+		opengl_visualization
+		opengl_application
+		${Boost_LIBRARIES}  
+		)
+        if(OpenBLAS_FOUND)
+                target_link_libraries(mnist_batch_visualization_test  ${OpenBLAS_LIB} )
+        endif(OpenBLAS_FOUND)
+	
+	# install test to bin directory
+	install(TARGETS mnist_batch_visualization_test RUNTIME DESTINATION bin)
+	
+endif(${BUILD_TEST_MNIST_BATCH_VISUALIZATION})
+
+# =======================================================================
+# Build executables - mnist mlnn features visualization test.
+# =======================================================================
+
+set(BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION ON CACHE BOOL "Build the program for visualization of features of mlnn layer trained on MNIST digits")
+
+if(${BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION})
+	# Create executable.
+	add_executable(mnist_mlnn_features_visualization_test mnist_mlnn_features_visualization_test.cpp)
+	# Link it with shared libraries.
+	target_link_libraries(mnist_mlnn_features_visualization_test 
+		logger
+		application
+		types
+		data_io
+		encoders
+		configuration
+		opengl_visualization
+		opengl_application
+		${Boost_LIBRARIES}  
+		)
+        if(OpenBLAS_FOUND)
+                target_link_libraries(mnist_mlnn_features_visualization_test  ${OpenBLAS_LIB} )
+        endif(OpenBLAS_FOUND)
+	
+	# install test to bin directory
+	install(TARGETS mnist_mlnn_features_visualization_test RUNTIME DESTINATION bin)
+	
+endif(${BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION})
