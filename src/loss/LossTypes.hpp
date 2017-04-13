@@ -14,4 +14,6 @@
 
 #include <loss/SquaredErrorLoss.hpp>
 
+#include <loss/LogLikelihoodLoss.hpp>
+
 #endif /* LOSSTYPES_HPP_ */

@@ -61,4 +61,6 @@ endif(GTEST_FOUND AND BUILD_UNIT_TESTS)
 # Add subdirectories
 # =======================================================================
 
+add_subdirectory(cost_function)
+
 add_subdirectory(fully_connected)

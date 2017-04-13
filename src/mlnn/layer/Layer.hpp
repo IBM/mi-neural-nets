@@ -128,7 +128,7 @@ public:
 		(*s["x"]) = (*x_);
 
 		// Call the (abstract, implemented by a given layer) forward pass.
-		forward();
+		forward(test);
 
 		// Return "output".
 		return s["y"];

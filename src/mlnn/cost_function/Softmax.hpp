@@ -14,10 +14,9 @@ namespace mic {
 namespace mlnn {
 namespace cost_function {
 
-
 /*!
  * Softmax cost function.
- * \author tkornuta/krocki
+ * \author tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
@@ -30,24 +29,36 @@ public:
 		// Add "temporary" parameters.
 		m.add("e", inputs_, 1);
 		m.add("sum", 1, 1);
+		m.add("max", 1, 1);
 	}
 
 	virtual ~Softmax() {};
 
 	void forward(bool test_ = false) {
-		// Calculate the e matrix.
+		mic::types::MatrixPtr<eT> x = s["x"];
+		mic::types::MatrixPtr<eT> y = s["y"];
 		mic::types::MatrixPtr<eT> e = m["e"];
-
-		//(*e) = ((*s['x']).unaryExpr(std::ptr_fun<eT>(std::exp)));
-		for (size_t i = 0; i < (size_t)e->size(); i++)
-			(*e)[i] = std::exp((*s['x'])[i]);
-
-		// Colwise sum - sum the values in columns, one by one.
+		mic::types::MatrixPtr<eT> max = m["max"];
 		mic::types::MatrixPtr<eT> sum = m["sum"];
+
+//		std::cout << "Softmax forward: s['x'] = \n" << (*s['x']) << std::endl;
+
+		// Prevent overflow according to: http://eric-yuan.me/softmax/
+		(*max) = x->colwise().maxCoeff();
+
+//		std::cout << "Softmax forward: max = \n" << (*max) << std::endl;
+
+		// Calculate the e matrix - with overflow prevention.
+		for (size_t i = 0; i < (size_t)y->rows(); i++)
+			for (size_t j = 0; j < (size_t)y->cols(); j++)
+				(*e)(i, j) = std::exp( (*x)(i, j) - (*max)(j) );
+
+//		std::cout << "Softmax forward: e = \n" << (*e) << std::endl;
+
+		// Sum the values in columns (single batch), one by one.
 		(*sum) = e->colwise().sum();
 
-		// Get output.
-		mic::types::MatrixPtr<eT> y = s["y"];
+//		std::cout << "Softmax forward: sum = \n" << (*sum) << std::endl;
 
 		// Iterate through elements.
 		for (size_t i = 0; i < (size_t)y->rows(); i++) {
@@ -56,11 +67,19 @@ public:
 			}//: for
 		}//: for
 
+//		std::cout << "Softmax forward: s['y'] = \n" << (*s['y']) << std::endl;
 	}
 
 	void backward() {
-		// dx = dy - y;
-		(*g['x']) = (*g['y']) - (*s['y']);
+		mic::types::MatrixPtr<eT> y = s["y"];
+		mic::types::MatrixPtr<eT> dx = g["x"];
+		mic::types::MatrixPtr<eT> dy = g["y"];
+		// dx = dy(1 - y);
+		for (size_t i = 0; i < (size_t)y->size(); i++)
+			(*dx)[i] = (*dy)[i] * (1 - (*y)[i]);
+
+/*		std::cout << "Softmax backward: g['y'] = \n" << (*g['y']) << std::endl;
+		std::cout << "Softmax backward: g['x'] = \n" << (*g['x']) << std::endl;*/
 	}
 
 	/*!
@@ -74,7 +93,12 @@ public:
 		// Reshape the temporary matrices.
 		m["e"]->resize(m["e"]->rows(), batch_size_);
 		m["sum"]->resize(m["sum"]->rows(), batch_size_);
+		m["max"]->resize(m["max"]->rows(), batch_size_);
 	}
+
+	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
+	using Layer<eT>::forward;
+	using Layer<eT>::backward;
 
 protected:
 	// Unhiding the template inherited fields via "using" statement.

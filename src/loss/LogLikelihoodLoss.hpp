@@ -1,16 +1,19 @@
 /*!
- * @file: CrossEntropyLoss.hpp
+ * @file: LogLikelihoodLoss.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
- * @Date:   Nov 9, 2016
+ * @Date:   Apr 12, 2017
  *
- *
- * Copyright (c) 2016, IBM Corporation. All rights reserved.
+ * Copyright (c) 2017, Tomasz Kornuta, IBM Corporation. All rights reserved.
  *
  */
 
+#ifndef LOGLIKELIHOODLOSS_HPP_
+#define LOGLIKELIHOODLOSS_HPP_
 
-#ifndef CROSSENTROPYLOSS_HPP_
-#define CROSSENTROPYLOSS_HPP_
+
+
+
+
 
 #include <cmath>
 #include <loss/Loss.hpp>
@@ -20,32 +23,38 @@ namespace neural_nets {
 namespace loss {
 
 /*!
- * \brief Class representing a cross-entropy loss function (classification).
+ * \brief Class representing a log-likelihood cost (to be used with softmax logistic regression).
  * \author tkornuta
  * \tparam dtype Template parameter denoting precision of variables.
  */
 template <typename dtype=float>
-class CrossEntropyLoss : public Loss<dtype> {
+class LogLikelihoodLoss : public Loss<dtype> {
 public:
 	/*!
-	 * \brief Calculates cross entropy (using log 2) [BPC] and returns cross-entropy error (CE).
+	 * \brief Calculates log-likelihood cost.
 	 */
 	dtype calculateLoss (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) {
 		// Sizes must match.
 		assert(predicted_y_->size() == target_y_->size());
 
+		size_t ind;
 		// Calculate loss.
 		dtype loss =0;
-		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
-			loss -= (*target_y_)[i] * std::log2((*predicted_y_)[i]);
-		}
-		// Return cross-entropy error (CE).
-		// The average cross entropy error (ACE) is loss divided by the batch size.
+		// For each column (sample from batch).
+		for (size_t i=0; i <(size_t)predicted_y_->cols(); i++) {
+			// Get index of max coefficient in given column.
+			target_y_.col(i).maxCoeff(ind);
+
+			// Add loss.
+			loss -= std::log((*predicted_y_)[ind]);
+		}//: for
+		// Return sum of log-likelihood cost.
 		return loss;
+		// Divide it by the batch size in order to calculate the mean loss.
 	}
 
 	/*!
-	 * \brief Gradient calculation for cross-entropy.
+	 * \brief Gradient calculation for log-likelihood cost. NOT FINISHED!!
 	 */
 	mic::types::MatrixPtr<dtype> calculateGradient (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) {
 		// Sizes must match.
@@ -54,7 +63,7 @@ public:
 		// Calculate gradient.
 		mic::types::MatrixPtr<dtype> dy = MAKE_MATRIX_PTR(dtype, predicted_y_->rows(), predicted_y_->cols());
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
-			(*dy)[i] = (*predicted_y_)[i] - (*target_y_)[i];
+			(*dy)[i] = 0.0;
 		}
 		return dy;
 	}
@@ -65,4 +74,4 @@ public:
 } //: neural_nets
 } //: mic
 
-#endif /* CROSSENTROPYLOSS_HPP_ */
+#endif /* LOGLIKELIHOODLOSS_HPP_ */

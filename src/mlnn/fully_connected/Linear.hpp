@@ -41,7 +41,7 @@ public:
 		double range = sqrt(6.0 / double(inputs_ + outputs_));
 
 		Layer<eT>::p['W']->rand(-range, range);
-		Layer<eT>::p['b']->rand(-range, range);// setZero();
+		Layer<eT>::p['b']->setZero();
 
 		//mW = (Eigen::MatrixXf)Eigen::MatrixXf::Zero(W.rows(), W.cols());
 		//Layer<eT>::m.add ("W", outputs_, inputs_);
@@ -79,6 +79,12 @@ public:
 
 		// Forward pass.
 		(*y) = W * x + b.replicate(1, x.cols());
+
+/*		std::cout << "Linear forward: s['x'] = \n" << (*s['x']) << std::endl;
+		std::cout << "Linear forward: p['W'] = \n" << (*p['W']) << std::endl;
+		std::cout << "Linear forward: p['b'] = \n" << (*p['b']) << std::endl;
+		std::cout << "Linear forward: s['y'] = \n" << (*s['y']) << std::endl;*/
+
 	}
 
 	/*!
@@ -98,6 +104,9 @@ public:
 		(*dW) = dy * x.transpose();
 		(*db) = dy.rowwise().sum();
 		(*dx) = W.transpose() * dy;
+
+/*		std::cout << "Linear backward: g['y'] = \n" << (*g['y']) << std::endl;
+		std::cout << "Linear backward: g['x'] = \n" << (*g['x']) << std::endl;*/
 	}
 
 	/*!

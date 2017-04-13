@@ -39,6 +39,9 @@ public:
 		for (size_t i = 0; i < size;  i++) {
 			y[i] = fmax(x[i], 0.0f); //: floats - fmax
 		}//: for
+
+/*		std::cout << "ReLU forward: s['x'] = \n" << (*s['x']) << std::endl;
+		std::cout << "ReLU forward: s['y'] = \n" << (*s['y']) << std::endl;*/
 	}
 
 	void backward() {
@@ -50,12 +53,15 @@ public:
 		// Iterate through elements.
 		size_t size = g['x']->rows() * g['x']->cols();
 		for (size_t i = 0; i < size; i++) {
-			// Calculate the ReLU y derivative.
+			// Calculate the ReLU "derivative".
 			eT dy = (eT)(y[i] > 0.0);
 			// Pass the gradient.
 			gx[i] = dy * gy[i];
 
 		}//: for
+
+/*		std::cout << "ReLU backward: g['y'] = \n" << (*g['y']) << std::endl;
+		std::cout << "ReLU backward: g['x'] = \n" << (*g['x']) << std::endl;*/
 	}
 
 protected:
