@@ -74,9 +74,11 @@ public:
 		mic::types::MatrixPtr<eT> y = s["y"];
 		mic::types::MatrixPtr<eT> dx = g["x"];
 		mic::types::MatrixPtr<eT> dy = g["y"];
-		// dx = dy(1 - y);
+
+		// Pass the gradient.
 		for (size_t i = 0; i < (size_t)y->size(); i++)
-			(*dx)[i] = (*dy)[i] * (1 - (*y)[i]);
+			// dx = dy *  derivatie of softmax, i.e. y * (1 - y);
+			(*dx)[i] = (*dy)[i] * (*y)[i] * (1 - (*y)[i]);
 
 /*		std::cout << "Softmax backward: g['y'] = \n" << (*g['y']) << std::endl;
 		std::cout << "Softmax backward: g['x'] = \n" << (*g['x']) << std::endl;*/
