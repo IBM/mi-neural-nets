@@ -34,15 +34,13 @@ matrix:
       addons:
         apt:
           sources:
-            # - ubuntu-toolchain-r-test
-            - sourceline: 'ppa:ubuntu-toolchain-r/test'
-            # Add PPA ppa:kzemek/boost to system's Software Sources - boost 1.58
-            # - sourceline: 'deb http://ppa.launchpad.net/kzemek/boost/ubuntu trusty main'
+            - ubuntu-toolchain-r-test
           packages:
             - libboost-all-dev
             - libeigen3-dev
-            - libarmadillo-dev
-            - libhdf5-dev
+            - freeglut3-dev
+            - libxmu-dev
+            - libxi-dev
             - g++-4.8
             - doxygen
             - doxygen-doc
@@ -93,7 +91,15 @@ before_script:
   - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
   - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
   - make -j2 install
-  # Make cal-c
+  # Install mi-visualization
+  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-visualization.git
+  - mkdir mi-visualization/build
+  - cd mi-visualization/build
+  # Overwrite compiler!
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
+  - make -j2 install
+  # Make mi-neural-nets
   - mkdir $TRAVIS_BUILD_DIR/build
   - cd $TRAVIS_BUILD_DIR/build
   # Overwrite compiler!
@@ -121,7 +127,7 @@ before_script:
   - cmake ..
 
 script:
-  - make -j8
+  - make install VERBOSE=1
   - src/types2/matrixTestsRunner
   - src/types2/matrixArrayTestsRunner
   - src/optimization/artificialLandscapesTestsRunner
