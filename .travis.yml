@@ -31,6 +31,9 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
+      env:
+        - OS=Ubuntu-14.04
+        - COMPILER=g++-4.8
       addons:
         apt:
           sources:
@@ -47,9 +50,6 @@ matrix:
             - doxygen-latex
             - doxygen-gui
             - graphviz
-      env:
-        - OS=Ubuntu-14.04
-        - COMPILER=g++-4.8
 
       # Generate and deploy documentation - only once, for this test environment.
       after_success:
@@ -66,8 +66,20 @@ matrix:
         - COMPILER=clang++
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5']
-          packages: ['libboost-all-dev', 'libeigen3-dev', 'libarmadillo-dev', 'libhdf5-dev']
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libboost-all-dev
+            - libeigen3-dev
+            - freeglut3-dev
+            - libxmu-dev
+            - libxi-dev
+            - g++-4.8
+            - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
 
 # Install gTesest.
 install:
