@@ -120,9 +120,9 @@ before_script:
 # Build and install.
 script:
   - make install VERBOSE=1
-  - src/types2/matrixTestsRunner
-  - src/types2/matrixArrayTestsRunner
+  - src/loss/lossTestsRunner
+  - src/mlnn/cost_function/softmaxTestsRunner
+  - src/mlnn/fully_connected/linearTestsRunner
+  - src/mlnn/mlnnTestsRunner
   - src/optimization/artificialLandscapesTestsRunner
   - src/optimization/optimizationFunctionsTestsRunner
-  - src/loss/lossTestsRunner
-  - src/feed_forward/fully_connected/fullyConnectedLayerTestsRunner
