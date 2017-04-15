@@ -41,7 +41,7 @@ public:
 		double range = sqrt(6.0 / double(inputs_ + outputs_));
 
 		Layer<eT>::p['W']->rand(-range, range);
-		Layer<eT>::p['b']->setZero();
+		Layer<eT>::p['b']->rand(-range, range);//setZero();
 
 		//mW = (Eigen::MatrixXf)Eigen::MatrixXf::Zero(W.rows(), W.cols());
 		//Layer<eT>::m.add ("W", outputs_, inputs_);
