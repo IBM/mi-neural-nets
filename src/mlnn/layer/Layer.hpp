@@ -14,7 +14,7 @@
 #include<types/MatrixTypes.hpp>
 #include<types/MatrixArray.hpp>
 #include <optimization/OptimizationFunctionTypes.hpp>
-
+#include <optimization/OptimizationArray.hpp>
 
 #include <boost/serialization/serialization.hpp>
 // include this header to serialize vectors
@@ -252,6 +252,24 @@ public:
 	}
 
 	/*!
+	 * Sets the optimization method.
+	 * @tparam omT Optimization method type
+	 */
+	template<typename omT>
+	void setOptimization () {
+		// Remove all previous optimization functions.
+		opt.clear();
+
+		// Iterate through parameters and add a separate optimization function for each parameters.
+		for (auto& i: p.keys()) {
+			opt.add(
+					i.first,
+					std::make_shared< omT >
+			(omT ( (p[i.second])->cols(), (p[i.second])->rows() )));
+		}//: for keys
+	}
+
+	/*!
 	 * Returns the type of layer.
 	 */
 	const std::string type() const {
@@ -361,8 +379,8 @@ protected:
 	/// Memory - a list of temporal parameters, to be used by the derived classes.
 	mic::types::MatrixArray<eT> m;
 
-	// Adds the nn class the access to protected fields of class layer.
-	//friend class MultiLayerNeuralNetwork<eT>;
+	/// Array of optimization functions.
+	mic::neural_nets::optimization::OptimizationArray<eT> opt;
 
 	/*!
 	 * Protected constructor, used only by the derived classes during the serialization. Empty!!

@@ -22,6 +22,7 @@ namespace fully_connected {
 template <typename eT=float>
 class Linear : public mic::mlnn::Layer<eT> {
 public:
+
 	/*!
 	 * Creates the linear (i.e fully connected) layer.
 	 * @param inputs_ Length of the input vector.
@@ -32,10 +33,10 @@ public:
 		Layer<eT>(inputs_, outputs_, 1, LayerTypes::Linear, name_) {
 
 		// Create the weights matrix.
-		Layer<eT>::p.add ("W", outputs_, inputs_);
+		p.add ("W", outputs_, inputs_);
 
 		// Create the bias vector.
-		Layer<eT>::p.add ("b", outputs_, 1);
+		p.add ("b", outputs_, 1);
 
 		// Initialize weights of the W matrix.
 		double range = sqrt(6.0 / double(inputs_ + outputs_));
@@ -54,9 +55,8 @@ public:
 		Layer<eT>::g.add ("W", outputs_, inputs_);
 		Layer<eT>::g.add ("b", outputs_, 1 );
 
-		// Create optimization functions.
-		opt_W = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (outputs_, inputs_));
-		opt_b = std::make_shared<mic::neural_nets::optimization::GradientDescent<eT> > (mic::neural_nets::optimization::GradientDescent<eT> (outputs_, 1));
+		// Set gradient descent as default optimization function.
+		Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
 	};
 
 
@@ -134,8 +134,8 @@ public:
 		/*std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
 		std::cout << "g['W'] = \n" << (*g['W']) << std::endl;*/
 
-		opt_W->update(p['W'], g['W'], alpha_);
-		opt_b->update(p['b'], g['b'], alpha_);
+		opt["W"]->update(p['W'], g['W'], alpha_);
+		opt["b"]->update(p['b'], g['b'], alpha_);
 
 		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 
@@ -161,6 +161,7 @@ protected:
     using Layer<eT>::input_size;
     using Layer<eT>::output_size;
     using Layer<eT>::batch_size;
+   using Layer<eT>::opt;
 
 private:
 	// Friend class - required for using boost serialization.
@@ -170,16 +171,6 @@ private:
 	 * Private constructor, used only during the serialization.
 	 */
 	Linear<eT>() : Layer<eT> () { }
-
-	/*!
-	 * Optimization function for W.
-	 */
-	std::shared_ptr<mic::neural_nets::optimization::OptimizationFunction<eT> > opt_W;
-
-	/*!
-	 * Optimization function for b.
-	 */
-	std::shared_ptr<mic::neural_nets::optimization::OptimizationFunction<eT> > opt_b;
 
 };
 

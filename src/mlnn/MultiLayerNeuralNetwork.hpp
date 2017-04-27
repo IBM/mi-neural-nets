@@ -99,6 +99,17 @@ public:
 	}
 
 	/*!
+	 * Sets the optimization method.
+	 * @tparam omT Optimization method type
+	 */
+	template<typename omT>
+	void setOptimization () {
+		// Iterate through layers and set optimization function for each one.
+		for (size_t i = 0; i < layers.size(); i++)
+			layers[i]->setOptimization<omT> ();
+	}
+
+	/*!
 	 * Passes the data in a feed-forward manner through all consecutive layers, from the input to the output layer.
 	 * @param input_data Input data - a matrix containing [sample_size x batch_size].
 	 * @param skip_dropout Flag for skipping dropouts - which should be set to true during testing.

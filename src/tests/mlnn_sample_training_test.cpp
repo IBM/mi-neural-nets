@@ -52,6 +52,8 @@ int main() {
 	nn.pushLayer(new ReLU<float>(15, "ReLU1"));
 	nn.pushLayer(new Linear<float>(15, classes, "Linear2"));
 	nn.pushLayer(new Softmax<float>(classes, "Softmax"));
+	// Change optimization function from default GradientDescent to Adam.
+	nn.setOptimization<mic::neural_nets::optimization::Adam<float> >();
 
 	// Training.
 	size_t iteration = 0;
