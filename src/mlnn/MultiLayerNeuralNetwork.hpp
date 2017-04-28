@@ -40,9 +40,8 @@ using namespace regularisation;
  * \brief Class representing a multi-layer neural network.
  * \author tkornuta/kmrocki
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
- * \tparam LossFunction Template parameter denoting the loss function type (e.g. mic::neural_nets::loss::CrossEntropyLoss<eT>).
  */
-template <typename eT, typename LossFunction >
+template <typename eT>
 class MultiLayerNeuralNetwork {
 public:
 
@@ -54,7 +53,9 @@ public:
 		name(name_),
 		connected(false) // Initially the network is not connected.
 	{
-
+		// Set default cross entropy loss function.
+		//Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
+		setLoss <mic::neural_nets::loss::CrossEntropyLoss<eT> >();
 	}
 
 	/*!
@@ -107,6 +108,15 @@ public:
 		// Iterate through layers and set optimization function for each one.
 		for (size_t i = 0; i < layers.size(); i++)
 			layers[i]->setOptimization<omT> ();
+	}
+
+	/*!
+	 * Sets the loss function.
+	 * \tparam LossFunction Template parameter denoting the loss function type (e.g. mic::neural_nets::loss::CrossEntropyLoss<eT>).
+	 */
+	template<typename LossFunction>
+	void setLoss () {
+		loss = std::make_shared< LossFunction > (LossFunction());
 	}
 
 	/*!
@@ -210,7 +220,7 @@ public:
 		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
 
 		// Calculate gradient according to the loss function.
-		mic::types::MatrixPtr<eT> dy = loss.calculateGradient(encoded_targets_, encoded_predictions);
+		mic::types::MatrixPtr<eT> dy = loss->calculateGradient(encoded_targets_, encoded_predictions);
 
 		// Backpropagate the gradients from last layer to the first.
 		backward(dy);
@@ -219,7 +229,7 @@ public:
 		update(learning_rate_);
 
 		// Calculate mean value of the loss function (i.e. loss divided by the batch size).
-		eT loss_value = loss.calculateMeanLoss(encoded_targets_, encoded_predictions);
+		eT loss_value = loss->calculateMeanLoss(encoded_targets_, encoded_predictions);
 
 		//eT correct = countCorrectPredictions(encoded_targets_, encoded_predictions);
 		//LOG(LDEBUG) << " Loss = " << std::setprecision(2) << std::setw(6) << loss_value << " | " << std::setprecision(1) << std::setw(4) << std::fixed << 100.0 * (eT)correct / (eT)encoded_batch_->cols() << "% batch correct";
@@ -244,7 +254,7 @@ public:
 		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
 
 		// Calculate the mean loss.
-		return loss.calculateMeanLoss(encoded_targets_, encoded_predictions);
+		return loss->calculateMeanLoss(encoded_targets_, encoded_predictions);
 	}
 
 	/*!
@@ -276,9 +286,9 @@ public:
 	 * @param encoded_predictions_ Predicted outputs of the network encoded in the form of pointer to matrix of size [label_size x batch_size].
 	 * @return Loss computed according to the selected loss function.
 	 */
-	eT calculateMeanLossFunction(mic::types::MatrixPtr<eT> encoded_targets_, mic::types::MatrixPtr<eT> encoded_predictions_)  {
+	eT calculateMeanLoss(mic::types::MatrixPtr<eT> encoded_targets_, mic::types::MatrixPtr<eT> encoded_predictions_)  {
 
-		return loss.calculateMeanLoss(encoded_targets_, encoded_predictions_);
+		return loss->calculateMeanLoss(encoded_targets_, encoded_predictions_);
 	}
 
 	/*!
@@ -410,9 +420,9 @@ protected:
 	std::string name;
 
 	/*!
-	 * Loss function.
+	 * Pointer to loss function.
 	 */
-	LossFunction loss;
+	std::shared_ptr<mic::neural_nets::loss::Loss<eT> > loss;
 
 private:
 	// Friend class - required for using boost serialization.
@@ -547,10 +557,8 @@ private:
 } /* namespace mic */
 
 // Just in the case that something important will change in the MLNN class - set version.
-BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<float BOOST_PP_COMMA() mic::neural_nets::loss::CrossEntropyLoss<float> >, 2)
-BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<float BOOST_PP_COMMA() mic::neural_nets::loss::SquaredErrorLoss<float> >, 2)
-BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<double BOOST_PP_COMMA() mic::neural_nets::loss::CrossEntropyLoss<double> >, 2)
-BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<double BOOST_PP_COMMA() mic::neural_nets::loss::SquaredErrorLoss<double> >, 2)
+BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<float>, 2)
+BOOST_CLASS_VERSION(mic::mlnn::MultiLayerNeuralNetwork<double>, 2)
 
 
 #endif /* SRC_MLNN_MULTILAYERNEURALNETWORK_HPP_ */

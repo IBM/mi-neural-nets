@@ -70,15 +70,15 @@ public:
 
 		// Calculate updates - and store as previous (already) = - RMS(ED)/(RMS(G) * dx
 		for (size_t i=0; i<(size_t)x_->size(); i++){
-//			(*prev_d)[i] = - (0.1 / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
-			(*delta)[i] = - (std::sqrt((*ED)[i] + eps) / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
+//			(*prev_d)[i] = (0.1 / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
+			(*delta)[i] = (std::sqrt((*ED)[i] + eps) / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
 //			std::cout << "(*prev_d)["<< i <<"] = " << (*prev_d)[i] <<std::endl;
 			assert(std::isfinite((*delta)[i]));
 		}
 
 		// Perform the update.
 		for (size_t i=0; i<(size_t)x_->size(); i++) {
-			(*x_)[i] += (*delta)[i];
+			(*x_)[i] -= (*delta)[i];
 //			std::cout << "(*x_)["<< i <<"] = " << (*x_)[i] <<std::endl;
 		}
 //		std::cout << std::endl;

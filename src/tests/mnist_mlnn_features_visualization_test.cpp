@@ -37,12 +37,13 @@ using namespace mic::mlnn;
 WindowGrayscaleBatch* w_input;
 WindowGrayscaleBatch* w_reconstruction;
 /// Window for displaying the weights.
-WindowGrayscaleBatch* w_weights;
+WindowGrayscaleBatch* w_weights1;
+WindowGrayscaleBatch* w_weights2;
 
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter* importer;
 /// Multi-layer neural network.
-MultiLayerNeuralNetwork<float, mic::neural_nets::loss::CrossEntropyLoss<float> > neural_net;
+MultiLayerNeuralNetwork<float> neural_net;
 
 /// MNIST matrix encoder.
 mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
@@ -51,7 +52,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 
 const size_t patch_size = 28;
 const size_t batch_size = 16;
-const size_t hidden_layer_units = 100;
+const size_t hidden_layer_units = 64;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
 
@@ -77,20 +78,22 @@ void batch_function (void) {
 
 		neural_net.pushLayer(new Linear<float>(hidden_layer_units, patch_size*patch_size));
 		neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));
+		neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
+		neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
+
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
 
 	size_t iteration = 0;
 
 	// Prepare temporary variables.
-	Eigen::MatrixXf tmp;
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > weights;
+/*	std::vector< std::shared_ptr <mic::types::MatrixXf> > weights;
 	for (size_t i=0; i < (size_t)hidden_layer_units; i++) {
 		// Create .
 		mic::types::MatrixXfPtr row = MAKE_MATRIX_PTR(float, patch_size, patch_size);
 		weights.push_back(row);
 	}
-	w_weights->setBatchDataSynchronized(weights);
+	w_weights->setBatchDataSynchronized(weights);*/
 
 
 	// Main application loop.
@@ -126,29 +129,20 @@ void batch_function (void) {
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
-					std::shared_ptr<mic::mlnn::Linear<float> > layer = neural_net.getLayer<mic::mlnn::Linear<float> >(0);
-					mic::types::MatrixXfPtr W = layer->getParam("W");
-					// Iterate through "units" and generate "activation image" for each one.
-					for (size_t i=0; i < (size_t)hidden_layer_units; i++) {
-						// Get row.
-						mic::types::MatrixXfPtr row = weights[i];
-						// Copy data.
-						(*row) = W->row(i);
-						row->resize(patch_size, patch_size);
-						// Calculate l2 norm.
-						float l2 = row->norm();
-						// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-						(*row) = row->unaryExpr ( [&] ( float x ) { return ( x / l2 + 0.5f); } );
-					}
+					std::shared_ptr<mic::mlnn::Linear<float> > layer1 = neural_net.getLayer<mic::mlnn::Linear<float> >(0);
+					w_weights1->setBatchDataUnsynchronized(layer1->getActivations(patch_size, patch_size));
+					// Visualize the weights.
+					std::shared_ptr<mic::mlnn::Linear<float> > layer2 = neural_net.getLayer<mic::mlnn::Linear<float> >(2);
+					w_weights2->setBatchDataUnsynchronized(layer2->getActivations(hidden_layer_units, 1));
 				}//: if
 
-				if (iteration%100 == 0) {
+				/*if (iteration%100 == 0) {
 					std::shared_ptr<mic::mlnn::Linear<float> > layer = neural_net.getLayer<mic::mlnn::Linear<float> >(0);
 					mic::types::MatrixXfPtr W = layer->getParam("W");
-					//std::cout<< *W << std::endl;
+					std::cout<< *W << std::endl;
 					// Save nn.
 					neural_net.save(fileName);
-				}//: if
+				}//: if*/
 
 				iteration++;
 				LOG(LINFO) << "Iteration: " << iteration << " loss =" << loss ;
@@ -206,7 +200,8 @@ int main(int argc, char* argv[]) {
 	// Create batch visualization window.
 	w_input = new WindowGrayscaleBatch("Input batch", 512, 512, 0, 0);
 	w_reconstruction = new WindowGrayscaleBatch("Reconstructed batch", 512, 512, 0, 580);
-	w_weights = new WindowGrayscaleBatch("L0 weights", 512, 512, 580, 0);
+	w_weights1 = new WindowGrayscaleBatch("L0 weights", 512, 512, 580, 0);
+	w_weights2 = new WindowGrayscaleBatch("L1 weights", 512, 100, 1092, 0);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 

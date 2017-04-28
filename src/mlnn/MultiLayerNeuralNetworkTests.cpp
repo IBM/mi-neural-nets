@@ -58,7 +58,7 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 	//std::cout << "Saved network: \n" << nn;
 
 	// Load network from file.
-	mic::mlnn::MultiLayerNeuralNetwork<double, mic::neural_nets::loss::SquaredErrorLoss<double> > restored_nn("simple_linear_network_loaded");
+	mic::mlnn::MultiLayerNeuralNetwork<double> restored_nn("simple_linear_network_loaded");
 	restored_nn.load(fileName);
 	//std::cout << "Restored network: \n" << restored_nn;
 
@@ -74,6 +74,8 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 		ASSERT_EQ(nn.layers[i]->layer_type, restored_nn.layers[i]->layer_type);
 	}//: for
 
+	// TODO: Check loss function.
+	// TODO: Check optimization function.
 }
 
 
@@ -100,12 +102,12 @@ TEST_F(Tutorial2LayerNN, BackpropagationSingleStep) {
 	ASSERT_LE( fabs( (*nn.layers[3]->s["y"])[1] - (*ffpass1_sig2_y)[1]), eps);
 
 	// Calculate loss.
-	double loss = nn.loss.calculateLoss(target_y, nn.getPredictions());
+	double loss = nn.loss->calculateLoss(target_y, nn.getPredictions());
 	ASSERT_LE( fabs( loss - ffpass1_loss), eps);
 
 	// Calculate gradient.
 	mic::types::MatrixPtr<double> dy = MAKE_MATRIX_PTR(double, 2, 1);
-	(*dy) = (*nn.loss.calculateGradient(target_y, nn.getPredictions()));
+	(*dy) = (*nn.loss->calculateGradient(target_y, nn.getPredictions()));
 
 	// Check gradient.
 	ASSERT_LE( fabs( (*dy)[0] - (*ffpass1_dy)[0]), eps);

@@ -123,6 +123,7 @@ void MNISTPatchSoftmaxApplication::initializePropertyDependentVariables() {
 		neural_net.popLayer(autoencoder_layers_to_be_removed);
 		neural_net.pushLayer(new Linear<float>(20, 10));
 		neural_net.pushLayer(new Softmax<float>(10));
+		neural_net.setLoss<  mic::neural_nets::loss::CrossEntropyLoss<float> >();
 
 		LOG(LINFO) << "The resulting softmax network";
 		LOG(LINFO) << neural_net;

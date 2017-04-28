@@ -55,7 +55,7 @@ int main() {
 
 	// Create a simple NN for classification (should give around 95.3% accuracy)
 	//MNIST - 28x28 -> 256 -> 100 -> 10
-	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::CrossEntropyLoss<float> > nn("3layerReLUSofmax");
+	MultiLayerNeuralNetwork<float> nn("3layerReLUSofmax");
 	nn.pushLayer(new Linear<float>(28 * 28, 256));
 	nn.pushLayer(new ReLU<float>(256));
 	nn.pushLayer(new Linear<float>(256, 100));
@@ -101,7 +101,7 @@ int main() {
 		// Get predictions.
 		mic::types::MatrixXfPtr encoded_predictions = nn.getPredictions();
 		// Calculate the loss and correct predictions.
-		loss += nn.calculateMeanLossFunction(encoded_targets, encoded_predictions);
+		loss += nn.calculateMeanLoss(encoded_targets, encoded_predictions);
 		correct += nn.countCorrectPredictions(encoded_targets, encoded_predictions);
 
 	}//: while
@@ -126,7 +126,7 @@ int main() {
 		// Get predictions.
 		mic::types::MatrixXfPtr encoded_predictions = nn.getPredictions();
 		// Calculate the loss and correct predictions.
-		loss += nn.calculateMeanLossFunction(encoded_targets, encoded_predictions);
+		loss += nn.calculateMeanLoss(encoded_targets, encoded_predictions);
 		correct += nn.countCorrectPredictions(encoded_targets, encoded_predictions);
 	}
 	double train_acc = (double)correct / (double)(training.size());

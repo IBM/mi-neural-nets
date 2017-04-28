@@ -120,6 +120,7 @@ void MNISTPatchReconstructionApplication::initializePropertyDependentVariables()
 
 		neural_net.pushLayer(new Linear<float>(20, patch_size*patch_size));
 		neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));
+		neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else

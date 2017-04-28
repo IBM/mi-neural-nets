@@ -42,14 +42,7 @@ public:
 		double range = sqrt(6.0 / double(inputs_ + outputs_));
 
 		Layer<eT>::p['W']->rand(-range, range);
-		Layer<eT>::p['b']->rand(-range, range);//setZero();
-
-		//mW = (Eigen::MatrixXf)Eigen::MatrixXf::Zero(W.rows(), W.cols());
-		//Layer<eT>::m.add ("W", outputs_, inputs_);
-
-
-		//mb = mic::types::VectorXf::Zero(b.rows());
-		//Layer<eT>::m.add ("b", outputs_, 1);
+		Layer<eT>::p['b']->setZero();
 
 		// Add W and b gradients.
 		Layer<eT>::g.add ("W", outputs_, inputs_);
@@ -147,6 +140,38 @@ public:
 		// W += alpha * dW;
 	}
 
+	/*!
+	 * Returns activations of neurons of a given layer.
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
+		// Check if memory for the activations was allocated.
+		if (neuron_activations.size() == 0) {
+			for (size_t i=0; i < output_size; i++) {
+				// Allocate memory for activation of every neuron.
+				mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, input_size, 1);
+				neuron_activations.push_back(row);
+			}//: for
+		}//: if
+
+		mic::types::MatrixPtr<eT> W =  Layer<eT>::getParam("W");
+		// Iterate through "neurons" and generate "activation image" for each one.
+		for (size_t i=0; i < output_size; i++) {
+			// Get row.
+			mic::types::MatrixPtr<eT> row = neuron_activations[i];
+			// Copy data.
+			(*row) = W->row(i);
+			// Resize row.
+			row->resize( height_, width_);
+			// Calculate l2 norm.
+			float l2 = row->norm();
+			// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
+			(*row) = row->unaryExpr ( [&] ( float x ) { return ( x / l2 + 0.5f); } );
+		}//: for
+
+		// Return activations.
+		return neuron_activations;
+	}
+
 
 	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
 	using Layer<eT>::forward;
@@ -165,7 +190,11 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class MultiLayerNeuralNetwork;
+
+
+	/// Vector containing activations of neurons.
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > neuron_activations;
 
 	/*!
 	 * Private constructor, used only during the serialization.

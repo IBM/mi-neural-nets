@@ -49,11 +49,13 @@ int main() {
 	}//: for
 
 	// Neural net.
-	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::CrossEntropyLoss<float> > nn("simple_linear_network");
+	MultiLayerNeuralNetwork<float> nn("simple_linear_network");
 	nn.pushLayer(new Linear<float>(dataset_size, 15, "Linear1"));
 	nn.pushLayer(new ReLU<float>(15, "ReLU1"));
 	nn.pushLayer(new Linear<float>(15, classes, "Linear2"));
 	nn.pushLayer(new Softmax<float>(classes, "Softmax"));
+	// Change optimization function from default GradientDescent to Adam.
+	nn.setOptimization<mic::neural_nets::optimization::Adam<float> >();
 
 	// Initialize the encoders.
 	mic::encoders::MatrixXfMatrixXfEncoder data_encoder(dataset_size, 1);

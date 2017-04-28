@@ -69,7 +69,7 @@ inline eT sqrt_eps(const eT x) {
 }
 
 // Forward declaration of MultiLayerNeuralNetwork - required for "lazy connection".
-template <typename eT, typename LossFunction>
+template <typename eT>
 class MultiLayerNeuralNetwork;
 
 /*!
@@ -260,12 +260,12 @@ public:
 		// Remove all previous optimization functions.
 		opt.clear();
 
-		// Iterate through parameters and add a separate optimization function for each parameters.
+		// Iterate through parameters and add a separate optimization function for each parameter.
 		for (auto& i: p.keys()) {
 			opt.add(
 					i.first,
-					std::make_shared< omT >
-			(omT ( (p[i.second])->cols(), (p[i.second])->rows() )));
+					std::make_shared< omT > (omT ( (p[i.second])->cols(), (p[i.second])->rows() ))
+					);
 		}//: for keys
 	}
 
@@ -389,7 +389,7 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;

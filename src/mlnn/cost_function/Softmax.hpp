@@ -77,7 +77,7 @@ public:
 
 		// Pass the gradient.
 		for (size_t i = 0; i < (size_t)y->size(); i++)
-			// dx = dy *  derivatie of softmax, i.e. y * (1 - y);
+			// dx = dy *  derivative of softmax, i.e. y * (1 - y);
 			(*dx)[i] = (*dy)[i] * (*y)[i] * (1 - (*y)[i]);
 
 /*		std::cout << "Softmax backward: g['y'] = \n" << (*g['y']) << std::endl;
@@ -111,7 +111,7 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
 	/*!
 	 * Private constructor, used only during the serialization.

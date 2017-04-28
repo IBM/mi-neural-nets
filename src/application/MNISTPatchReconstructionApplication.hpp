@@ -109,7 +109,7 @@ private:
 	mic::configuration::Property<bool> mlnn_load;
 
 	/// Multi-layer neural network.
-	MultiLayerNeuralNetwork<float, mic::neural_nets::loss::SquaredErrorLoss<float> > neural_net;
+	MultiLayerNeuralNetwork<float> neural_net;
 
 };
 

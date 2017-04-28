@@ -34,6 +34,7 @@ public:
 		nn.pushLayer(new mic::mlnn::activation_function::ReLU<double>(20, "First ReLU"));
 		nn.pushLayer(new mic::mlnn::fully_connected::Linear<double>(20, 4, "Second Linear"));
 		nn.pushLayer(new mic::mlnn::activation_function::ReLU<double>(4, "Second ReLU"));
+		nn.setLoss< mic::neural_nets::loss::SquaredErrorLoss<double> >();
 	}
 
 protected:
@@ -46,7 +47,7 @@ protected:
 
 private:
 	// Neural network.
-	mic::mlnn::MultiLayerNeuralNetwork<double, mic::neural_nets::loss::SquaredErrorLoss<double> > nn;
+	mic::mlnn::MultiLayerNeuralNetwork<double> nn;
 };
 
 
@@ -68,6 +69,7 @@ public:
 		nn.pushLayer(new mic::mlnn::activation_function::Sigmoid<double>(2, "Sigmoid1"));
 		nn.pushLayer(new mic::mlnn::fully_connected::Linear<double>(2, 2, "Linear2"));
 		nn.pushLayer(new mic::mlnn::activation_function::Sigmoid<double>(2, "Sigmoid2"));
+		nn.setLoss< mic::neural_nets::loss::SquaredErrorLoss<double> >();
 
 		input_x = MAKE_MATRIX_PTR(double, 2, 1);
 		target_y = MAKE_MATRIX_PTR(double, 2, 1);
@@ -125,7 +127,7 @@ protected:
 
 private:
 	// Neural network.
-	mic::mlnn::MultiLayerNeuralNetwork<double, mic::neural_nets::loss::SquaredErrorLoss<double> > nn;
+	mic::mlnn::MultiLayerNeuralNetwork<double> nn;
 
 	// Test input x - used in forward pass.
 	mic::types::MatrixPtr<double> input_x;
