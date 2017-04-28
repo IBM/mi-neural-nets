@@ -17,7 +17,7 @@ TEST_F(Linear5x2Float, WbInitialization) {
 		ASSERT_NE( (*layer.p["W"])[i], 0.0 ) << "Weight W is zero at position i=" << i;
 
 	for (size_t i=0; i<2; i++)
-		ASSERT_NE( (*layer.p["b"])[i], 0.0 ) << "Bias b is zero at position i=" << i;
+		ASSERT_EQ( (*layer.p["b"])[i], 0.0 ) << "Bias b is not zero at position i=" << i;
 }
 
 /*!
