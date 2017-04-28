@@ -37,7 +37,7 @@ TEST_F(Sphere1DLandscape, RMSProp_Convergence) {
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		// Update - learning rate not used!
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -66,7 +66,7 @@ TEST_F(Sphere20DLandscape,  RMSProp_Convergence) {
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		// Update - learning rate not used!
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);

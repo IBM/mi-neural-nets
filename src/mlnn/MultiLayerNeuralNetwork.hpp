@@ -196,11 +196,12 @@ public:
 
 	/*!
 	 * Performs the network training by updating parameters of all layers according to gradients computed by back-propagation.
-	 * @param alpha Learning rate - passed to the optimization functions of all layers.
+	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
-	void update(eT alpha) {
+	void update(eT alpha_, eT decay_ = 0.0f) {
 		for (size_t i = 0; i < layers.size(); i++) {
-			layers[i]->applyGrads(alpha);
+			layers[i]->update(alpha_, decay_);
 		}//: for
 	}
 
@@ -209,9 +210,10 @@ public:
 	 * @param encoded_batch_ Batch encoded in the form of matrix of size [sample_size x batch_size].
 	 * @param encoded_targets_ Targets (labels) encoded in the form of matrix of size [label_size x batch_size].
 	 * @param learning_rate_ The learning rate.
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 * @return Loss computed according to the selected loss function. If function not set - returns INF.
 	 */
-	eT train(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_, eT learning_rate_) {
+	eT train(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_, eT learning_rate_, eT decay_ = 0.0f) {
 
 		// Forward propagate the activations from first layer to the last.
 		forward(encoded_batch_);
@@ -226,7 +228,7 @@ public:
 		backward(dy);
 
 		// Apply the changes - according to the optimization function.
-		update(learning_rate_);
+		update(learning_rate_, decay_);
 
 		// Calculate mean value of the loss function (i.e. loss divided by the batch size).
 		eT loss_value = loss->calculateMeanLoss(encoded_targets_, encoded_predictions);

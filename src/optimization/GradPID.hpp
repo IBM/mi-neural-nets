@@ -53,12 +53,12 @@ public:
 	}
 
 	/*!
-	 * Performs update according to the GradPID update rule.
+	 * Calculates the update according to the GradPID update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001).
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == Edx->size());
 
@@ -100,25 +100,22 @@ public:
 //			std::cout<< "(*deltaD)[" << i << "]=" << (*deltaD)[i] << std::endl;
 		}
 
-		// Calculate update.
+		// Calculate the update.
 		for(size_t i=0; i< (size_t)delta->size(); i++) {
 			(*delta)[i] = (*deltaP)[i] + (*deltaI)[i] + (*deltaD)[i];
 //			std::cout<< "(*delta)[" << i << "]=" << (*delta)[i] << std::endl;
 			assert(std::isfinite((*delta)[i]));
 		}
 
-		// Perform the update.
-		for (size_t i=0; i< (size_t)delta->size(); i++) {
-			(*x_)[i] -= (*delta)[i];
-		}
-
 		// Store past gradients.
-		// Perform the update.
 		for (size_t i=0; i< (size_t)dx_->size(); i++) {
 			(*dx_prev)[i] = (*dx_)[i];
 		}
 
 //		std::cout << std::endl;
+
+		// Return the update.
+		return delta;
 	}
 
 protected:
@@ -207,12 +204,12 @@ public:
 	}
 
 	/*!
-	 * Performs update according to the AdaGradPID update rule.
+	 * Calculates the update according to the AdaGradPID update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001).
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == Edx->size());
 
@@ -310,17 +307,13 @@ public:
 		}
 	//	std::cout << std::endl << std::endl;
 
-		// Perform the update.
-		for (size_t i=0; i< (size_t)delta->size(); i++) {
-			(*x_)[i] -= (*delta)[i];
-		}
-
 		// Store past gradiens.
-		// Perform the update.
 		for (size_t i=0; i< (size_t)dx_->size(); i++) {
 			(*dx_prev)[i] = (*dx_)[i];
 		}
 
+		// Return the update.
+		return delta;
 //		std::cout << "-------------------" <<  std::endl;
 	}
 

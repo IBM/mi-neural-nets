@@ -113,8 +113,10 @@ public:
 
 	/*!
 	 * Applies the gradient update.
+	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
-	void applyGrads(double alpha_) {
+	void update(eT alpha_, eT decay_  = 0.0f) {
 		//adagrad
 		//mW += dW.cwiseProduct(dW);
 		//(*m['W']) += (*g['W']).cwiseProduct((*g['W']));
@@ -127,8 +129,8 @@ public:
 		/*std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
 		std::cout << "g['W'] = \n" << (*g['W']) << std::endl;*/
 
-		opt["W"]->update(p['W'], g['W'], alpha_);
-		opt["b"]->update(p['b'], g['b'], alpha_);
+		opt["W"]->update(p['W'], g['W'], alpha_, decay_);
+		opt["b"]->update(p['b'], g['b'], alpha_, decay_);
 
 		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 
@@ -153,6 +155,9 @@ public:
 			}//: for
 		}//: if
 
+		// Epsilon added for numerical stability.
+		eT eps = 1e-10;
+
 		mic::types::MatrixPtr<eT> W =  Layer<eT>::getParam("W");
 		// Iterate through "neurons" and generate "activation image" for each one.
 		for (size_t i=0; i < output_size; i++) {
@@ -163,9 +168,9 @@ public:
 			// Resize row.
 			row->resize( height_, width_);
 			// Calculate l2 norm.
-			float l2 = row->norm();
+			eT l2 = row->norm() + eps;
 			// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-			(*row) = row->unaryExpr ( [&] ( float x ) { return ( x / l2 + 0.5f); } );
+			(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
 		}//: for
 
 		// Return activations.

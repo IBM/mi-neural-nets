@@ -41,6 +41,7 @@ public:
 		dx_prev = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		dx_prev->zeros();
 
+		// Allocate and reset delta.
 		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		delta->zeros();
 
@@ -49,12 +50,12 @@ public:
 	}
 
 	/*!
-	 * Performs update according to the AdamID update rule.
+	 * Calculates the update according to the AdamID update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001).
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == Edx->size());
 
@@ -82,13 +83,7 @@ public:
 		}
 //		std::cout << std::endl;
 
-		// Perform the update.
-		for (size_t i=0; i< (size_t)delta->size(); i++) {
-			(*x_)[i] -= (*delta)[i];
-		}
-
 		// Store past gradients.
-		// Perform the update.
 		for (size_t i=0; i< (size_t)dx_->size(); i++) {
 			(*dx_prev)[i] = (*dx_)[i];
 		}
@@ -99,6 +94,8 @@ public:
 		beta1_powt *= beta1;
 		beta2_powt *= beta2;
 
+		// Return the update.
+		return delta;
 	}
 
 protected:

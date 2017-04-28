@@ -38,12 +38,12 @@ public:
 	}
 
 	/*!
-	 * Performs update according to the RMSProp update rule.
+	 * Calculates the update according to the RMSProp update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001). NOT USED!
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == EG->size());
 
@@ -55,14 +55,12 @@ public:
 
 		// Calculate updates - and store as previous (already) = - RMS(ED)/(RMS(G) * dx
 		for (size_t i=0; i<(size_t)x_->size(); i++){
-			(*delta)[i] = - (learning_rate_ / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
+			(*delta)[i] = (learning_rate_ / std::sqrt((*EG)[i] + eps)) * (*dx_)[i];
 			assert(std::isfinite((*delta)[i]));
 		}
 
-		// Perform the update.
-		for (size_t i=0; i<(size_t)x_->size(); i++) {
-			(*x_)[i] += (*delta)[i];
-		}
+		// Return the update.
+		return delta;
 	}
 
 protected:

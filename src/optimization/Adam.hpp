@@ -38,17 +38,21 @@ public:
 		v = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		v->zeros();
 
+		// Allocate and reset delta.
+		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		delta->zeros();
+
 		beta1_powt = beta1;
 		beta2_powt = beta2;
 	}
 
 	/*!
-	 * Performs update according to the ADAM update rule.
+	 * Calculates the update according to the ADAM update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001).
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_  = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_  = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == m->size());
 
@@ -60,13 +64,16 @@ public:
 		for (size_t i=0; i<(size_t)x_->size(); i++)
 			(*v)[i] = beta2 * (*v)[i] + (1-beta2) * (*dx_)[i] * (*dx_)[i];
 
-		// Theta = Theta - update.
+		// Calculate the update.
 		for (size_t i=0; i<(size_t)x_->size(); i++)
-			(*x_)[i] -= learning_rate_ / (sqrt( (*v)[i] / (1 - beta2_powt)) + eps) * (*m)[i] / (1 - beta1_powt);
+			(*delta)[i] = learning_rate_ / (sqrt( (*v)[i] / (1 - beta2_powt)) + eps) * (*m)[i] / (1 - beta1_powt);
 
 		// Update "powered" factors.
 		beta1_powt *= beta1;
 		beta2_powt *= beta2;
+
+		// Return the update.
+		return delta;
 	}
 
 protected:
@@ -75,6 +82,9 @@ protected:
 
 	/// Exponentially decaying average of past squared gradients.
 	mic::types::MatrixPtr<eT> v;
+
+	/// Calculated update.
+	mic::types::MatrixPtr<eT> delta;
 
 	/// Decay rate 1 (momentum for past gradients).
 	eT beta1;

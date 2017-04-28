@@ -33,6 +33,10 @@ public:
 		G = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		// Reset G.
 		G->zeros();
+
+		// Allocate and reset delta.
+		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		delta->zeros();
 	}
 
 	/*!
@@ -41,7 +45,7 @@ public:
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001).
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == G->size());
 
@@ -49,9 +53,12 @@ public:
 		for (size_t i=0; i<(size_t)x_->size(); i++)
 				(*G)[i] += (*dx_)[i] * (*dx_)[i];
 
-		// W = W - alpha * dW.
+		// delta = alpha * dW.
 		for (size_t i=0; i<(size_t)x_->size(); i++)
-			(*x_)[i] -= learning_rate_ * (*dx_)[i] / (std::sqrt((*G)[i] + eps));
+			(*delta)[i] = learning_rate_ * (*dx_)[i] / (std::sqrt((*G)[i] + eps));
+
+		// Return the update.
+		return delta;
 	}
 
 protected:
@@ -60,6 +67,9 @@ protected:
 
 	/// Sum of all of the squares of the gradients up to time t ("diagonal matrix").
 	mic::types::MatrixPtr<eT> G;
+
+	/// Calculated update.
+	mic::types::MatrixPtr<eT> delta;
 };
 
 } //: optimization

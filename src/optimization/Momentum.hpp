@@ -36,22 +36,21 @@ public:
 	}
 
 	/*!
-	 * Performs update according to the Momentum update rule.
+	 * Calculates the update according to the Momentum update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001). NOT USED!
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == v->size());
 
-		// Update the update vector.
+		// Calculate the update vector (delta).
 		for (size_t i=0; i<(size_t)x_->size(); i++)
 			(*v)[i] = momentum * (*v)[i] + learning_rate_ * (*dx_)[i];
 
-		// Theta = Theta - update.
-		for (size_t i=0; i<(size_t)x_->size(); i++)
-			(*x_)[i] -= (*v)[i];
+		// Return the update.
+		return v;
 	}
 
 protected:

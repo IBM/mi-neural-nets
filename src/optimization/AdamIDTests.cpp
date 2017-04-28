@@ -31,7 +31,7 @@ TEST_F(Sphere1DLandscape, AdamID_Convergence) {
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// errorCheck whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -59,7 +59,7 @@ TEST_F(Sphere20DLandscape, AdamID_Convergence) {
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -86,7 +86,7 @@ TEST_F(Beale2DLandscape, AdamID_Convergence) {
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);
@@ -114,7 +114,7 @@ TEST_F(Rosenbrock2DLandscape, AdamID_Convergence) {
 	double abs_diff = 1.0;
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);

@@ -65,7 +65,7 @@ TEST_F(Sphere20DLandscape, DISABLED_AdaGrad_Convergence) {
 	while (abs_diff > eps) {
 		mic::types::MatrixPtr<double> dx = fun.calculateGradient(x);
 		// Update with default learning rate.
-		opt.update(x, dx);
+		opt.update(x, dx, 0.001);
 
 		// Check whether value of the function is finite.
 		double value = fun.calculateValue(x);

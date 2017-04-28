@@ -120,7 +120,7 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_labels = mnist_encoder->encodeBatch(bt.data());
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_labels, 0.005);
+				float loss = neural_net.train (encoded_batch, encoded_labels, 0.005, 0.05);
 
 				// Get reconstruction.
 				mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();

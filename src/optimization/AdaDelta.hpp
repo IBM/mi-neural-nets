@@ -36,17 +36,18 @@ public:
 		ED = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		ED->zeros();
 
+		// Allocate and reset delta.
 		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		delta->zeros();
 	}
 
 	/*!
-	 * Performs update according to the AdaDelta update rule.
+	 * Calculates the update according to the AdaDelta update rule.
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate (default=0.001). NOT USED!
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
+	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_) {
 		assert(x_->size() == dx_->size());
 		assert(x_->size() == EG->size());
 
@@ -76,13 +77,8 @@ public:
 			assert(std::isfinite((*delta)[i]));
 		}
 
-		// Perform the update.
-		for (size_t i=0; i<(size_t)x_->size(); i++) {
-			(*x_)[i] -= (*delta)[i];
-//			std::cout << "(*x_)["<< i <<"] = " << (*x_)[i] <<std::endl;
-		}
-//		std::cout << std::endl;
-
+		// Return the update.
+		return delta;
 	}
 
 protected:
