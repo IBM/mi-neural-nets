@@ -67,17 +67,11 @@ void batch_function (void) {
 	} else {*/
 		{
 		// Create a simple autoencoder.
-		neural_net.pushLayer(new Linear<float>(patch_size*patch_size, hidden_layer_units));
-		neural_net.pushLayer(new ReLU<float>(hidden_layer_units));
+		neural_net.pushLayer(new Linear<float>(patch_size*patch_size, patch_size*patch_size));
+		//neural_net.pushLayer(new ReLU<float>(hidden_layer_units));
 
-/*		neural_net.pushLayer(new Linear(hidden_layer_units, 20));
-		neural_net.pushLayer(new ReLU(20));
-
-		neural_net.pushLayer(new Linear(20, hidden_layer_units));
-		neural_net.pushLayer(new ReLU(hidden_layer_units));*/
-
-		neural_net.pushLayer(new Linear<float>(hidden_layer_units, patch_size*patch_size));
-		neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));
+/*		neural_net.pushLayer(new Linear<float>(hidden_layer_units, patch_size*patch_size));
+		neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));*/
 		neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 		neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
 
@@ -120,7 +114,7 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_labels = mnist_encoder->encodeBatch(bt.data());
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_labels, 0.005, 0.05);
+				float loss = neural_net.train (encoded_batch, encoded_labels, 0.001, 0.0);
 
 				// Get reconstruction.
 				mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -131,9 +125,9 @@ void batch_function (void) {
 					// Visualize the weights.
 					std::shared_ptr<mic::mlnn::Linear<float> > layer1 = neural_net.getLayer<mic::mlnn::Linear<float> >(0);
 					w_weights1->setBatchDataUnsynchronized(layer1->getActivations(patch_size, patch_size));
-					// Visualize the weights.
-					std::shared_ptr<mic::mlnn::Linear<float> > layer2 = neural_net.getLayer<mic::mlnn::Linear<float> >(2);
-					w_weights2->setBatchDataUnsynchronized(layer2->getActivations(hidden_layer_units, 1));
+
+					/*std::shared_ptr<mic::mlnn::Linear<float> > layer2 = neural_net.getLayer<mic::mlnn::Linear<float> >(2);
+					w_weights2->setBatchDataUnsynchronized(layer2->getActivations(hidden_layer_units, 1));*/
 				}//: if
 
 				/*if (iteration%100 == 0) {

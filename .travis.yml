@@ -58,28 +58,28 @@ matrix:
       - ./generateDocumentationAndDeploy.sh
 
    # 3. Ubuntu 14.04 clang++
-    - os: linux
-      dist: trusty
-      compiler: clang
-      env:
-        - OS=Ubuntu-14.04
-        - COMPILER=clang++
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - libboost-all-dev
-            - libeigen3-dev
-            - freeglut3-dev
-            - libxmu-dev
-            - libxi-dev
-            - g++-4.8
-            - doxygen
-            - doxygen-doc
-            - doxygen-latex
-            - doxygen-gui
-            - graphviz
+#    - os: linux
+#      dist: trusty
+#      compiler: clang
+#      env:
+#        - OS=Ubuntu-14.04
+#        - COMPILER=clang++
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#          packages:
+#            - libboost-all-dev
+#            - libeigen3-dev
+#            - freeglut3-dev
+#            - libxmu-dev
+#            - libxi-dev
+#            - g++-4.8
+#            - doxygen
+#            - doxygen-doc
+#            - doxygen-latex
+#            - doxygen-gui
+#            - graphviz
 
 # Install gTesest.
 install:

@@ -37,8 +37,8 @@ public:
 		// Calculate loss (negative log probability).
 		dtype loss =0;
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
-			// -t * log y
-			loss -= (*target_y_)[i] * std::log2((*predicted_y_)[i]);
+			// -t * log (y + eps!)
+			loss -= (*target_y_)[i] * std::log2((*predicted_y_ + 1e-15)[i]);
 		}
 		// Return cross-entropy error (CE).
 		// The average cross entropy error (ACE) is loss divided by the batch size.

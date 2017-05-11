@@ -14,9 +14,13 @@ namespace mic {
 namespace mlnn {
 namespace fully_connected {
 
+// Forward declaration of SparseLinear class.
+template <typename eT>
+class SparseLinear;
+
 /*!
  * \brief Class implementing a linear, fully connected layer.
- * \author krocki/tkornuta
+ * \author tkornuta
   * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
@@ -64,11 +68,11 @@ public:
 	 */
 	void forward(bool test_ = false) {
 		// Get input matrices.
-		mic::types::Matrix<eT> x = (*Layer<eT>::s['x']);
-		mic::types::Matrix<eT> W = (*Layer<eT>::p['W']);
-		mic::types::Matrix<eT> b = (*Layer<eT>::p['b']);
-		// Get output pointer!
-		mic::types::MatrixPtr<eT> y = Layer<eT>::s['y'];
+		mic::types::Matrix<eT> x = (*s['x']);
+		mic::types::Matrix<eT> W = (*p['W']);
+		mic::types::Matrix<eT> b = (*p['b']);
+		// Get output pointer - so the results will be stored!
+		mic::types::MatrixPtr<eT> y = s['y'];
 
 		// Forward pass.
 		(*y) = W * x + b.replicate(1, x.cols());
@@ -85,17 +89,17 @@ public:
 	 */
 	void backward() {
 		// Get matrices.
-		mic::types::Matrix<eT> dy = (*Layer<eT>::g['y']);
-		mic::types::Matrix<eT> x = (*Layer<eT>::s['x']);
-		mic::types::Matrix<eT> W = (*Layer<eT>::p['W']);
-		// Get output pointers!
-		mic::types::MatrixPtr<eT> dW = Layer<eT>::g['W'];
-		mic::types::MatrixPtr<eT> db = Layer<eT>::g['b'];
-		mic::types::MatrixPtr<eT> dx = Layer<eT>::g['x'];
+		mic::types::Matrix<eT> dy = (*g['y']);
+		mic::types::Matrix<eT> x = (*s['x']);
+		mic::types::Matrix<eT> W = (*p['W']);
+		// Get output pointers - so the results will be stored!
+		mic::types::MatrixPtr<eT> dW = g['W'];
+		mic::types::MatrixPtr<eT> db = g['b'];
+		mic::types::MatrixPtr<eT> dx = g['x'];
 
 		// Backward pass.
 		(*dW) = dy * x.transpose();
-		(*db) = dy.rowwise().sum();
+		(*db) = dy.rowwise().mean(); // take mean value, instead of sum!
 		(*dx) = W.transpose() * dy;
 
 /*		std::cout << "Linear backward: g['y'] = \n" << (*g['y']) << std::endl;
@@ -106,44 +110,28 @@ public:
 	 * Resets the gradients - empty, to be overridden by the inherited classes.
 	 */
 	void resetGrads() {
-		(*Layer<eT>::g['W']).setZero();
-		(*Layer<eT>::g['b']).setZero();
+		g['W']->setZero();
+		g['b']->setZero();
 	}
 
 
 	/*!
-	 * Applies the gradient update.
+	 * Applies the gradient update, using the selected optimization method.
 	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
 	void update(eT alpha_, eT decay_  = 0.0f) {
-		//adagrad
-		//mW += dW.cwiseProduct(dW);
-		//(*m['W']) += (*g['W']).cwiseProduct((*g['W']));
-
-		//mb += db.cwiseProduct(db);
-		//(*m['b']) += (*g['b']).cwiseProduct((*g['b']));
-
-		//W = (1 - decay_) * W + alpha_ * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
-		//(*p['W']) = (1.0f - decay_) * (*p['W']) + alpha_ * (*g['W']).cwiseQuotient((*m['W']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
-		/*std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
-		std::cout << "g['W'] = \n" << (*g['W']) << std::endl;*/
+		//std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
+		//std::cout << "g['W'] = \n" << (*g['W']) << std::endl;
 
 		opt["W"]->update(p['W'], g['W'], alpha_, decay_);
-		opt["b"]->update(p['b'], g['b'], alpha_, decay_);
+		opt["b"]->update(p['b'], g['b'], alpha_, 0.0);
 
 		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
-
-		//b += alpha_ * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));
-		//(*p['b']) += alpha_ * (*g['b']).cwiseQuotient((*m['b']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
-
-		// 'plain' fixed learning rate update
-		// b += alpha * db;
-		// W += alpha * dW;
 	}
 
 	/*!
-	 * Returns activations of neurons of a given layer.
+	 * Returns activations of neurons of a given layer (simple visualization).
 	 */
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
 		// Check if memory for the activations was allocated.
@@ -158,7 +146,7 @@ public:
 		// Epsilon added for numerical stability.
 		eT eps = 1e-10;
 
-		mic::types::MatrixPtr<eT> W =  Layer<eT>::getParam("W");
+		mic::types::MatrixPtr<eT> W =  p["W"];
 		// Iterate through "neurons" and generate "activation image" for each one.
 		for (size_t i=0; i < output_size; i++) {
 			// Get row.
@@ -191,12 +179,14 @@ protected:
     using Layer<eT>::input_size;
     using Layer<eT>::output_size;
     using Layer<eT>::batch_size;
-   using Layer<eT>::opt;
+    using Layer<eT>::opt;
 
 private:
 	// Friend class - required for using boost serialization.
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
+	// Friend class - required for accessing private constructor.
+	template<typename tmp> friend class SparseLinear;
 
 	/// Vector containing activations of neurons.
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > neuron_activations;

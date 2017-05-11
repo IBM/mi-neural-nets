@@ -10,7 +10,7 @@
 #ifndef SPARSELINEAR_H_
 #define SPARSELINEAR_H_
 
-#include <mlnn/layer/Layer.hpp>
+#include <mlnn/fully_connected/Linear.hpp>
 
 namespace mic {
 namespace mlnn {
@@ -22,7 +22,7 @@ namespace fully_connected {
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
-class SparseLinear : public mic::mlnn::Layer<eT> {
+class SparseLinear : public mic::mlnn::fully_connected::Linear<eT> {
 public:
 	/*!
 	 * Default constructor used for creation of the layer.
@@ -31,26 +31,21 @@ public:
 	 * @param batch_size_ Size of the batch.
 	 * @param name_ Name of the layer.
 	 */
-	SparseLinear<eT>(size_t inputs_, size_t outputs_, size_t batch_size_ = 1, std::string name_ = "SparseLinear") :
-		Layer<eT>(inputs_, outputs_, batch_size_, LayerTypes::SparseLinear, name_) {
+	SparseLinear<eT>(size_t inputs_, size_t outputs_, std::string name_ = "SparseLinear") :
+		Linear<eT>(inputs_, outputs_, name_) {
 
-		// Allocate parameters: weight and bias.
-		p.add (std::make_tuple ( "W", outputs_, inputs_ ));
-		p.add (std::make_tuple ( "b", outputs_, 1 ));
+		// Change type to SparseLinear.
+		Layer<eT>::layer_type = LayerTypes::SparseLinear;
 
-		// Initialize weights of the W matrix.
-		double range = sqrt(6.0 / double(inputs_ + outputs_));
-		p['W']->rand(-range, range);
-		p['b']->rand(-range, range);// setZero();
+		// Prepare matrices in the "temporal memory".
+		// For current sparsity vector.
+		m.add ("ro", output_size, 1 );
+		// For penalty.
+		m.add ("penalty", output_size, 1 );
 
-		//mW = (Eigen::MatrixXf)Eigen::MatrixXf::Zero(W.rows(), W.cols());
-		m.add (std::make_tuple ( "W", outputs_, inputs_ ));
-		m.add (std::make_tuple ( "b", outputs_, 1 ));
-
-		// Allocate gradients: W and b.
-		g.add (std::make_tuple ( "W", outputs_, inputs_ ));
-		g.add (std::make_tuple ( "b", outputs_, 1 ));
-
+		// Set desired sparsity and penalty term.
+		desired_ro = 0.1; // 10 %
+		beta = 0.5;
 	};
 
 
@@ -60,55 +55,44 @@ public:
 	virtual ~SparseLinear() {};
 
 	/*!
-	 * Forward pass.
-	 */
-	void forward(bool test_ = false) {
-		// y = W * x + b
-		(*s['y']) = (*p['W']) * (*s['x']) + (*p['b']).replicate(1, (*s['x']).cols());
-	}
-
-	/*!
 	 * Backward pass.
 	 */
 	void backward() {
-		/*dW = dy * x.transpose();
-		db = dy.rowwise().sum();
-		dx = W.transpose() * dy;*/
+		eT eps = 1e-10;
+		// Calculate the current "activation sparsity".
+		mic::types::MatrixPtr<eT> ro = m["ro"];
+		(*ro) = ((*s['y']).rowwise().sum()/batch_size);
 
+		// Calculate the sparsity penalty - for every output neuron.
+		mic::types::MatrixPtr<eT> penalty = m["penalty"];
+		for (size_t i=0; i<output_size; i++)
+			(*penalty)[i] = beta*(-desired_ro/((*ro)[i] + eps) + (1-desired_ro)/(1-(*ro)[i] + eps));
+
+
+		// Calculate derivatives of W,b and x.
 		(*g['W']) = (*g['y']) * ((*s['x']).transpose());
-		(*g['b']) = (*g['y']).rowwise().sum();
+		(*g['b']) = (*g['y']).rowwise().mean();
 		(*g['x']) = (*p['W']).transpose() * (*g['y']);
 	}
 
 	/*!
-	 * Reset the gradients.
+	 * Applies the gradient update, using the selected optimization method.
+	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
-	void resetGrads() {
-		(*g['W']).setZero();
-		(*g['b']).setZero();
-	}
+	void update(eT alpha_, eT decay_  = 0.0f) {
+		//std::cout << "p['W'] = \n" << (*p['W']) << std::endl;
+		//std::cout << "g['W'] = \n" << (*g['W']) << std::endl;
 
-	/*!
-	 * Apply the gradient update.
-	 */
-	void applyGrads(double alpha_) {
-		//adagrad
-		//mW += dW.cwiseProduct(dW);
-		(*m['W']) += (*g['W']).cwiseProduct((*g['W']));
+		// Apply selected learning rule to W.
+		opt["W"]->update(p['W'], g['W'], alpha_, decay_);
 
-		//mb += db.cwiseProduct(db);
-		(*m['b']) += (*g['b']).cwiseProduct((*g['b']));
+		// Apply sparsity learning rule to b, incorporating the KL-divergence term.
+		mic::types::MatrixPtr<eT> penalty = m["penalty"];
+		// (*p['b']) -=  alpha_ * beta * (*penalty);
+		opt["b"]->update(p['b'], g['b'], alpha_, 0.0);
 
-		//W = (1 - decay_) * W + alpha_ * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
-		//(*p['W']) = (1.0f - decay_) * (*p['W']) + alpha_ * (*g['W']).cwiseQuotient((*m['W']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
-
-		//b += alpha_ * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));
-		//(*p['b']) += alpha_ * (*g['b']).cwiseQuotient((*m['b']).unaryExpr(std::ptr_fun<eT>(sqrt_eps)));
-
-		// 'plain' fixed learning rate update
-		// b += alpha * db;
-		// W += alpha * dW;
-
+		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 	}
 
 	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
@@ -124,6 +108,7 @@ protected:
     using Layer<eT>::input_size;
     using Layer<eT>::output_size;
     using Layer<eT>::batch_size;
+    using Layer<eT>::opt;
 
 private:
 	// Friend class - required for using boost serialization.
@@ -132,8 +117,13 @@ private:
     /*!
 	 * Private constructor, used only during the deserialization.
 	 */
-	SparseLinear<eT>() : Layer<eT> () { }
+	SparseLinear<eT>() : mic::mlnn::fully_connected::Linear<eT> () { }
 
+	/// Desired sparsity of the layer.
+	eT desired_ro;
+
+	/// Controls the weight of the sparsity penalty term.
+	eT beta;
 };
 
 
