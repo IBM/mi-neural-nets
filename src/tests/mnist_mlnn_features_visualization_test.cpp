@@ -26,7 +26,7 @@ using namespace mic::logger;
 using namespace mic::opengl::visualization;
 
 // Neural net.
-#include <mlnn/MultiLayerNeuralNetwork.hpp>
+#include <mlnn/BackpropagationNeuralNetwork.hpp>
 using namespace mic::mlnn;
 
 // Encoders.
@@ -43,7 +43,7 @@ WindowGrayscaleBatch* w_weights2;
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter* importer;
 /// Multi-layer neural network.
-MultiLayerNeuralNetwork<float> neural_net;
+BackpropagationNeuralNetwork<float> neural_net;
 
 /// MNIST matrix encoder.
 mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
@@ -68,7 +68,7 @@ void batch_function (void) {
 		{
 		// Create a simple autoencoder.
 		neural_net.pushLayer(new Linear<float>(patch_size*patch_size, patch_size*patch_size));
-		//neural_net.pushLayer(new ReLU<float>(hidden_layer_units));
+		neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));
 
 /*		neural_net.pushLayer(new Linear<float>(hidden_layer_units, patch_size*patch_size));
 		neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));*/

@@ -20,7 +20,7 @@ using namespace mic::opengl::visualization;
 
 #include <data_io/MNISTPatchImporter.hpp>
 
-#include <mlnn/MultiLayerNeuralNetwork.hpp>
+#include <mlnn/BackpropagationNeuralNetwork.hpp>
 using namespace mic::mlnn;
 
 #include <encoders/MatrixXfMatrixXfEncoder.hpp>
@@ -129,7 +129,7 @@ private:
 	mic::configuration::Property<bool> softmax_load;
 
 	/// Multi-layer neural network.
-	MultiLayerNeuralNetwork<float> neural_net;
+	BackpropagationNeuralNetwork<float> neural_net;
 
 };
 

@@ -13,7 +13,7 @@ using namespace mic::logger;
 #include <encoders/MatrixXfMatrixXfEncoder.hpp>
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
-#include <mlnn/MultiLayerNeuralNetwork.hpp>
+#include <mlnn/BackpropagationNeuralNetwork.hpp>
 
 // Using multi layer neural networks
 using namespace mic::mlnn;
@@ -55,7 +55,7 @@ int main() {
 
 	// Create a simple NN for classification (should give around 95.3% accuracy)
 	//MNIST - 28x28 -> 256 -> 100 -> 10
-	MultiLayerNeuralNetwork<float> nn("3layerReLUSofmax");
+	BackpropagationNeuralNetwork<float> nn("3layerReLUSofmax");
 	nn.pushLayer(new Linear<float>(28 * 28, 256));
 	nn.pushLayer(new ReLU<float>(256));
 	nn.pushLayer(new Linear<float>(256, 100));

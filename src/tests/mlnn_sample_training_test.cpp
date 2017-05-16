@@ -11,7 +11,7 @@ using namespace mic::logger;
 
 #include <iostream>
 
-#include <mlnn/MultiLayerNeuralNetwork.hpp>
+#include <mlnn/BackpropagationNeuralNetwork.hpp>
 
 #include <types/Batch.hpp>
 
@@ -47,7 +47,7 @@ int main() {
 	}//: for
 
 	// Neural net.
-	MultiLayerNeuralNetwork<float> nn("simple_linear_network");
+	BackpropagationNeuralNetwork<float> nn("simple_linear_network");
 	nn.pushLayer(new Linear<float>(dataset_size, 15, "Linear1"));
 	nn.pushLayer(new ReLU<float>(15, "ReLU1"));
 	nn.pushLayer(new Linear<float>(15, classes, "Linear2"));

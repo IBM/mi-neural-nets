@@ -392,6 +392,7 @@ protected:
 private:
 	// Friend class - required for using boost serialization.
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class BackpropagationNeuralNetwork;
 
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;

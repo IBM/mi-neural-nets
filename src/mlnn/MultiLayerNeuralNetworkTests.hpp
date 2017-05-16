@@ -16,7 +16,7 @@
 // Redefine "private" and "protected" so every class field/method will be accessible for tests.
 #define private public
 #define protected public
-#include <mlnn/MultiLayerNeuralNetwork.hpp>
+#include <mlnn/BackpropagationNeuralNetwork.hpp>
 
 
 /*!
@@ -47,7 +47,7 @@ protected:
 
 private:
 	// Neural network.
-	mic::mlnn::MultiLayerNeuralNetwork<double> nn;
+	mic::mlnn::BackpropagationNeuralNetwork<double> nn;
 };
 
 
@@ -127,7 +127,7 @@ protected:
 
 private:
 	// Neural network.
-	mic::mlnn::MultiLayerNeuralNetwork<double> nn;
+	mic::mlnn::BackpropagationNeuralNetwork<double> nn;
 
 	// Test input x - used in forward pass.
 	mic::types::MatrixPtr<double> input_x;

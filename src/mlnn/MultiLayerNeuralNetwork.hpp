@@ -53,9 +53,7 @@ public:
 		name(name_),
 		connected(false) // Initially the network is not connected.
 	{
-		// Set default cross entropy loss function.
-		//Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
-		setLoss <mic::neural_nets::loss::CrossEntropyLoss<eT> >();
+
 	}
 
 	/*!
@@ -99,6 +97,47 @@ public:
 		connected = false;
 	}
 
+
+	/*!
+	 * Returns the size of the input od a given layer.
+	 * \param layer_number Number of layer. As default(= -1) returns the size of the input of LAST layer.
+	 */
+	size_t layerInputsSize(size_t layer_number_ = -1) {
+		assert (layer_number_ < layers.size());
+		// Last layer.
+		if (layer_number_ < 0)
+			layer_number_ = layers.size() -1;
+		// Return input size.
+		return layers[layer_number_]->inputsSize();
+	}
+
+	/*!
+	 * Returns the size of the output of a given layer.
+	 * \param layer_number Number of layer. As default(= -1) returns the size of the output of LAST layer.
+	 */
+	size_t lastLayerOutputsSize(size_t layer_number_ = -1) {
+		assert (layer_number_ < layers.size());
+		// Last layer.
+		if (layer_number_ < 0)
+			layer_number_ = layers.size() -1;
+		// Return input size.
+		return layers[layer_number_]->outputsSize();
+	}
+
+	/*!
+	 * Returns the size of the batch of a given layer.
+	 * \param layer_number Number of layer. As default(= -1) returns the size of the batch of LAST layer.
+	 */
+	size_t lastLayerBatchSize(size_t layer_number_ = -1) {
+		assert (layer_number_ < layers.size());
+		// Last layer.
+		if (layer_number_ < 0)
+			layer_number_ = layers.size() -1;
+		// Return input size.
+		return layers[layer_number_]->batchSize();
+	}
+
+
 	/*!
 	 * Sets the optimization method.
 	 * @tparam omT Optimization method type
@@ -110,14 +149,6 @@ public:
 			layers[i]->setOptimization<omT> ();
 	}
 
-	/*!
-	 * Sets the loss function.
-	 * \tparam LossFunction Template parameter denoting the loss function type (e.g. mic::neural_nets::loss::CrossEntropyLoss<eT>).
-	 */
-	template<typename LossFunction>
-	void setLoss () {
-		loss = std::make_shared< LossFunction > (LossFunction());
-	}
 
 	/*!
 	 * Passes the data in a feed-forward manner through all consecutive layers, from the input to the output layer.
@@ -169,32 +200,6 @@ public:
 	}
 
 	/*!
-	 * Performs the back propagation
-	 * @param targets_ The targer matrix, containing target (desired) outputs of the network [encoded_label_size x batch_size]
-	 */
-	void backward(mic::types::MatrixPtr<eT> targets_) {
-		// Make sure that there are some layers in the nn!
-		assert(layers.size() != 0);
-
-		LOG(LDEBUG) << "Last layer output gradient matrix size: " << layers.back()->g['y']->cols() << "x" << layers.back()->g['y']->rows();
-		LOG(LDEBUG) << "Passed target matrix size: " <<  targets_->cols() << "x" << targets_->rows();
-
-		// Make sure that the dimensions are ok.
-		assert((layers.back()->g['y'])->cols() == targets_->cols());
-		assert((layers.back()->g['y'])->rows() == targets_->rows());
-
-		// Set targets at the top.
-		(*(layers.back()->g['y'])) = (*targets_);
-
-		// Back-propagate the error.
-		for (int i = layers.size() - 1; i >= 0; i--) {
-			layers[i]->resetGrads();
-			layers[i]->backward();
-		}//: for
-
-	}
-
-	/*!
 	 * Performs the network training by updating parameters of all layers according to gradients computed by back-propagation.
 	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
@@ -205,59 +210,6 @@ public:
 		}//: for
 	}
 
-	/*!
-	 * Trains the neural network with a given batch.
-	 * @param encoded_batch_ Batch encoded in the form of matrix of size [sample_size x batch_size].
-	 * @param encoded_targets_ Targets (labels) encoded in the form of matrix of size [label_size x batch_size].
-	 * @param learning_rate_ The learning rate.
-	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
-	 * @return Loss computed according to the selected loss function. If function not set - returns INF.
-	 */
-	eT train(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_, eT learning_rate_, eT decay_ = 0.0f) {
-
-		// Forward propagate the activations from first layer to the last.
-		forward(encoded_batch_);
-
-		// Get predictions.
-		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
-
-		// Calculate gradient according to the loss function.
-		mic::types::MatrixPtr<eT> dy = loss->calculateGradient(encoded_targets_, encoded_predictions);
-
-		// Backpropagate the gradients from last layer to the first.
-		backward(dy);
-
-		// Apply the changes - according to the optimization function.
-		update(learning_rate_, decay_);
-
-		// Calculate mean value of the loss function (i.e. loss divided by the batch size).
-		eT loss_value = loss->calculateMeanLoss(encoded_targets_, encoded_predictions);
-
-		//eT correct = countCorrectPredictions(encoded_targets_, encoded_predictions);
-		//LOG(LDEBUG) << " Loss = " << std::setprecision(2) << std::setw(6) << loss_value << " | " << std::setprecision(1) << std::setw(4) << std::fixed << 100.0 * (eT)correct / (eT)encoded_batch_->cols() << "% batch correct";
-
-		// Return loss.
-		return loss_value;
-	}
-
-	/*!
-	 * Tests the neural network with a given batch.
-	 * @param encoded_batch_ Batch encoded in the form of matrix of size [sample_size x batch_size].
-	 * @param encoded_targets_ Targets (labels) encoded in the form of matrix of size [label_size x batch_size].
-	 * @return Loss computed according to the selected loss function. If function not set - returns INF.
-	 */
-	eT test(mic::types::MatrixPtr<eT> encoded_batch_, mic::types::MatrixPtr<eT> encoded_targets_) {
-		// skip dropout layers at test time
-		bool skip_dropout = true;
-
-		forward(encoded_batch_, skip_dropout);
-
-		// Get predictions.
-		mic::types::MatrixPtr<eT> encoded_predictions = getPredictions();
-
-		// Calculate the mean loss.
-		return loss->calculateMeanLoss(encoded_targets_, encoded_predictions);
-	}
 
 	/*!
 	 * Resets the gradients of all layers.
@@ -280,17 +232,6 @@ public:
 		for (size_t i = 0; i < layers.size(); i++) {
 			layers[i]->resizeBatch(batch_size_);
 		}//: for
-	}
-
-	/*!
-	 * Calculates the loss function according to the selected loss function.
-	 * @param encoded_targets_ Targets (labels) encoded in the form of pointer to matrix of size [label_size x batch_size].
-	 * @param encoded_predictions_ Predicted outputs of the network encoded in the form of pointer to matrix of size [label_size x batch_size].
-	 * @return Loss computed according to the selected loss function.
-	 */
-	eT calculateMeanLoss(mic::types::MatrixPtr<eT> encoded_targets_, mic::types::MatrixPtr<eT> encoded_predictions_)  {
-
-		return loss->calculateMeanLoss(encoded_targets_, encoded_predictions_);
 	}
 
 	/*!
@@ -329,18 +270,6 @@ public:
 		return correct;
 	}
 
-
-	size_t lastLayerInputsSize() {
-		return layers.back()->inputsSize();
-	}
-
-	size_t lastLayerOutputsSize() {
-		return layers.back()->outputsSize();
-	}
-
-	size_t lastLayerBatchSize() {
-		return layers.back()->batchSize();
-	}
 
 	/*!
 	 * Stream operator enabling to print neural network.
@@ -421,10 +350,6 @@ protected:
 	 */
 	std::string name;
 
-	/*!
-	 * Pointer to loss function.
-	 */
-	std::shared_ptr<mic::neural_nets::loss::Loss<eT> > loss;
 
 private:
 	// Friend class - required for using boost serialization.
