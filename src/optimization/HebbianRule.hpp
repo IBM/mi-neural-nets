@@ -43,22 +43,6 @@ public:
 
 
 	/*!
-	 * Updates the weight matrix according to the hebbian rule.
-	 * @param w_ Pointer to the weight matrix.
-	 * @param x_ Pointer to the input data matrix.
-	 * @param y_ Pointer to the output data matrix.
-	 * @param learning_rate_ Learning rate (default=0.001).
-	 */
-	void update(mic::types::MatrixPtr<eT> w_, mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_ = 0.001) {
-		assert(w_->cols() == y_->cols());
-		assert(w_->rows() == x_->rows());
-		assert(x_->cols() == y_->rows());
-
-		// w += delta;
-		(*w_) += calculateUpdate(x_, y_, learning_rate_);
-	}
-
-	/*!
 	 * Calculates the update according to the hebbian rule.
 	 * @param x_ Pointer to the input data matrix.
 	 * @param y_ Pointer to the output data matrix.
@@ -66,7 +50,7 @@ public:
 	 */
 	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_) {
 		// delta + alpha * x * y.
-		(*delta) = learning_rate_ * (*x_) * (*y_).transpose();
+		(*delta) = learning_rate_ * (*y_) * ((*x_).transpose());
 
 		return delta;
 	}

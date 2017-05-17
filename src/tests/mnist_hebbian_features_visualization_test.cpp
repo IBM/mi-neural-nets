@@ -1,8 +1,8 @@
 /*!
- * @file mnist_mlnn_features_visualization_test.cpp
- * @brief Program for visualization of features of mlnn layer trained on MNIST digits.
- * @author tkornuta
- * @date:   03-04-2017
+ * @file mnist_hebbian_features_visualization_test.cpp
+ * @brief Program for visualization of features of hebbian network trained on MNIST digits.
+ * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
+ * @Date:   May 16, 2017
  *
  * Copyright (c) 2017, Tomasz Kornuta, IBM Corporation. All rights reserved.
  *
@@ -25,8 +25,8 @@ using namespace mic::logger;
 #include <opengl/visualization/WindowGrayscaleBatch.hpp>
 using namespace mic::opengl::visualization;
 
-// Neural net.
-#include <mlnn/BackpropagationNeuralNetwork.hpp>
+// Hebbian neural net.
+#include <mlnn/HebbianNeuralNetwork.hpp>
 using namespace mic::mlnn;
 
 // Encoders.
@@ -43,7 +43,7 @@ WindowGrayscaleBatch* w_weights2;
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter* importer;
 /// Multi-layer neural network.
-BackpropagationNeuralNetwork<float> neural_net;
+HebbianNeuralNetwork<float> neural_net;
 
 /// MNIST matrix encoder.
 mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
@@ -53,8 +53,6 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 const size_t patch_size = 28;
 const size_t batch_size = 16;
 const size_t hidden_layer_units = 64;
-const char* fileName = "nn_autoencoder_weights_visualization.txt";
-
 
 /*!
  * \brief Function for batch sampling.
@@ -67,11 +65,7 @@ void batch_function (void) {
 	} else {*/
 		{
 		// Create a simple autoencoder.
-		neural_net.pushLayer(new Linear<float>(patch_size*patch_size, patch_size*patch_size));
-		//neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));
-
-		neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
-		neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
+		neural_net.pushLayer(new HebbianLinear<float>(patch_size*patch_size, patch_size*patch_size));
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
@@ -102,7 +96,7 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_labels = mnist_encoder->encodeBatch(bt.data());
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_labels, 0.001);
+				float loss = neural_net.train (encoded_batch, 0.001);
 
 				// Get reconstruction.
 				mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -112,15 +106,13 @@ void batch_function (void) {
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
-					std::shared_ptr<mic::mlnn::Linear<float> > layer1 = neural_net.getLayer<mic::mlnn::Linear<float> >(0);
+					std::shared_ptr<mic::mlnn::HebbianLinear<float> > layer1 = neural_net.getLayer<mic::mlnn::HebbianLinear<float> >(0);
 					w_weights1->setBatchDataUnsynchronized(layer1->getActivations(patch_size, patch_size));
 
-					/*std::shared_ptr<mic::mlnn::Linear<float> > layer2 = neural_net.getLayer<mic::mlnn::Linear<float> >(2);
-					w_weights2->setBatchDataUnsynchronized(layer2->getActivations(hidden_layer_units, 1));*/
 				}//: if
 
 				iteration++;
-				LOG(LINFO) << "Iteration: " << iteration << " loss =" << loss ;
+				LOG(LINFO) << "Iteration: " << iteration;
 			}//: end of critical section
 
 		}//: if

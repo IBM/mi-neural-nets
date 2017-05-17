@@ -151,55 +151,6 @@ public:
 
 
 	/*!
-	 * Passes the data in a feed-forward manner through all consecutive layers, from the input to the output layer.
-	 * @param input_data Input data - a matrix containing [sample_size x batch_size].
-	 * @param skip_dropout Flag for skipping dropouts - which should be set to true during testing.
-	 */
-	void forward(mic::types::MatrixPtr<eT> input_data, bool skip_dropout = false)  {
-		// Make sure that there are some layers in the nn!
-		assert(layers.size() != 0);
-
-		// Boost::Matrix is col major!
-		LOG(LDEBUG) << "Inputs size: " << input_data->rows() << "x" << input_data->cols();
-		LOG(LDEBUG) << "First layer input matrix size: " <<  layers[0]->s['x']->rows() << "x" << layers[0]->s['x']->cols();
-
-		// Make sure that the dimensions are ok.
-		// Check only rows, as cols determine the batch size - and we allow them to be dynamically changing!.
-		assert((layers[0]->s['x'])->rows() == input_data->rows());
-		//LOG(LDEBUG) <<" input_data: " << input_data.transpose();
-
-		// Connect layers by setting the input matrices pointers to point the output matrices.
-		// There will not need to be copy data between layers anymore.
-		if (!connected) {
-			// Set pointers - pass result to the next layer: x(next layer) = y(current layer).
-			for (size_t i = 0; i < layers.size()-1; i++) {
-				layers[i+1]->s['x'] = layers[i]->s['y'];
-				layers[i]->g['y'] = layers[i+1]->g['x'];
-			}//: for
-			connected = true;
-		}
-
-		//assert((layers[0]->s['x'])->cols() == input_data->cols());
-		// Change the size of batch - if required.
-		resizeBatch(input_data->cols());
-
-		// Copy inputs to the lowest point in the network.
-		(*(layers[0]->s['x'])) = (*input_data);
-
-		// Compute the forward activations.
-		for (size_t i = 0; i < layers.size(); i++) {
-			LOG(LDEBUG) << "Layer [" << i << "] " << layers[i]->name() << ": (" <<
-					layers[i]->inputSize() << "x" << layers[i]->batchSize() << ") -> (" <<
-					layers[i]->outputSize() << "x" << layers[i]->batchSize() << ")";
-
-			// Perform the forward computation: y = f(x).
-			layers[i]->forward(skip_dropout);
-
-		}
-		//LOG(LDEBUG) <<" predictions: " << getPredictions()->transpose();
-	}
-
-	/*!
 	 * Performs the network training by updating parameters of all layers according to gradients computed by back-propagation.
 	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
@@ -350,13 +301,13 @@ protected:
 	 */
 	std::string name;
 
+    /// Flag denoting whether the layers are interconnected, thus no copying between inputs and outputs of the neighboring layers will be required.
+    bool connected;
+
 
 private:
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;
-
-    /// Flag denoting whether the layers are interconnected, thus no copying between inputs and outputs of the neighboring layers will be required.
-    bool connected;
 
     /*!
      * Serialization save - saves the neural net object to archive.

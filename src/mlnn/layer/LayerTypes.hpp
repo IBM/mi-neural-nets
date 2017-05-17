@@ -41,4 +41,6 @@
 
 #include <mlnn/regularisation/Dropout.hpp>
 
+#include <mlnn/fully_connected/HebbianLinear.hpp>
+
 #endif /* SRC_MLNN_LAYERTYPES_HPP_ */

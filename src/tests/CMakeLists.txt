@@ -171,3 +171,34 @@ if(${BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION})
 	install(TARGETS mnist_mlnn_features_visualization_test RUNTIME DESTINATION bin)
 	
 endif(${BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION})
+
+
+# =======================================================================
+# Build executables - mnist hebbian features visualization test.
+# =======================================================================
+
+set(BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION ON CACHE BOOL "Build the program for visualization of features of hebbian network trained on MNIST digits")
+
+if(${BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION})
+	# Create executable.
+	add_executable(mnist_hebbian_features_visualization_test mnist_hebbian_features_visualization_test.cpp)
+	# Link it with shared libraries.
+	target_link_libraries(mnist_hebbian_features_visualization_test 
+		logger
+		application
+		types
+		data_io
+		encoders
+		configuration
+		opengl_visualization
+		opengl_application
+		${Boost_LIBRARIES}  
+		)
+        if(OpenBLAS_FOUND)
+                target_link_libraries(mnist_hebbian_features_visualization_test  ${OpenBLAS_LIB} )
+        endif(OpenBLAS_FOUND)
+	
+	# install test to bin directory
+	install(TARGETS mnist_hebbian_features_visualization_test RUNTIME DESTINATION bin)
+	
+endif(${BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION})

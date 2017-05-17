@@ -55,7 +55,8 @@ enum class LayerTypes : short
 	Linear,
 	SparseLinear,
 	// regularization
-	Dropout
+	Dropout,
+	HebbianLinear
 };
 
 
@@ -393,6 +394,7 @@ private:
 	// Friend class - required for using boost serialization.
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
 	template<typename tmp> friend class BackpropagationNeuralNetwork;
+	template<typename tmp> friend class HebbianNeuralNetwork;
 
 	// Friend class - required for using boost serialization.
     friend class boost::serialization::access;

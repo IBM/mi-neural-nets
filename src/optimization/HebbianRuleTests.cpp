@@ -29,8 +29,8 @@ TEST(HebbianRule, Weight3x4Update) {
 	(*y) << 0, 1, 1, 0, 0, 1, 1, 1;
 
 	// Desired result - delta.
-	mic::types::MatrixPtr<double> result_delta = MAKE_MATRIX_PTR(double, 3, 4);
-	(*result_delta) << 0.001, 0, 0.001, 0.001, 0, 0.001, 0, 0.001, 0, 0, 0, 0;
+	mic::types::MatrixPtr<double> result_delta = MAKE_MATRIX_PTR(double, 4, 3);
+	(*result_delta) << 0.001, 0, 0, 0, 0.001, 0, 0.001, 0, 0, 0.001, 0.001, 0;
 
 	// Rule.
 	mic::neural_nets::learning::HebbianRule<double> hebb(result_delta->rows(), result_delta->cols());
@@ -38,14 +38,22 @@ TEST(HebbianRule, Weight3x4Update) {
 	mic::types::MatrixPtr<double> delta = hebb.calculateUpdate(x, y, 0.001);
 
 /*	std::cout << "x = \n" << (*x) << std::endl;
-	std::cout << "y = \n" << (*y).transpose() << std::endl;
+	std::cout << "y = \n" << (*y) << std::endl;
 	std::cout << "delta = \n" << (*delta) << std::endl;
-	std::cout << "delta = \n" << (*delta) << std::endl;*/
+	std::cout << "result_delta = \n" << (*result_delta) << std::endl;*/
 
+	// Check dimensions.
+	ASSERT_EQ(delta->rows(), result_delta->rows());
+	ASSERT_EQ(delta->cols(), result_delta->cols());
+
+	// Before update.
 	for (size_t i=0; i< (size_t)result_delta->size(); i++)
 		ASSERT_LE(std::fabs((*delta)[i] - (*result_delta)[i]), 0) << " at element i=" << i;
 
-//	std::cout << "              -> Converged after " << iteration << " iterations\n";
+	// After update.
+	hebb.update(result_delta, x, y, 0.001);
+	for (size_t i=0; i< (size_t)result_delta->size(); i++)
+		ASSERT_LE(std::fabs((*result_delta)[i] - 2*(*delta)[i]), 0) << " at element i=" << i;
 }
 
 

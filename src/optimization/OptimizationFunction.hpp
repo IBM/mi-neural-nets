@@ -34,32 +34,54 @@ public:
 	virtual ~OptimizationFunction () { }
 
 	/*!
-	 * Method responsible for performing the update. Calls abstract method calculateUpdate().
-	 * @param x_ Pointer to the current matrix.
-	 * @param dx_ Pointer to current gradient of that matrix.
+	 * Method responsible for performing the update using backpropagation and gradient descent. Calls abstract method calculateUpdate().
+	 * @param p_ Pointer to the current parameter (matrix).
+	 * @param dp_ Pointer to current gradient of that parameter (matrix).
 	 * @param learning_rate_ Learning rate.
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT = 0.0 means "no decay").
 	 */
-	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_, eT decay_ = 0.0) {
+	virtual void update(mic::types::MatrixPtr<eT> p_, mic::types::MatrixPtr<eT> dp_, eT learning_rate_, eT decay_ = 0.0) {
 
 		// Calculate the update.
-		mic::types::MatrixPtr<eT> delta = calculateUpdate(x_, dx_, learning_rate_);
+		mic::types::MatrixPtr<eT> delta = calculateUpdate(p_, dp_, learning_rate_);
 
 		//assert(std::isfinite((*delta)[i]));
 
-		// Perform the update: x = x - delta.
+		// Perform the update: x = x - delta (with optional weight decay).
 		for (size_t i=0; i< (size_t)delta->size(); i++) {
-			(*x_)[i] = (1.0f - decay_) * (*x_)[i] - (*delta)[i];
+			(*p_)[i] = (1.0f - decay_) * (*p_)[i] - (*delta)[i];
 		}//: for
 	}
 
 	/*!
+	 * Updates the weight matrix according to the hebbian rule.
+	 * @param p_ Pointer to the parameter (weight) matrix.
+	 * @param x_ Pointer to the input data matrix.
+	 * @param y_ Pointer to the output data matrix.
+	 * @param learning_rate_ Learning rate (default=0.001).
+	 */
+	virtual void update(mic::types::MatrixPtr<eT> p_, mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_ = 0.001) {
+		assert(p_->rows() == y_->rows());
+		assert(p_->cols() == x_->rows());
+		assert(x_->cols() == y_->cols());
+
+		// Calculate the update using hebbian "fire together, wire together".
+		mic::types::MatrixPtr<eT> delta = calculateUpdate(x_, y_, learning_rate_);
+
+		// weight += delta;
+		(*p_) += (*delta);
+	}
+
+
+	/*!
 	 * Abstract method responsible for calculating the update.
-	 * @param x_ Pointer to the current matrix (parameter).
-	 * @param dx_ Pointer to current gradient of that matrix (parameter).
+	 * @param x_ Pointer to the current matrix (parameter) OR Pointer to current input matrix (in Hebbian learning).
+	 * @param dx_ Pointer to current gradient of that matrix (parameter) OR Pointer to current output matrix (in Hebbian learning).
 	 * @param learning_rate_ Learning rate.
 	 */
 	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_) = 0;
+
+
 
 };
 
