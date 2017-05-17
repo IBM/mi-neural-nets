@@ -268,7 +268,7 @@ public:
 		for (auto& i: p.keys()) {
 			opt.add(
 					i.first,
-					std::make_shared< omT > (omT ( (p[i.second])->cols(), (p[i.second])->rows() ))
+					std::make_shared< omT > (omT ( (p[i.second])->rows(), (p[i.second])->cols() ))
 					);
 		}//: for keys
 	}

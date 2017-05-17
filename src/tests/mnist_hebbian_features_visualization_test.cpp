@@ -52,7 +52,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 
 const size_t patch_size = 28;
 const size_t batch_size = 1;
-const size_t output_units = 1;
+const size_t output_units = 12;
 
 /*!
  * \brief Function for batch sampling.
@@ -65,8 +65,8 @@ void batch_function (void) {
 	} else {*/
 		{
 		// Create a simple hebbian network.
-		neural_net.pushLayer(new BinaryCorrelator<float>(patch_size*patch_size, output_units, 0.97, 0.1));
-		//neural_net.setOptimization<  mic::neural_nets::learning::BinaryCorrelatorLearningRule<float> >();
+		neural_net.pushLayer(new BinaryCorrelator<float>(patch_size*patch_size, output_units, 0.6, 28*28*0.01));
+		neural_net.setOptimization<  mic::neural_nets::learning::BinaryCorrelatorLearningRule<float> >();
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
@@ -97,7 +97,7 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_labels = mnist_encoder->encodeBatch(bt.data());
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, 0.1);
+				float loss = neural_net.train (encoded_batch, 0.05);
 
 				// Get reconstruction.
 				mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -168,8 +168,8 @@ int main(int argc, char* argv[]) {
 	// Create batch visualization window.
 	w_input = new WindowGrayscaleBatch("Input batch", 512, 512, 0, 0);
 	w_reconstruction = new WindowGrayscaleBatch("Reconstructed batch", 512, 512, 0, 580);
-	w_weights1 = new WindowGrayscaleBatch("L0 weights", 512, 512, 580, 0);
-//	w_weights2 = new WindowGrayscaleBatch("L1 weights", 512, 100, 1092, 0);
+	w_weights1 = new WindowGrayscaleBatch("Permanences", 512, 512, 580, 0);
+//	w_weights2 = new WindowGrayscaleBatch("Connectivity", 512, 512, 1092, 0);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 

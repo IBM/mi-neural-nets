@@ -35,7 +35,6 @@ public:
 	BinaryCorrelatorLearningRule(size_t rows_, size_t cols_) {
 		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		delta->zeros();
-
 	}
 
 	// Virtual destructor - empty.
@@ -49,21 +48,22 @@ public:
 	 * @param ni_aa Learning rate for P({AA}) (default=0.1).
 	 */
 	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT ni_aa = 0.1) {
-		std::cout<<"calculateUpdate\n";
 		// Calculate N_on - sum active bits.
 		size_t N_on = y_->sum();
 		// Calculate ni_ia = ni_ai.
 		eT ni_ia = ni_aa * N_on * (x_->rows() - N_on);
 
+		delta->setZero();
+
 		// Calculate deltas.
-		for (size_t i=0; i< (size_t)x_->size(); i++) {
-			for (size_t j=0; j< (size_t)y_->size(); j++) {
-				if ((*y_)[j] && (*x_)[i])
-					(*delta)(j,i) = ni_aa;
-				else if ((*y_)[j] || (*x_)[i])
-					(*delta)(j,i) = -ni_ia;
-				else
-					(*delta)(j,i) = 0;
+		for (size_t b=0; b< (size_t)x_->cols(); b++) { // for batch size.
+			for (size_t i=0; i< (size_t)x_->rows(); i++) {
+				for (size_t j=0; j< (size_t)y_->rows(); j++) {
+					if ((*y_)(j,b) && (*x_)(i,b))
+						(*delta)(j,i) += ni_aa;
+					else if ((*y_)(j,b) || (*x_)(i,b))
+						(*delta)(j,i) -= ni_ia;
+				}//: for
 			}//: for
 		}//: for
 

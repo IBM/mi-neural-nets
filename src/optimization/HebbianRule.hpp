@@ -35,7 +35,6 @@ public:
 	HebbianRule(size_t rows_, size_t cols_) {
 		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		delta->zeros();
-
 	}
 
 	// Virtual destructor - empty.
@@ -50,11 +49,8 @@ public:
 	 */
 	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_) {
 		// delta + alpha * x * y.
-		//std::cout<<" y: \n" << *y_ << std::endl;
-		//std::cout<<" x: \n" << *x_ << std::endl;
 		(*delta) = learning_rate_ * (*y_) * ((*x_).transpose());
 
-		std::cout<<" Delta: \n" << *delta << std::endl;
 		return delta;
 	}
 

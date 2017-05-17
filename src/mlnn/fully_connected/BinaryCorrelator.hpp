@@ -36,8 +36,7 @@ public:
 		Layer<eT>(inputs_, outputs_, 1, LayerTypes::BinaryCorrelator, name_),
 		permanence_threshold(permanence_threshold_),
 		proximal_threshold(proximal_threshold_)
-{
-
+	{
 		// Create the permanence matrix.
 		p.add ("p", outputs_, inputs_);
 		// Create "connectivity" matrix.
@@ -96,21 +95,20 @@ public:
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
 	void update(eT alpha_, eT decay_ = 0.0f) {
-		std::cout<<"p before update: " << (*p['p']) << std::endl;
+		//std::cout<<"p before update: " << (*p['p']) << std::endl;
 		// Update permanence using the learning rule.
 		opt["p"]->update(p['p'], s['x'], s['y'], alpha_);
-		std::cout<<"p after update: " << (*p['p']) << std::endl;
+		//std::cout<<"p after update: " << (*p['p']) << std::endl;
 
 		// Update connectivity matrix.
 		mic::types::MatrixPtr<eT> c = m['c'];
 		mic::types::MatrixPtr<eT> perm = p['p'];
-		std::cout<<"C before threshold: " << (*c) << std::endl;
+		//std::cout<<"C before threshold: " << (*c) << std::endl;
 		// Threshold.
 		for (size_t i = 0; i < (size_t)c->size(); i++) {
 			(*c)[i] = ((*perm)[i] > permanence_threshold) ? 1.0f : 0.0f;
 		}//: for
-		std::cout<<"C after threshold: " << (*c) << std::endl;
-
+		//std::cout<<"C after threshold: " << (*c) << std::endl;
 	}
 
 	/*!
@@ -127,20 +125,21 @@ public:
 		}//: if
 
 		// Epsilon added for numerical stability.
+		eT eps = 1e-10;
 
-		mic::types::MatrixPtr<eT> c =  m["c"];
+		mic::types::MatrixPtr<eT> perm =  p["p"];
 		// Iterate through "neurons" and generate "activation image" for each one.
 		for (size_t i=0; i < output_size; i++) {
 			// Get row.
 			mic::types::MatrixPtr<eT> row = neuron_activations[i];
 			// Copy data.
-			(*row) = c->row(i);
+			(*row) = perm->row(i);
 			// Resize row.
 			row->resize( height_, width_);
-/*			// Calculate l2 norm.
+			// Calculate l2 norm.
 			eT l2 = row->norm() + eps;
 			// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-			(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );*/
+			(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
 		}//: for
 
 		// Return activations.

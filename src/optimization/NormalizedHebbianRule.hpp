@@ -34,7 +34,7 @@ public:
 	 * @param cols_ Number of columns of the updated matrix/its gradient.
 	 */
 	NormalizedHebbianRule(size_t rows_, size_t cols_) {
-		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
+		delta = MAKE_MATRIX_PTR(eT, cols_, rows_);
 		delta->zeros();
 
 	}
