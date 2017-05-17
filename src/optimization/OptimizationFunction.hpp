@@ -34,11 +34,11 @@ public:
 	virtual ~OptimizationFunction () { }
 
 	/*!
-	 * Abstract method responsible for performing the update.
+	 * Method responsible for performing the update. Calls abstract method calculateUpdate().
 	 * @param x_ Pointer to the current matrix.
 	 * @param dx_ Pointer to current gradient of that matrix.
 	 * @param learning_rate_ Learning rate.
-	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT = 0.0 means on decay).
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT = 0.0 means "no decay").
 	 */
 	void update(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_, eT decay_ = 0.0) {
 

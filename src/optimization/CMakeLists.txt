@@ -10,6 +10,7 @@ install(FILES
 	OptimizationFunction.hpp
 	RMSProp.hpp
 	OptimizationFunctionTypes.hpp
+	HebbianRule.hpp
 	DESTINATION include/optimization)
 
 
@@ -37,5 +38,21 @@ if(GTEST_FOUND AND BUILD_UNIT_TESTS)
 		)
 	target_link_libraries(optimizationFunctionsTestsRunner ${GTEST_LIBRARIES})
 	add_test(optimizationFunctionsTestsRunner ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/optimizationFunctionsTestsRunner)
+
+endif(GTEST_FOUND AND BUILD_UNIT_TESTS)
+
+
+# =======================================================================
+# Build hebbian learning test
+# =======================================================================
+
+# Link tests with GTest
+if(GTEST_FOUND AND BUILD_UNIT_TESTS)
+
+	add_executable(hebbianLearningTestsRunner
+		HebbianRuleTests.cpp
+		)
+	target_link_libraries(hebbianLearningTestsRunner ${GTEST_LIBRARIES})
+	add_test(optimizationFunctionsTestsRunner ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/hebbianLearningTestsRunner)
 
 endif(GTEST_FOUND AND BUILD_UNIT_TESTS)

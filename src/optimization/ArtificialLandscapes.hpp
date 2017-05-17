@@ -15,6 +15,7 @@
 namespace mic {
 namespace neural_nets {
 namespace optimization {
+namespace artificial_landscapes {
 
 /*!
  * \brief Abstract class representing interface to a differentiable function.
@@ -228,6 +229,7 @@ private:
 };
 
 
+} //: artificial_landscapes
 } //: optimization
 } //: neural_nets
 } //: mic

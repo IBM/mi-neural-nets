@@ -43,10 +43,10 @@ TEST_F(Sphere1DLandscape, AdaDelta_Convergence) {
 		ASSERT_EQ(true, std::isfinite(value)) << " at iteration i=" << iteration;
 
 		// Calculate diff - std:abs!!
-		abs_diff = std::abs(value - fun.minValue());
+		abs_diff = std::fabs(value - fun.minValue());
 		iteration++;
 	}//: while
-	ASSERT_GE(eps, std::abs(fun.calculateValue(x) - fun.minValue()));
+	ASSERT_GE(eps, std::fabs(fun.calculateValue(x) - fun.minValue()));
 	std::cout << "              -> Converged after " << iteration << " iterations\n";
 }
 
@@ -72,10 +72,10 @@ TEST_F(Sphere20DLandscape, AdaDelta_Convergence) {
 		ASSERT_EQ(true, std::isfinite(value)) << " at iteration i=" << iteration;
 
 		// Calculate diff - std:abs!!
-		abs_diff = std::abs(value - fun.minValue());
+		abs_diff = std::fabs(value - fun.minValue());
 		iteration++;
 	}//: while
-	ASSERT_GE(eps, std::abs(fun.calculateValue(x) - fun.minValue()));
+	ASSERT_GE(eps, std::fabs(fun.calculateValue(x) - fun.minValue()));
 	std::cout << "              -> Converged after " << iteration << " iterations\n";
 }
 
@@ -101,10 +101,10 @@ TEST_F(Beale2DLandscape, DISABLED_AdaDelta_Convergence) {
 		ASSERT_EQ(true, std::isfinite(value)) << " at iteration i=" << iteration;
 
 		// Calculate diff - std:abs!!
-		abs_diff = std::abs(value - fun.minValue());
+		abs_diff = std::fabs(value - fun.minValue());
 		iteration++;
 	}//: while
-	ASSERT_GE(eps, std::abs(fun.calculateValue(x) - fun.minValue()));
+	ASSERT_GE(eps, std::fabs(fun.calculateValue(x) - fun.minValue()));
 	std::cout << "              -> Converged after " << iteration << " iterations\n";
 }
 

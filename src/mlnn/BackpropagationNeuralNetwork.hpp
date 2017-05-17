@@ -17,7 +17,8 @@ namespace mlnn {
 
 /*!
  * \brief Class representing a multi-layer neural network based on backpropagation/gradient descent.
- * \author tkornuta/kmrocki
+ *
+ * \author tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT>
@@ -33,7 +34,8 @@ public:
 		// Set default cross entropy loss function.
 		setLoss <mic::neural_nets::loss::CrossEntropyLoss<eT> >();
 
-		//Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
+		// Set "classical" SDG as default optimization method.
+		MultiLayerNeuralNetwork<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
 	}
 
 	/*!
@@ -105,12 +107,10 @@ public:
 		// Calculate mean value of the loss function (i.e. loss divided by the batch size).
 		eT loss_value = loss->calculateMeanLoss(encoded_targets_, encoded_predictions);
 
-		//eT correct = countCorrectPredictions(encoded_targets_, encoded_predictions);
-		//LOG(LDEBUG) << " Loss = " << std::setprecision(2) << std::setw(6) << loss_value << " | " << std::setprecision(1) << std::setw(4) << std::fixed << 100.0 * (eT)correct / (eT)encoded_batch_->cols() << "% batch correct";
-
 		// Return loss.
 		return loss_value;
 	}
+
 
 	/*!
 	 * Tests the neural network with a given batch.
@@ -143,21 +143,20 @@ public:
 		return loss->calculateMeanLoss(encoded_targets_, encoded_predictions_);
 	}
 
-
-	// Unhide the overloaded methods & fields inherited from the template class MultiLayerNeuralNetwork fields via "using" statement.
+	// Unhide the overloaded public methods & fields inherited from the template class MultiLayerNeuralNetwork fields via "using" statement.
 	using MultiLayerNeuralNetwork<eT>::getPredictions;
 	using MultiLayerNeuralNetwork<eT>::forward;
 	using MultiLayerNeuralNetwork<eT>::update;
+	using MultiLayerNeuralNetwork<eT>::setOptimization;
 
 protected:
+	// Unhide the overloaded protected methods & fields inherited from the template class MultiLayerNeuralNetwork fields via "using" statement.
+	using MultiLayerNeuralNetwork<eT>::layers;
+
 	/*!
 	 * Pointer to loss function.
 	 */
 	std::shared_ptr<mic::neural_nets::loss::Loss<eT> > loss;
-
-	// Unhide the overloaded methods & fields inherited from the template class MultiLayerNeuralNetwork fields via "using" statement.
-	using MultiLayerNeuralNetwork<eT>::layers;
-
 
 };
 
