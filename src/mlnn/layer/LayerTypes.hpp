@@ -43,4 +43,6 @@
 
 #include <mlnn/fully_connected/HebbianLinear.hpp>
 
+#include <mlnn/fully_connected/BinaryCorrelator.hpp>
+
 #endif /* SRC_MLNN_LAYERTYPES_HPP_ */

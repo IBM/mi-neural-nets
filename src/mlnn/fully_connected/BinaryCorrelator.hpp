@@ -1,5 +1,5 @@
 /*!
- * @file HebbianLinear.hpp
+ * @file BinaryCorrelator.hpp
  * @brief
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
  * @Date:   May 16, 2017
@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef SRC_MLNN_HEBBIANLINEAR_HPP_
-#define SRC_MLNN_HEBBIANLINEAR_HPP_
+#ifndef SRC_MLNN_BINRARYCORRELATOR_HPP_
+#define SRC_MLNN_BINRARYCORRELATOR_HPP_
 
 #include <mlnn/layer/Layer.hpp>
 
@@ -23,7 +23,7 @@ namespace fully_connected {
   * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
-class HebbianLinear : public mic::mlnn::Layer<eT> {
+class BinaryCorrelator : public mic::mlnn::Layer<eT> {
 public:
 
 	/*!
@@ -32,15 +32,27 @@ public:
 	 * @param outputs_ Length of the output vector.
 	 * @param name_ Name of the layer.
 	 */
-	HebbianLinear<eT>(size_t inputs_, size_t outputs_, std::string name_ = "HebbianLinear") :
-		Layer<eT>(inputs_, outputs_, 1, LayerTypes::HebbianLinear, name_) {
+	BinaryCorrelator<eT>(size_t inputs_, size_t outputs_, eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5, std::string name_ = "BinaryCorrelator") :
+		Layer<eT>(inputs_, outputs_, 1, LayerTypes::BinaryCorrelator, name_),
+		permanence_threshold(permanence_threshold_),
+		proximal_threshold(proximal_threshold_)
+{
 
-		// Create the weights matrix.
-		p.add ("W", outputs_, inputs_);
+		// Create the permanence matrix.
+		p.add ("p", outputs_, inputs_);
+		// Create "connectivity" matrix.
+		m.add ("c", outputs_, inputs_);
 
-		// Initialize weights of the W matrix.
-		double range = sqrt(6.0 / double(inputs_ + outputs_));
-		Layer<eT>::p['W']->rand(-range, range);
+		// Initialize permanence matrix.
+		//double range = sqrt(6.0 / double(inputs_ + outputs_));
+		p['p']->rand(0, 1);
+		// Initialize connectivity.
+		mic::types::MatrixPtr<eT> c = m['c'];
+		mic::types::MatrixPtr<eT> perm = p['p'];
+		// Threshold.
+		for (size_t i = 0; i < (size_t)c->size(); i++) {
+			(*c)[i] = ((*perm)[i] > permanence_threshold) ? 1.0f : 0.0f;
+		}//: for
 
 		// Set hebbian learning as default optimization function.
 		Layer<eT>::template setOptimization<mic::neural_nets::learning::HebbianRule<eT> > ();
@@ -50,7 +62,7 @@ public:
 	/*!
 	 * Virtual destructor - empty.
 	 */
-	virtual ~HebbianLinear() {};
+	virtual ~BinaryCorrelator() {};
 
 	/*!
 	 * Forward pass.
@@ -59,17 +71,15 @@ public:
 	void forward(bool test_ = false) {
 		// Get input matrices.
 		mic::types::Matrix<eT> x = (*s['x']);
-		mic::types::Matrix<eT> W = (*p['W']);
+		mic::types::Matrix<eT> c = (*m['c']);
 		// Get output pointer - so the results will be stored!
 		mic::types::MatrixPtr<eT> y = s['y'];
 
 		// Forward pass.
-		(*y) = W * x;
-		for (size_t i = 0; i < (size_t)s['x']->rows() * s['x']->cols(); i++) {
-			// Sigmoid.
-			//(*y)[i] = 1.0f / (1.0f +::exp(-(*y)[i]));
+		(*y) = c * x;
+		for (size_t i = 0; i < (size_t)y->size(); i++) {
 			// Threshold.
-			(*y)[i] = ((*y)[i] > 0.8) ? 1.0f : 0.0f;
+			(*y)[i] = ((*y)[i] > proximal_threshold) ? 1.0f : 0.0f;
 		}//: for
 	}
 
@@ -77,7 +87,7 @@ public:
 	 * Backward pass.
 	 */
 	void backward() {
-		//LOG(LERROR) << "Backward propagation should not be used with layers using Hebbian learning!";
+		//LOG(LERROR) << "Backward propagation should not be used with layers relying on Hebbian learning!";
 	}
 
 	/*!
@@ -85,8 +95,22 @@ public:
 	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
-	void update(eT alpha_, eT decay_  = 0.0f) {
-		opt["W"]->update(p['W'], s['x'], s['y'], alpha_);
+	void update(eT alpha_, eT decay_ = 0.0f) {
+		std::cout<<"p before update: " << (*p['p']) << std::endl;
+		// Update permanence using the learning rule.
+		opt["p"]->update(p['p'], s['x'], s['y'], alpha_);
+		std::cout<<"p after update: " << (*p['p']) << std::endl;
+
+		// Update connectivity matrix.
+		mic::types::MatrixPtr<eT> c = m['c'];
+		mic::types::MatrixPtr<eT> perm = p['p'];
+		std::cout<<"C before threshold: " << (*c) << std::endl;
+		// Threshold.
+		for (size_t i = 0; i < (size_t)c->size(); i++) {
+			(*c)[i] = ((*perm)[i] > permanence_threshold) ? 1.0f : 0.0f;
+		}//: for
+		std::cout<<"C after threshold: " << (*c) << std::endl;
+
 	}
 
 	/*!
@@ -103,21 +127,20 @@ public:
 		}//: if
 
 		// Epsilon added for numerical stability.
-		eT eps = 1e-10;
 
-		mic::types::MatrixPtr<eT> W =  p["W"];
+		mic::types::MatrixPtr<eT> c =  m["c"];
 		// Iterate through "neurons" and generate "activation image" for each one.
 		for (size_t i=0; i < output_size; i++) {
 			// Get row.
 			mic::types::MatrixPtr<eT> row = neuron_activations[i];
 			// Copy data.
-			(*row) = W->row(i);
+			(*row) = c->row(i);
 			// Resize row.
 			row->resize( height_, width_);
-			// Calculate l2 norm.
+/*			// Calculate l2 norm.
 			eT l2 = row->norm() + eps;
 			// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-			(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
+			(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );*/
 		}//: for
 
 		// Return activations.
@@ -146,10 +169,16 @@ private:
 	/// Vector containing activations of neurons.
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > neuron_activations;
 
+	// Permanence threshold - used for calculation of binary connectivity.
+	eT permanence_threshold;
+
+	// Proximal threshold - used for activation of a given dendrite segment.
+	eT proximal_threshold;
+
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */
-	HebbianLinear<eT>() : Layer<eT> () { }
+	BinaryCorrelator<eT>() : Layer<eT> () { }
 
 };
 
@@ -158,4 +187,4 @@ private:
 } /* namespace mlnn */
 } /* namespace mic */
 
-#endif /* SRC_MLNN_HEBBIANLINEAR_HPP_ */
+#endif /* SRC_MLNN_BINRARYCORRELATOR_HPP_ */

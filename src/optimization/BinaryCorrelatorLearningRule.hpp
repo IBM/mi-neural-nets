@@ -1,5 +1,5 @@
 /*!
- * @file: HebbianRule.hpp
+ * @file: BinaryCorrelatorLearningRule.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
  * @Date:   May 16, 2017
  *
@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef HEBBIAN_HPP_
-#define HEBBIAN_HPP_
+#ifndef BINARYCORRELATORLEARNINGRULE_HPP_
+#define BINARYCORRELATORLEARNINGRULE_HPP_
 
 #include <optimization/OptimizationFunction.hpp>
 
@@ -25,36 +25,48 @@ namespace learning {
  * \author tkornuta
  */
 template <typename eT=float>
-class HebbianRule : public mic::neural_nets::optimization::OptimizationFunction<eT> {
+class BinaryCorrelatorLearningRule : public mic::neural_nets::optimization::OptimizationFunction<eT> {
 public:
 	/*!
 	 * Constructor. Sets dimensions, momentum rates (beta1=0.9 and beta2=0.999) and eps(default=1e-8).
 	 * @param rows_ Number of rows of the updated matrix/its gradient.
 	 * @param cols_ Number of columns of the updated matrix/its gradient.
 	 */
-	HebbianRule(size_t rows_, size_t cols_) {
+	BinaryCorrelatorLearningRule(size_t rows_, size_t cols_) {
 		delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		delta->zeros();
 
 	}
 
 	// Virtual destructor - empty.
-	virtual ~HebbianRule() { }
+	virtual ~BinaryCorrelatorLearningRule() { }
 
 
 	/*!
 	 * Calculates the update according to the hebbian rule.
 	 * @param x_ Pointer to the input data matrix.
 	 * @param y_ Pointer to the output data matrix.
-	 * @param learning_rate_ Learning rate (default=0.001).
+	 * @param ni_aa Learning rate for P({AA}) (default=0.1).
 	 */
-	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_) {
-		// delta + alpha * x * y.
-		//std::cout<<" y: \n" << *y_ << std::endl;
-		//std::cout<<" x: \n" << *x_ << std::endl;
-		(*delta) = learning_rate_ * (*y_) * ((*x_).transpose());
+	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT ni_aa = 0.1) {
+		std::cout<<"calculateUpdate\n";
+		// Calculate N_on - sum active bits.
+		size_t N_on = y_->sum();
+		// Calculate ni_ia = ni_ai.
+		eT ni_ia = ni_aa * N_on * (x_->rows() - N_on);
 
-		std::cout<<" Delta: \n" << *delta << std::endl;
+		// Calculate deltas.
+		for (size_t i=0; i< (size_t)x_->size(); i++) {
+			for (size_t j=0; j< (size_t)y_->size(); j++) {
+				if ((*y_)[j] && (*x_)[i])
+					(*delta)(j,i) = ni_aa;
+				else if ((*y_)[j] || (*x_)[i])
+					(*delta)(j,i) = -ni_ia;
+				else
+					(*delta)(j,i) = 0;
+			}//: for
+		}//: for
+
 		return delta;
 	}
 
@@ -69,4 +81,4 @@ protected:
 } /* namespace neural_nets */
 } /* namespace mic */
 
-#endif /* HEBBIAN_HPP_ */
+#endif /* BINARYCORRELATORLEARNINGRULE_HPP_ */

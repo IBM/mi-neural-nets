@@ -51,8 +51,8 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 //mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
-const size_t batch_size = 16;
-const size_t hidden_layer_units = 64;
+const size_t batch_size = 1;
+const size_t output_units = 1;
 
 /*!
  * \brief Function for batch sampling.
@@ -64,8 +64,9 @@ void batch_function (void) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
-		// Create a simple autoencoder.
-		neural_net.pushLayer(new HebbianLinear<float>(patch_size*patch_size, patch_size*patch_size));
+		// Create a simple hebbian network.
+		neural_net.pushLayer(new BinaryCorrelator<float>(patch_size*patch_size, output_units, 0.97, 0.1));
+		//neural_net.setOptimization<  mic::neural_nets::learning::BinaryCorrelatorLearningRule<float> >();
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
@@ -96,7 +97,7 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_labels = mnist_encoder->encodeBatch(bt.data());
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, 0.001);
+				float loss = neural_net.train (encoded_batch, 0.1);
 
 				// Get reconstruction.
 				mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -106,7 +107,7 @@ void batch_function (void) {
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
-					std::shared_ptr<mic::mlnn::HebbianLinear<float> > layer1 = neural_net.getLayer<mic::mlnn::HebbianLinear<float> >(0);
+					std::shared_ptr<mic::mlnn::BinaryCorrelator<float> > layer1 = neural_net.getLayer<mic::mlnn::BinaryCorrelator<float> >(0);
 					w_weights1->setBatchDataUnsynchronized(layer1->getActivations(patch_size, patch_size));
 
 				}//: if

@@ -16,6 +16,10 @@
 #include <optimization/GradientDescent.hpp>
 #include <optimization/Momentum.hpp>
 #include <optimization/RMSProp.hpp>
+
+
 #include <optimization/HebbianRule.hpp>
+#include <optimization/NormalizedHebbianRule.hpp>
+#include <optimization/BinaryCorrelatorLearningRule.hpp>
 
 #endif /* OPTIMIZATIONFUNCTIONTYPES_HPP_ */
