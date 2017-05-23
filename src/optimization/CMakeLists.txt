@@ -2,15 +2,18 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 install(FILES
+	OptimizationFunction.hpp
+	OptimizationArray.hpp
 	AdaDelta.hpp
 	AdaGrad.hpp
 	Adam.hpp
 	GradientDescent.hpp
 	Momentum.hpp
-	OptimizationFunction.hpp
 	RMSProp.hpp
 	OptimizationFunctionTypes.hpp
 	HebbianRule.hpp
+	NormalizedHebbianRule.hpp
+	BinaryCorrelatorLearningRule.hpp
 	DESTINATION include/optimization)
 
 

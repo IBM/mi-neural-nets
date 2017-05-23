@@ -39,7 +39,7 @@ include_directories( ${EIGEN3_INCLUDE_DIR} )
 find_package(MIToolchain 1.1 REQUIRED)
 
 # Find MIC Algorithms
-find_package(MIAlgorithms 1.1 REQUIRED)
+find_package(MIAlgorithms 1.2 REQUIRED)
 
 # Find MIC Visualization
 find_package(MIVisualization 1.2 REQUIRED)
@@ -93,8 +93,36 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Add subdirectories
 # =======================================================================
 
+# Create the cached variable for storing all library names.
+set(MINeuralNets_LIBRARIES "" CACHE INTERNAL "" FORCE)
+
 add_subdirectory(src)
 
 add_subdirectory(configs)
 
-#add_subdirectory(datasets)
+
+# =======================================================================
+# Cmake configuration
+# =======================================================================
+message ("-- Configured MI Neural Nets libraries:\n" "--   " "${MINeuralNets_LIBRARIES}")
+
+# Set include directory
+set(CMAKE_INCLUDE_DIRS_CONFIGCMAKE "${CMAKE_INSTALL_PREFIX}/include ${CMAKE_ADD_INCLUDE_PATH}")
+# Set lib directory
+set(CMAKE_LIB_DIRS_CONFIGCMAKE "${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_ADD_LIB_PATH}")
+# Set variable that will store generated libraries
+
+# =======================================================================
+# Preparation of cmake configs
+# =======================================================================
+
+# Configure *Config.cmake and *ConfigVersion.cmake
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/MINeuralNetsConfig.cmake.in" "${CMAKE_BINARY_DIR}/MINeuralNetsConfig.cmake" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/MINeuralNetsConfigVersion.cmake.in" "${CMAKE_BINARY_DIR}/MINeuralNetsConfigVersion.cmake" @ONLY)
+
+# Install the *Config.cmake and *ConfigVersion.cmake
+install(FILES
+  "${CMAKE_BINARY_DIR}/MINeuralNetsConfig.cmake"
+  "${CMAKE_BINARY_DIR}/MINeuralNetsConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/share/MINeuralNets/")
+

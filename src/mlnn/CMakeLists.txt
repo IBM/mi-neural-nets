@@ -27,6 +27,8 @@ install(FILES
 	fully_connected/Identity.hpp
 	fully_connected/Linear.hpp
 	fully_connected/SparseLinear.hpp
+	fully_connected/HebbianLinear.hpp
+	fully_connected/BinaryCorrelator.hpp
 	DESTINATION include/mlnn/fully_connected)
 
 install(FILES
@@ -34,7 +36,11 @@ install(FILES
 	DESTINATION include/mlnn/regularisation)
 
 # Install MLNN headers.
-install(FILES MultiLayerNeuralNetwork.hpp DESTINATION include/mlnn)
+install(FILES
+	MultiLayerNeuralNetwork.hpp
+	BackpropagationNeuralNetwork.hpp
+	HebbianNeuralNetwork.hpp
+	DESTINATION include/mlnn)
 
 
 # =======================================================================

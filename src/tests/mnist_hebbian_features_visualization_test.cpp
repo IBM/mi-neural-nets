@@ -51,7 +51,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 //mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
-const size_t batch_size = 1;
+const size_t batch_size = 4;
 const size_t output_units = 12;
 
 /*!
@@ -66,7 +66,7 @@ void batch_function (void) {
 		{
 		// Create a simple hebbian network.
 		neural_net.pushLayer(new BinaryCorrelator<float>(patch_size*patch_size, output_units, 0.6, 28*28*0.01));
-		neural_net.setOptimization<  mic::neural_nets::learning::BinaryCorrelatorLearningRule<float> >();
+		neural_net.setOptimization<  mic::neural_nets::learning::NormalizedHebbianRule<float> >();
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
