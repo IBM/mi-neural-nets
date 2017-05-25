@@ -1,5 +1,5 @@
 /*!
- * @file: LinearTests.hpp
+ * @file: Linear_tests.hpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
  * @Date:   Nov 4, 2016
  *

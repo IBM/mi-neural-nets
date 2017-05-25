@@ -1,4 +1,4 @@
-# Machine Intelligence Core: Neural Nets
+#Machine Intelligence Core: Neural Nets
 
 Status of Travis Continuous Integration:
 

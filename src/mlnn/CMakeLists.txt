@@ -13,11 +13,11 @@ install(FILES
 	activation_function/Sigmoid.hpp
 	DESTINATION include/mlnn/activation_function)
 
-#install(FILES
-#	convolution/Convolution.hpp
+install(FILES
+	convolution/Convolution.hpp
 #	convolution/Padding.hpp
 #	convolution/Pooling.hpp
-#	DESTINATION include/mlnn/convolution)
+	DESTINATION include/mlnn/convolution)
 
 install(FILES
 	cost_function/Softmax.hpp
@@ -68,5 +68,7 @@ endif(GTEST_FOUND AND BUILD_UNIT_TESTS)
 # =======================================================================
 
 add_subdirectory(cost_function)
+
+add_subdirectory(convolution)
 
 add_subdirectory(fully_connected)

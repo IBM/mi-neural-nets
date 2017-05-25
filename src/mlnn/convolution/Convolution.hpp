@@ -28,41 +28,113 @@ template <typename eT=float>
 class Convolution : public mic::mlnn::Layer<eT> {
 public:
 
-	Convolution<eT>(size_t inputs, size_t channels, size_t filter_size, size_t filters, std::string name_ = "Convolution") :
-		Layer<eT>(inputs * channels, filters * (sqrt(inputs) - filter_size + 1) * (sqrt(inputs) - filter_size + 1), 1, LayerTypes::Convolution, name_),
-		input_channels(channels), output_channels(filters), kernel_size(filter_size),
-		output_map_size((sqrt(inputs) - filter_size + 1) * (sqrt(inputs) - filter_size + 1)) {
+	/*!
+	 * Creates the a convolutional layer.
+	 * @param input_height_ Height of the input / rows (e.g. 28 for MNIST).
+	 * @param input_width_ Width of the input / cols (e.g. 28 for MNIST).
+	 * @param input_channels_ Number of channels of the input (e.g. 3 for RGB images).
+	 * @param filter_size_ Size of filters (assuming square filters).
+	 * @param stride_ Stride (assuming equal vertical and horizontal strides).
+	 * @param number_of_filters_ Number of filters = Length of the output vector.
+	 * @param name_ Name of the layer.
+	 */
+	Convolution<eT>(size_t input_height_, size_t input_width_, size_t input_channels_, size_t filter_size_, size_t stride_, size_t number_of_filters_, std::string name_ = "Convolution") :
+		Layer<eT>(input_width_ * input_height_ * input_channels_, number_of_filters_ * (input_width_ - filter_size_ + 1) * (input_height_ - filter_size_ + 1), 1, LayerTypes::Convolution, name_),
+	    input_width(input_width_),
+	    input_channels(input_channels_),
+		input_height(input_height_),
+		filter_size(filter_size_),
+		stride(stride_),
+		number_of_filters(number_of_filters_)
+	{
+		// Calculate total input-output number of parameters - for initialization.
+		size_t fan_in = filter_size * filter_size * input_channels;
+		size_t fan_out = filter_size * filter_size * number_of_filters;
+
+		// Create filters.
+		for (size_t i=0; i< number_of_filters; i++) {
+			// Create the weights matrix.
+			p.add ("W"+std::to_string(i), filter_size, filter_size);
+			// Create the bias for a given filter.
+			p.add ("b"+std::to_string(i), 1, 1);
+
+			// Initialize weights of the W matrix.
+			eT range = sqrt(6.0 / eT(fan_in + fan_out));
+			p["W"+std::to_string(i)]->rand(-range, range);
+			p["b"+std::to_string(i)]->setZero();
+
+		}//: for
 
 
-		W = mic::types::Matrix<eT>(filters, filter_size * filter_size * input_channels);
-		b = (Eigen::Vector<eT>)Eigen::Vector<eT>::Zero(filters);
+		// Calculate number of receptive fields within a "single input channel".
+		number_of_receptive_fields_horizontal = (input_width - filter_size)/stride + 1;
+		number_of_receptive_fields_vertical = (input_height - filter_size)/stride + 1;
+//		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;
+//		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
+		// Filters must "exactly" fit!
+		assert((number_of_receptive_fields_horizontal - 1) * stride + filter_size == input_width);
+		assert((number_of_receptive_fields_vertical - 1) * stride + filter_size == input_height);
 
-		//W << 0.1, 0, 0, 0, 0, 0, 0, 0, 0;
-		size_t fan_in = channels * filter_size * filter_size;
-		size_t fan_out = filters * filter_size * filter_size;
-		eT range = sqrt(6.0 / eT(fan_in + fan_out));
-
-		W.rand(-range, range);
-
-		mW = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(W.rows(), W.cols());
-		mb = mic::types::Vector<eT>::Zero(b.rows());
+		// Allocate memory for "input receptive fields".
+		// Create filters.
+		for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
+			for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
+				// Create receptive field matrix.
+				m.add ("r"+std::to_string(ry)+std::to_string(rx), filter_size, filter_size);
+			}//: for
+		}//: for
 
 	};
 
 	virtual ~Convolution() {};
 
 	void forward(bool test = false) {
+		// Get input matrix.
+		mic::types::Matrix<eT> x = (*s['x']);
 
-		forwardGemm((*s['y']), (*s['x']));
+		// Get output pointer - so the results will be stored!
+		mic::types::MatrixPtr<eT> y = s['y'];
+
+		// Forward pass.
+		//(*y) = W * x + b.replicate(1, x.cols());
+		// Cut x into "slices" - receptive fields.
+
+		// Iterate through input channels.
+		for (size_t c=0; c< input_channels; c++) {
+			// Iterate through receptive fields.
+			/*for (size_t r=0; r< number_of_receptive_fields; r++) {
+				// Get receptive field
+				mic::types::MatrixPtr<eT> field = m.["r"+std::to_string(r)];
+			}//: for*/
+
+		}//: for
+
+		// Iterate through filters.
+		for (size_t f=0; f< number_of_filters; f++) {
+			// Get filter weight and bias.
+			mic::types::Matrix<eT> W = (*p["W"+std::to_string(f)]);
+			mic::types::Matrix<eT> b = (*p["b"+std::to_string(f)]);
+
+		}//: for
 
 	}
+
+	void backward() {
+
+/*		(*g['x']).setZero();
+		//dW
+		backwardGemm((*g['y']), (*s['x']));
+		//dx
+		backwardFullGemm((*g['y']), (*g['x']));*/
+	}
+
 
 	/*!
 	 * Outer loop over image locations, all images processed in parallel
 	 * @param out
 	 * @param in
 	 */
-	void forwardGemm(mic::types::Matrix<eT>& out, mic::types::Matrix<eT>& in) {
+/*	void forwardGemm(mic::types::Matrix<eT>& out, mic::types::Matrix<eT>& in) {
 
 		//W is size [kernel_length x filters]
 		//I is size [batch_size x kernel_length]
@@ -117,15 +189,6 @@ public:
 			} 	// y loop
 		}	// x loop
 
-	}
-
-	void backward() {
-
-		(*g['x']).setZero();
-		//dW
-		backwardGemm((*g['y']), (*s['x']));
-		//dx
-		backwardFullGemm((*g['y']), (*g['x']));
 	}
 
 	void backwardGemm(mic::types::Matrix<eT>& out, mic::types::Matrix<eT>& in)  {
@@ -281,53 +344,68 @@ public:
 
 			}
 		}
-	}
+	}*/
 
 	void resetGrads()  {
 
-		dW = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(W.rows(), W.cols());
-		db = mic::types::Vector<eT>::Zero(b.rows());;
+/*		dW = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(W.rows(), W.cols());
+		db = mic::types::Vector<eT>::Zero(b.rows());;*/
 
 	}
 
 	void applyGrads(double alpha)  {
 
 		//adagrad
-		mW += dW.cwiseProduct(dW);
+/*		mW += dW.cwiseProduct(dW);
 		mb += db.cwiseProduct(db);
 
 		W = (1 - decay) * W + alpha * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
-		b += alpha * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));
+		b += alpha * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));*/
 
 	}
 
-protected:
-	mic::types::Matrix<eT> W;
-	mic::types::Vector<eT> b;
-
-	mic::types::Matrix<eT> dW;
-	mic::types::Matrix<eT> db;
-
-	mic::types::Matrix<eT> mW;
-	mic::types::Matrix<eT> mb;
-
-	size_t input_channels;
-
-	size_t output_channels;
-
-	size_t kernel_size;
-
-	size_t output_map_size;
+	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
+	using Layer<eT>::forward;
+	using Layer<eT>::backward;
 
 protected:
-	// Unhiding the template inherited fields via "using" statement.
+	// Unhide the fields inherited from the template class Layer via "using" statement.
     using Layer<eT>::g;
     using Layer<eT>::s;
-    using *this<eT>::b;
+    using Layer<eT>::p;
+    using Layer<eT>::m;
+//    using Layer<eT>::input_size;
+//    using Layer<eT>::output_size;
+    using Layer<eT>::batch_size;
+    using Layer<eT>::opt;
+
+    /// Width of the input (e.g. 28 for MNIST).
+    size_t input_width;
+
+    /// Number of channels of the input (e.g. 3 for RGB images).
+    size_t input_channels;
+
+    /// Height of the input (e.g. 28 for MNIST).
+    size_t input_height;
+
+    /// Size of filters (assuming square filters). Filter_size^2 = length of the output vector.
+	size_t filter_size;
+
+	/// Number of filters = number of output channels.
+	size_t number_of_filters;
+
+	/// Number of receptive fields in a single channel - horizontal direction.
+	size_t number_of_receptive_fields_horizontal;
+
+	/// Number of receptive fields in a single channel - vertical direction.
+	size_t number_of_receptive_fields_vertical;
+
+	 /// Stride (assuming equal vertical and horizontal strides).
+	 size_t stride;
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
 
 	/*!

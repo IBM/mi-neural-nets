@@ -1,5 +1,5 @@
 /*!
- * @file: LinearTests.cpp
+ * @file: Convolution_tests.cpp
  * @Author: Tomasz Kornuta <tkornut@us.ibm.com>
  * @Date:   Nov 4, 2016
  *
@@ -7,7 +7,7 @@
  *
  */
 
-#include "LinearTests.hpp"
+#include "Linear_tests.hpp"
 
 /*!
  * Makes sure that the layer is properly initialized - initial W weights must be non zero and b must be zero.

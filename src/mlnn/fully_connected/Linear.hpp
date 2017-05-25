@@ -43,7 +43,7 @@ public:
 		p.add ("b", outputs_, 1);
 
 		// Initialize weights of the W matrix.
-		double range = sqrt(6.0 / double(inputs_ + outputs_));
+		eT range = sqrt(6.0 / eT(inputs_ + outputs_));
 
 		Layer<eT>::p['W']->rand(-range, range);
 		Layer<eT>::p['b']->setZero();
