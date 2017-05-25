@@ -9,7 +9,7 @@
 
 #include "Convolution_tests.hpp"
 
-TEST(Convolutions, NumberofFilters) {
+TEST(Convolutions, NumberFfFilters) {
 
 	// Stride = 1.
 	mic::mlnn::convolution::Convolution<float> l1(5,7,1,3,1,1);
@@ -33,8 +33,8 @@ TEST(Convolutions, NumberofFilters) {
 TEST_F(Conv5x5x1Filter3x3x1Float, LayerDimensions) {
 
 	// Check filter size - W.
-	ASSERT_EQ((*layer.p["W0"]).rows(), 3);
-	ASSERT_EQ((*layer.p["W0"]).cols(), 3);
+	ASSERT_EQ((*layer.p["W0"]).rows(), 1);
+	ASSERT_EQ((*layer.p["W0"]).cols(), 9);
 
 	// Check filter size - b.
 	ASSERT_EQ((*layer.p["b0"]).rows(), 1);

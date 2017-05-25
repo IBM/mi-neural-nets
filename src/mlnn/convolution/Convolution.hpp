@@ -39,7 +39,7 @@ public:
 	 * @param name_ Name of the layer.
 	 */
 	Convolution<eT>(size_t input_height_, size_t input_width_, size_t input_channels_, size_t filter_size_, size_t stride_, size_t number_of_filters_, std::string name_ = "Convolution") :
-		Layer<eT>(input_width_ * input_height_ * input_channels_, number_of_filters_ * (input_width_ - filter_size_ + 1) * (input_height_ - filter_size_ + 1), 1, LayerTypes::Convolution, name_),
+		Layer<eT>(input_width_ * input_height_ * input_channels_, input_channels_ * number_of_filters_ * ((input_width_ - filter_size_)/stride_ + 1) * ((input_height_ - filter_size_)/stride_ + 1), 1, LayerTypes::Convolution, name_),
 	    input_width(input_width_),
 	    input_channels(input_channels_),
 		input_height(input_height_),
@@ -47,25 +47,6 @@ public:
 		stride(stride_),
 		number_of_filters(number_of_filters_)
 	{
-		// Calculate total input-output number of parameters - for initialization.
-		size_t fan_in = filter_size * filter_size * input_channels;
-		size_t fan_out = filter_size * filter_size * number_of_filters;
-
-		// Create filters.
-		for (size_t i=0; i< number_of_filters; i++) {
-			// Create the weights matrix.
-			p.add ("W"+std::to_string(i), filter_size, filter_size);
-			// Create the bias for a given filter.
-			p.add ("b"+std::to_string(i), 1, 1);
-
-			// Initialize weights of the W matrix.
-			eT range = sqrt(6.0 / eT(fan_in + fan_out));
-			p["W"+std::to_string(i)]->rand(-range, range);
-			p["b"+std::to_string(i)]->setZero();
-
-		}//: for
-
-
 		// Calculate number of receptive fields within a "single input channel".
 		number_of_receptive_fields_horizontal = (input_width - filter_size)/stride + 1;
 		number_of_receptive_fields_vertical = (input_height - filter_size)/stride + 1;
@@ -75,12 +56,37 @@ public:
 		assert((number_of_receptive_fields_horizontal - 1) * stride + filter_size == input_width);
 		assert((number_of_receptive_fields_vertical - 1) * stride + filter_size == input_height);
 
-		// Allocate memory for "input receptive fields".
+		// Calculate "range" - for initialization.
+		eT range_init = (eT) (input_width * input_height * input_channels) +
+				(number_of_receptive_fields_horizontal * number_of_receptive_fields_vertical * input_channels * number_of_filters);
+
 		// Create filters.
+		for (size_t fi=0; fi< number_of_filters; fi++) {
+			// Create the weights matrix.
+			p.add ("W"+std::to_string(fi), 1, filter_size*filter_size);
+			// Create the bias for a given filter.
+			p.add ("b"+std::to_string(fi), 1, 1);
+
+			// Initialize weights of the W matrix.
+			eT range = sqrt(6.0 / range_init);
+			p["W"+std::to_string(fi)]->rand(-range, range);
+			p["b"+std::to_string(fi)]->setZero();
+
+		}//: for
+
+		// Allocate (temporary) memory for "input receptive fields".
 		for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
 			for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
 				// Create receptive field matrix.
-				m.add ("r"+std::to_string(ry)+std::to_string(rx), filter_size, filter_size);
+				m.add ("irf"+std::to_string(ry)+std::to_string(rx), filter_size, filter_size);
+			}//: for
+		}//: for
+
+		// Allocate (temporary) memory for "output channels".
+		for (size_t ic=0; ic< input_channels; ic++) {
+			for (size_t fi=0; fi< number_of_filters; fi++) {
+				// Create output channel matrix.
+				m.add ("oc"+std::to_string(ic)+std::to_string(fi), number_of_receptive_fields_horizontal, number_of_receptive_fields_vertical);
 			}//: for
 		}//: for
 
@@ -90,32 +96,77 @@ public:
 
 	void forward(bool test = false) {
 		// Get input matrix.
-		mic::types::Matrix<eT> x = (*s['x']);
+		mic::types::MatrixPtr<eT> batch = s['x'];
 
 		// Get output pointer - so the results will be stored!
 		mic::types::MatrixPtr<eT> y = s['y'];
 
-		// Forward pass.
-		//(*y) = W * x + b.replicate(1, x.cols());
-		// Cut x into "slices" - receptive fields.
+		// TODO - for: get sample from batch!
+		mic::types::MatrixPtr<eT> image = batch;
 
 		// Iterate through input channels.
-		for (size_t c=0; c< input_channels; c++) {
-			// Iterate through receptive fields.
-			/*for (size_t r=0; r< number_of_receptive_fields; r++) {
-				// Get receptive field
-				mic::types::MatrixPtr<eT> field = m.["r"+std::to_string(r)];
-			}//: for*/
+		for (size_t ic=0; ic< input_channels; ic++) {
+			// Temporal solution. TODO - get input channel from image.
+			mic::types::MatrixPtr<eT> ichannel = image;
 
-		}//: for
+			// Resize channel using the given dimensions.
+			ichannel->resize(input_height, input_width);
 
-		// Iterate through filters.
-		for (size_t f=0; f< number_of_filters; f++) {
-			// Get filter weight and bias.
-			mic::types::Matrix<eT> W = (*p["W"+std::to_string(f)]);
-			mic::types::Matrix<eT> b = (*p["b"+std::to_string(f)]);
+			// 1. Preparation.
+			// Iterate through receptive fields - vertical and horizontal
+			// and copy data from given channel to array of "input receptive fields".
 
-		}//: for
+			// Image coordinates: ix, iy.
+			// Receptive fields coordinates: rx, ry.
+			for (size_t ry=0, iy = 0; ry< number_of_receptive_fields_vertical; ry++, iy+=stride) {
+				for (size_t rx=0, ix = 0; rx< number_of_receptive_fields_horizontal; rx++, ix+=stride) {
+					std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
+					// Get receptive field matrix...
+					mic::types::MatrixPtr<eT> field = m["irf"+std::to_string(ry)+std::to_string(rx)];
+					// And copy data from input image.
+					(*field) = ichannel->block(iy,ix,filter_size, filter_size);
+					std::cout<< (*field) << std::endl;
+					// Resize the field to a vector.
+					field->resize(filter_size*filter_size, 1);
+				}//: for rx
+			}//: for ry
+
+			// 2. Convolution.
+			// Iterate through filters and calculate the result of the convolution.
+			for (size_t fi=0; fi< number_of_filters; fi++) {
+				// Get output channel matrix field matrix.
+				mic::types::MatrixPtr<eT> ochannel = m["oc"+std::to_string(ic)+std::to_string(fi)];
+
+				// Get filter weight and bias.
+				mic::types::Matrix<eT> W = (*p["W"+std::to_string(fi)]);
+				eT b = (*p["b"+std::to_string(fi)])[0];
+				for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
+					for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
+						// Get receptive field matrix of size (1, filter_size^2)...
+						mic::types::Matrix<eT> x = (*m["irf"+std::to_string(ry)+std::to_string(rx)]);
+						// ... and "convolve" it with the receptive field.
+						std::cout << (W*x) << std::endl;
+						(*ochannel)(ry, rx) = (W*x)(0) + b;
+
+					}//: for rx
+				}//: for ry
+				std::cout << (*ochannel)<<std::endl;
+				//(*y) = W * x + b.replicate(1, x.cols());
+
+			}//: for filters
+
+		}//: for channels
+
+		// 3. Produce output.
+		// "Concatenate" output channels into one vector.
+		for (size_t ic=0; ic< input_channels; ic++) {
+			for (size_t fi=0; fi< number_of_filters; fi++) {
+				mic::types::MatrixPtr<eT> y = s['y'];
+				// TODO: concatenate.
+				(*y) = (*m["oc"+std::to_string(ic)+std::to_string(fi)]);
+				std::cout << (*y)<<std::endl;
+			}//: for filters
+		}//: for channels
 
 	}
 
@@ -391,6 +442,9 @@ protected:
     /// Size of filters (assuming square filters). Filter_size^2 = length of the output vector.
 	size_t filter_size;
 
+	/// Stride (assuming equal vertical and horizontal strides).
+	 size_t stride;
+
 	/// Number of filters = number of output channels.
 	size_t number_of_filters;
 
@@ -399,9 +453,6 @@ protected:
 
 	/// Number of receptive fields in a single channel - vertical direction.
 	size_t number_of_receptive_fields_vertical;
-
-	 /// Stride (assuming equal vertical and horizontal strides).
-	 size_t stride;
 
 private:
 	// Friend class - required for using boost serialization.
