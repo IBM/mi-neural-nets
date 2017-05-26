@@ -76,7 +76,7 @@ public:
 
 		input = MAKE_MATRIX_PTR(float, 18, 1);
 
-		desired_output = MAKE_MATRIX_PTR(float, 24, 1);
+		desired_output = MAKE_MATRIX_PTR(float, 12, 1);
 
 	}
 
@@ -91,7 +91,7 @@ protected:
 		(*layer.p["b2"]) << -1;
 
 		(*input) << 1, 4, 7, 2, 5, 8, 3, 6, 9, 9, 6, 3, 8, 5, 2, 7, 4, 1;
-		(*desired_output) << 7, 13, 9, 15, 4, 4, 4, 4, 6, 12, 8, 14, 15, 9, 13, 7, -4, -4, -4, -4, 12, 6, 10, 4;
+		(*desired_output) << 21, 21, 21, 21, 0, 0, 0, 0, 19, 19, 19, 19;
 
 	}
 

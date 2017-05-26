@@ -19,12 +19,14 @@ TEST(Convolutions, NumberOfReceptiveFields) {
 
 	ASSERT_EQ(l1.number_of_receptive_fields_vertical, 3);
 	ASSERT_EQ(l1.number_of_receptive_fields_horizontal, 5);
+	ASSERT_EQ(l1.s["y"]->rows(), 3*3*1);
 
 	// Stride = 2.
 	mic::mlnn::convolution::Convolution<float> l2(5,7,1,3,2,1);
 
 	ASSERT_EQ(l2.number_of_receptive_fields_vertical, 2);
 	ASSERT_EQ(l2.number_of_receptive_fields_horizontal, 3);
+	ASSERT_EQ(l1.s["y"]->rows(), 3*3*1);
 
 }
 
@@ -84,7 +86,7 @@ TEST_F(Conv3x3x2Filter2x2x3Float, Forward) {
 
 	// Forward pass.
 	mic::types::MatrixPtr<float> output = layer.forward(input);
-	// Second forward - just to check whether "internal dimensions" are ok.
+	// Second forward - just to check whether "internal dimensions" are ok after the first pass.
 	output = layer.forward(input);
 	//std::cout<<"output = \n" << (*output) <<std::endl;
 
