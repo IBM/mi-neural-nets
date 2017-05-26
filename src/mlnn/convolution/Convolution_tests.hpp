@@ -82,6 +82,10 @@ public:
 
 		desired_output = MAKE_MATRIX_PTR(float, 12, 1);
 
+		dy = MAKE_MATRIX_PTR(float, 12, 1);
+
+		desired_dx = MAKE_MATRIX_PTR(float, 18, 1);
+
 	}
 
 protected:
@@ -100,6 +104,9 @@ protected:
 		(*input) << 1, 4, 7, 2, 5, 8, 3, 6, 9, 9, 6, 3, 8, 5, 2, 7, 4, 1;
 		(*desired_output) << -7, 5, -3, 9, 8, 8, 8, 8, -7, 5, -3, 9;
 
+		(*dy) << 1, 3, 2, 4, 5, 7, 6, 8, 9, 11, 10, 12;
+		(*desired_dx) <<  -1, -2, 3, 0, 6, 10, 4, 12, 8, 5, 2, -7, -4, -22, -22, -12, -28, -16;
+
 	}
 
 private:
@@ -111,6 +118,12 @@ private:
 
 	/// Desired output for a given input.
 	mic::types::MatrixPtr<float> desired_output;
+
+	/// Gradient passed to backpropagation.
+	mic::types::MatrixPtr<float> dy;
+
+	/// Desired gradient dy from backpropagation.
+	mic::types::MatrixPtr<float> desired_dx;
 
 };
 

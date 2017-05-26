@@ -258,6 +258,7 @@ public:
 
 		// 1. Fill the "rotated-expanded" filters.
 		for (size_t ic=0; ic< input_channels; ic++) {
+			std::cout<<"Channel: " << ic <<std::endl;
 			for (size_t fi=0; fi< number_of_filters; fi++) {
 				mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
 				reW->setZero();
@@ -268,7 +269,7 @@ public:
 				for(size_t y=0; y < filter_size; y++)
 					for(size_t x=0; x < filter_size; x++)
 					(*reW)(y + (number_of_receptive_fields_vertical-1), x + (number_of_receptive_fields_horizontal -1)) = (*W)(filter_size-y-1,filter_size-x-1);
-				//std::cout<<"reW=\n"<<(*reW)<<std::endl;
+				std::cout<<"reW=\n"<<(*reW)<<std::endl;
 				// Resize filter matrix W back to a row vector.
 				W->resize(1, filter_size*filter_size);
 			}//: for filters
@@ -288,6 +289,7 @@ public:
 
 			// Convolve reWs with sample channel by channel.
 			for (size_t ic=0; ic< input_channels; ic++) {
+				std::cout<<"Channel: " << ic <<std::endl;
 
 				// Get gradient y channel.
 				mic::types::MatrixPtr<eT> gyc = m["gyc"];
@@ -309,13 +311,14 @@ public:
 					mic::types::MatrixPtr<eT> rerf = m["rerf"];
 					for (size_t y=0, rew_y= rew_height - number_of_receptive_fields_vertical; y< input_height; y++, rew_y--) {
 						for (size_t x=0, rew_x= rew_width - number_of_receptive_fields_horizontal; x< input_width; x++, rew_x--) {
-							eT val=0;
 							// Get block under "reverse receptive field".
 							//std::cout<< "rew_y=" << rew_y<< "rew_x=" << rew_x << std::endl;
 							(*rerf) = reW->block(rew_y, rew_x, number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
+							std::cout<< "(*rerf) = \n" << (*rerf) << std::endl;
 							rerf->resize(1, number_of_receptive_fields_vertical * number_of_receptive_fields_horizontal);
-							/*std::cout<< "(*rerf) = \n" << (*rerf) << std::endl;
-							std::cout<< "(*gyc) = \n" << (*gyc) << std::endl;*/
+							(*gyc).resize(filter_size, filter_size);
+							std::cout<< "(*gyc) = \n" << (*gyc) << std::endl;
+							(*gyc).resize(filter_size*filter_size,1);
 							// Convolve.
 							(*gxc)(y,x) += ((*rerf)*(*gyc))(0);
 						}//: x
