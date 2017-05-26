@@ -20,6 +20,65 @@
 
 namespace mic { namespace neural_nets { namespace unit_tests {
 
+
+/*!
+ * \brief Test Fixture - layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1, floats.
+ * Math example taken from my own calculations;)
+ * \author tkornuta
+ */
+class Conv2x2x2Filter2x1x1s1Float : public ::testing::Test {
+public:
+	// Constructor. Sets layer size.
+	Conv2x2x2Filter2x1x1s1Float () : layer(2,2,2,2,1,1) {
+
+		x = MAKE_MATRIX_PTR(float, 8, 1);
+
+		desired_y = MAKE_MATRIX_PTR(float, 8, 1);
+
+		dy = MAKE_MATRIX_PTR(float, 8, 1);
+
+		desired_dx = MAKE_MATRIX_PTR(float, 8, 1);
+
+	}
+
+protected:
+	// Sets values
+	virtual void SetUp() {
+		(*layer.p["W00"]) << 0;
+		(*layer.p["W01"]) << -1;
+		(*layer.p["b0"]) << 1;
+		(*layer.p["W10"]) << 1;
+		(*layer.p["W11"]) << 2;
+		(*layer.p["b1"]) << 0;
+
+		(*x) << 2, 1, 0, 0, 1, 2, -1, 0;
+		(*desired_y) << 0, -1, 2, 1, 4, 5, -2, 0;
+
+		(*dy) << 1, 0, -1, 2, 0, 1, 1, -1;
+		(*desired_dx) <<  0, 1, 1, -1, -1, 2, 3, -4;
+
+	}
+
+private:
+	/// Object to be tested.
+	mic::mlnn::convolution::Convolution<float> layer;
+
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<float> x;
+
+	/// Desired output for a given x.
+	mic::types::MatrixPtr<float> desired_y;
+
+	/// Gradient passed to backpropagation.
+	mic::types::MatrixPtr<float> dy;
+
+	/// Desired gradient dy from backpropagation.
+	mic::types::MatrixPtr<float> desired_dx;
+
+};
+
+
+
 /*!
  * \brief Test Fixture - layer of input size 5x5x1 and with filter bank of 1 filter of size 3x3 with stride 1 (floats).
  * Math example taken from: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
@@ -30,9 +89,9 @@ public:
 	// Constructor. Sets layer size.
 	Conv5x5x1Filter1x3x3s1Float () : layer(5,5,1,1,3,1) {
 
-		input = MAKE_MATRIX_PTR(float, 25, 1);
+		x = MAKE_MATRIX_PTR(float, 25, 1);
 
-		desired_output = MAKE_MATRIX_PTR(float, 9, 1);
+		desired_y = MAKE_MATRIX_PTR(float, 9, 1);
 
 		dy = MAKE_MATRIX_PTR(float, 9, 1);
 	}
@@ -43,8 +102,8 @@ protected:
 		(*layer.p["W00"]) << 1, 0, 1, 0, 1, 0, 1, 0, 1;
 		(*layer.p["b0"]) << 0;
 
-		(*input) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
-		(*desired_output) << 4, 3, 4, 2, 4, 3, 2, 3, 4;
+		(*x) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
+		(*desired_y) << 4, 3, 4, 2, 4, 3, 2, 3, 4;
 
 		(*dy) << 1, 1, -1, 1, 0, -1, 0, 1, 0;
 	}
@@ -53,11 +112,11 @@ private:
 	/// Object to be tested.
 	mic::mlnn::convolution::Convolution<float> layer;
 
-	/// Test input - used in forward pass.
-	mic::types::MatrixPtr<float> input;
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<float> x;
 
-	/// Desired output for a given input.
-	mic::types::MatrixPtr<float> desired_output;
+	/// Desired output for a given x.
+	mic::types::MatrixPtr<float> desired_y;
 
 	/// Gradient passed to backpropagation.
 	mic::types::MatrixPtr<float> dy;
@@ -78,9 +137,9 @@ public:
 	// Constructor. Sets layer size.
 	Conv3x3x2Filter3x2x2s1Float () : layer(3,3,2,3,2,1) {
 
-		input = MAKE_MATRIX_PTR(float, 18, 1);
+		x = MAKE_MATRIX_PTR(float, 18, 1);
 
-		desired_output = MAKE_MATRIX_PTR(float, 12, 1);
+		desired_y = MAKE_MATRIX_PTR(float, 12, 1);
 
 		dy = MAKE_MATRIX_PTR(float, 12, 1);
 
@@ -101,8 +160,8 @@ protected:
 		(*layer.p["W21"]) << 0, 0, -1, -1;
 		(*layer.p["b2"]) << -1;
 
-		(*input) << 1, 4, 7, 2, 5, 8, 3, 6, 9, 9, 6, 3, 8, 5, 2, 7, 4, 1;
-		(*desired_output) << -7, 5, -3, 9, 8, 8, 8, 8, -7, 5, -3, 9;
+		(*x) << 1, 4, 7, 2, 5, 8, 3, 6, 9, 9, 6, 3, 8, 5, 2, 7, 4, 1;
+		(*desired_y) << -7, 5, -3, 9, 8, 8, 8, 8, -7, 5, -3, 9;
 
 		(*dy) << 1, 3, 2, 4, 5, 7, 6, 8, 9, 11, 10, 12;
 		(*desired_dx) <<  -1, -2, 3, 0, 6, 10, 4, 12, 8, 5, 2, -7, -4, -22, -22, -12, -28, -16;
@@ -113,11 +172,11 @@ private:
 	/// Object to be tested.
 	mic::mlnn::convolution::Convolution<float> layer;
 
-	/// Test input - used in forward pass.
-	mic::types::MatrixPtr<float> input;
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<float> x;
 
-	/// Desired output for a given input.
-	mic::types::MatrixPtr<float> desired_output;
+	/// Desired output for a given x.
+	mic::types::MatrixPtr<float> desired_y;
 
 	/// Gradient passed to backpropagation.
 	mic::types::MatrixPtr<float> dy;
@@ -139,9 +198,9 @@ public:
 	// Constructor. Sets layer size.
 	Conv7x7x3Filter3x3x3s2Float () : layer(7,7,3,2,3,2) {
 
-		input = MAKE_MATRIX_PTR(float, 7*7*3, 1);
+		x = MAKE_MATRIX_PTR(float, 7*7*3, 1);
 
-		desired_output = MAKE_MATRIX_PTR(float, 3*3*2, 1);
+		desired_y = MAKE_MATRIX_PTR(float, 3*3*2, 1);
 
 	}
 
@@ -160,7 +219,7 @@ protected:
 		(*layer.p["b1"]) << 0;
 
 
-		(*input) <<
+		(*x) <<
 				// x[:,:,0]
 				0, 0, 0, 0, 0, 0, 0,
 				0, 0, 2, 1, 1, 2, 0,
@@ -186,7 +245,7 @@ protected:
 				0, 2, 2, 0, 2, 0, 0,
 				0, 0, 0, 0, 0, 0, 0;
 
-		(*desired_output) <<
+		(*desired_y) <<
 				// o[:,:,0]
 				-2, 3, 10, 7, 12, 11, -1, -1, 0,
 				// o[:,:,1]
@@ -197,11 +256,11 @@ private:
 	/// Object to be tested.
 	mic::mlnn::convolution::Convolution<float> layer;
 
-	/// Test input - used in forward pass.
-	mic::types::MatrixPtr<float> input;
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<float> x;
 
-	/// Desired output for a given input.
-	mic::types::MatrixPtr<float> desired_output;
+	/// Desired output for a given x.
+	mic::types::MatrixPtr<float> desired_y;
 
 };
 
@@ -218,9 +277,9 @@ public:
 	// Constructor. Sets layer size.
 	Conv5x6x1Filter1x4x4s1Float () : layer(5,6,1,1,4,1) {
 
-		input = MAKE_MATRIX_PTR(float, 6, 5);
+		x = MAKE_MATRIX_PTR(float, 6, 5);
 
-		desired_output = MAKE_MATRIX_PTR(float, 6,1);
+		desired_y = MAKE_MATRIX_PTR(float, 6,1);
 
 		dy = MAKE_MATRIX_PTR(float, 6, 1);
 		desired_dx = MAKE_MATRIX_PTR(float, 30, 1);
@@ -238,13 +297,13 @@ protected:
 		(*layer.p["b0"]) << 0;
 
 		for (size_t i=0; i<30; i++)
-			(*input)(i) = i+1;
-		(*input).transposeInPlace();
-		//std::cout<<"*input = \n" << (*input) << std::endl;
-		(*input).resize(30,1);
+			(*x)(i) = i+1;
+		(*x).transposeInPlace();
+		//std::cout<<"*x = \n" << (*x) << std::endl;
+		(*x).resize(30,1);
 
-		(*desired_output) << 2064, 2880, 2200, 3016, 2336, 3152;
-		//std::cout<<"*desired_output = \n" << (*desired_output) << std::endl;
+		(*desired_y) << 2064, 2880, 2200, 3016, 2336, 3152;
+		//std::cout<<"*desired_y = \n" << (*desired_y) << std::endl;
 
 		(*dy) << 1, 4, 2, 5, 3, 6;
 		(*desired_dx) <<  1, 9, 29, 49, 52, 4, 29, 77, 125, 121, 10, 62, 146, 230, 208, 16, 83, 167, 251, 223, 17, 75, 139, 203, 170, 12, 48, 84, 120, 96;
@@ -254,11 +313,11 @@ private:
 	/// Object to be tested.
 	mic::mlnn::convolution::Convolution<float> layer;
 
-	/// Test input - used in forward pass.
-	mic::types::MatrixPtr<float> input;
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<float> x;
 
-	/// Desired output for a given input.
-	mic::types::MatrixPtr<float> desired_output;
+	/// Desired output for a given x.
+	mic::types::MatrixPtr<float> desired_y;
 
 	/// Gradient passed to backpropagation.
 	mic::types::MatrixPtr<float> dy;
