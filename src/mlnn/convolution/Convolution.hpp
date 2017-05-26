@@ -115,6 +115,18 @@ public:
 
 		// Allocate memory for "reverse" receptive field.
 		m.add ("rerf", number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
+
+		// Allocate memory for "gradient x channel".
+		m.add ("gxc", input_height, input_width);
+
+		// Allocate memory for "gradient x sample".
+		m.add ("gxs", input_channels * input_height * input_width, 1);
+
+		// Allocate memory for "gradient y sample".
+		m.add ("gys", number_of_filters * number_of_receptive_fields_vertical * number_of_receptive_fields_horizontal, 1);
+
+		// Allocate memory for "gradient y channel".
+		m.add ("gyc", number_of_receptive_fields_vertical * number_of_receptive_fields_horizontal, 1);
 	};
 
 	/*!
@@ -235,44 +247,95 @@ public:
 	 */
 	void backward() {
 		// Get matrices.
-		mic::types::Matrix<eT> dy = (*g['y']);
-		mic::types::Matrix<eT> x = (*s['x']);
+		mic::types::MatrixPtr<eT> batch_dy = g['y'];
+		mic::types::MatrixPtr<eT> batch_x = s['x'];
 		// Get output pointers - so the results will be stored!
-		mic::types::MatrixPtr<eT> dx = g['x'];
+		mic::types::MatrixPtr<eT> batch_dx = g['x'];
+
+		// reW sizes.
+		size_t rew_height = filter_size+2*(number_of_receptive_fields_vertical-1);
+		size_t rew_width = filter_size+2*(number_of_receptive_fields_horizontal-1);
 
 		// 1. Fill the "rotated-expanded" filters.
-		for (size_t fi=0; fi< number_of_filters; fi++) {
-			for (size_t ic=0; ic< input_channels; ic++) {
+		for (size_t ic=0; ic< input_channels; ic++) {
+			for (size_t fi=0; fi< number_of_filters; fi++) {
 				mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
 				reW->setZero();
 				// Get filter.
 				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
 				W->resize(filter_size, filter_size);
-				// "Rotate".
+				// "Rotate" and insert filter values into right positions of "rotated-expanded" filter.
 				for(size_t y=0; y < filter_size; y++)
 					for(size_t x=0; x < filter_size; x++)
-					(*reW)(y + (number_of_receptive_fields_vertical-1), x + (number_of_receptive_fields_horizontal -1)) = (*W)(y,x);
-				std::cout<<"reW=\n"<<(*reW)<<std::endl;
+					(*reW)(y + (number_of_receptive_fields_vertical-1), x + (number_of_receptive_fields_horizontal -1)) = (*W)(filter_size-y-1,filter_size-x-1);
+				//std::cout<<"reW=\n"<<(*reW)<<std::endl;
 				// Resize filter matrix W back to a row vector.
 				W->resize(1, filter_size*filter_size);
+			}//: for filters
+		}//: for channels
+
+		// 2. Calculate dx for a given gradient batch.
+		// Iterate through samples in the input batch.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get y gradient sample from batch.
+			mic::types::MatrixPtr<eT> gys = m["gys"];
+			(*gys) = batch_dy->col(ib);
+
+			// Get pointer to x gradient sample matrix.
+			mic::types::MatrixPtr<eT> gxs = m["gxs"];
+			gxs->setZero();
+
+			// Convolve reWs with sample channel by channel.
+			for (size_t ic=0; ic< input_channels; ic++) {
+
+				// Get gradient y channel.
+				mic::types::MatrixPtr<eT> gyc = m["gyc"];
+				// Copy block - resizes the input channel matrix.
+				(*gyc) = gys->block(ic*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 0, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1);
+
+				// Resize channel using the given dimensions.
+				//ichannel->resize(input_height, input_width);
+
+				// Get pointer to x gradient channel "storage".
+				mic::types::MatrixPtr<eT> gxc = m["gxc"];
+				gxc->setZero();
+				gxc->resize(input_height, input_width);
+
+				// For each filter.
+				for (size_t fi=0; fi< number_of_filters; fi++) {
+					mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
+					// Get pointer to "reverse receptive field".
+					mic::types::MatrixPtr<eT> rerf = m["rerf"];
+					for (size_t y=0, rew_y= rew_height - number_of_receptive_fields_vertical; y< input_height; y++, rew_y--) {
+						for (size_t x=0, rew_x= rew_width - number_of_receptive_fields_horizontal; x< input_width; x++, rew_x--) {
+							eT val=0;
+							// Get block under "reverse receptive field".
+							//std::cout<< "rew_y=" << rew_y<< "rew_x=" << rew_x << std::endl;
+							(*rerf) = reW->block(rew_y, rew_x, number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
+							rerf->resize(1, number_of_receptive_fields_vertical * number_of_receptive_fields_horizontal);
+							/*std::cout<< "(*rerf) = \n" << (*rerf) << std::endl;
+							std::cout<< "(*gyc) = \n" << (*gyc) << std::endl;*/
+							// Convolve.
+							(*gxc)(y,x) += ((*rerf)*(*gyc))(0);
+						}//: x
+					}//: y
+					//std::cout<< "filter = "<< fi << " (*gxc) = \n" << (*gxc) << std::endl;
+				}//: for filters
+				// Resize gradient channel to a column vector.
+				gxc->resize(input_height * input_width, 1);
+
+				// Concatenate gradient.
+				gxs->block(ic*input_height*input_width, 0, input_height*input_width, 1)
+						= (*gxc);
+
+				//std::cout<< "(*gs) = \n" << (*gxs) << std::endl;
 			}//: for channels
-		}//: for filters
 
-		// 2. Calculate dx: convolve reWs with output.
-		dx->setZero();
-		//mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)];
-		// Get pointer to "reverse receptive field".
-		mic::types::MatrixPtr<eT> rerf = p["rerf"];
-		for (size_t y=0; y< input_height; y++) {
-			for (size_t x=0; x< input_width; x++) {
-				eT val=0;
-				// Perform "full convolution".
-				//(*rerf) = reW->block(filter_size-1-y, filter_size-1-y,)
+			// Set column in the gradient batch.
+			batch_dx->col(ib) = (*gxs);
 
-
-			}//: x
-		}//: y
-
+		}//: batch
 		/*
 		mic::types::Matrix<eT> W = (*p['W']);
 		mic::types::MatrixPtr<eT> dW = g['W'];

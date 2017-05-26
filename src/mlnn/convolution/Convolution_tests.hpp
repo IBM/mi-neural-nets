@@ -34,7 +34,7 @@ public:
 
 		desired_output = MAKE_MATRIX_PTR(float, 9, 1);
 
-		gradient = MAKE_MATRIX_PTR(float, 9, 1);
+		dy = MAKE_MATRIX_PTR(float, 9, 1);
 	}
 
 protected:
@@ -46,7 +46,7 @@ protected:
 		(*input) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
 		(*desired_output) << 4, 3, 4, 2, 4, 3, 2, 3, 4;
 
-		(*gradient) << 1, 1, -1, 1, 0, -1, 0, 1, 0;
+		(*dy) << 1, 1, -1, 1, 0, -1, 0, 1, 0;
 	}
 
 private:
@@ -60,7 +60,10 @@ private:
 	mic::types::MatrixPtr<float> desired_output;
 
 	/// Gradient passed to backpropagation.
-	mic::types::MatrixPtr<float> gradient;
+	mic::types::MatrixPtr<float> dy;
+
+	/// Desired gradient dy from backpropagation.
+	mic::types::MatrixPtr<float> desired_dx;
 };
 
 
@@ -127,12 +130,12 @@ public:
 
 		desired_output = MAKE_MATRIX_PTR(float, 3*3*2, 1);
 
-		gradient = MAKE_MATRIX_PTR(float, 3*3*2, 1);
 	}
 
 protected:
 	// Sets values
 	virtual void SetUp() {
+
 		(*layer.p["W00"]) << 0, -1, 0, 0, 1, -1, 1, 1, -1;
 		(*layer.p["W01"]) << 1, 0, 1, 0, -1, -1, 1, 1, -1;
 		(*layer.p["W02"]) << 1, 1, 0, -1, 1, -1, 1, 0, 1;
@@ -175,8 +178,6 @@ protected:
 				-2, 3, 10, 7, 12, 11, -1, -1, 0,
 				// o[:,:,1]
 				-5, -10, -6, 4, -3, 2, 2, 3, 6;
-
-		//(*gradient) << 1, 1, -1, 1, 0, -1, 0, 1, 0;
 	}
 
 private:
@@ -189,8 +190,6 @@ private:
 	/// Desired output for a given input.
 	mic::types::MatrixPtr<float> desired_output;
 
-	/// Gradient passed to backpropagation.
-	mic::types::MatrixPtr<float> gradient;
 };
 
 
@@ -198,7 +197,7 @@ private:
 
 /*!
  * \brief Test Fixture - layer of input size 5x6x1 and with filter bank of 1 filter of size 4x4 with stride 1, floats.
- * Math example taken from: http://soumith.ch/ex/pages/2014/08/07/why-rotate-weights-convolution-gradient/
+ * Math example taken from: http://soumith.ch/ex/pages/2014/08/07/why-rotate-weights-convolution-dy/
  * \author tkornuta
  */
 class Conv5x6x1Filter1x4x4s1Float : public ::testing::Test {
@@ -210,7 +209,8 @@ public:
 
 		desired_output = MAKE_MATRIX_PTR(float, 6,1);
 
-		gradient = MAKE_MATRIX_PTR(float, 6, 1);
+		dy = MAKE_MATRIX_PTR(float, 6, 1);
+		desired_dx = MAKE_MATRIX_PTR(float, 30, 1);
 	}
 
 protected:
@@ -233,7 +233,8 @@ protected:
 		(*desired_output) << 2064, 2880, 2200, 3016, 2336, 3152;
 		//std::cout<<"*desired_output = \n" << (*desired_output) << std::endl;
 
-		(*gradient) << 1, 4, 2, 5, 3, 6;
+		(*dy) << 1, 4, 2, 5, 3, 6;
+		(*desired_dx) <<  1, 9, 29, 49, 52, 4, 29, 77, 125, 121, 10, 62, 146, 230, 208, 16, 83, 167, 251, 223, 17, 75, 139, 203, 170, 12, 48, 84, 120, 96;
 	}
 
 private:
@@ -247,7 +248,10 @@ private:
 	mic::types::MatrixPtr<float> desired_output;
 
 	/// Gradient passed to backpropagation.
-	mic::types::MatrixPtr<float> gradient;
+	mic::types::MatrixPtr<float> dy;
+
+	/// Desired gradient dy from backpropagation.
+	mic::types::MatrixPtr<float> desired_dx;
 
 };
 
