@@ -47,11 +47,17 @@ public:
 		stride(stride_),
 		number_of_filters(number_of_filters_)
 	{
+
+		std::cout<<"input_width = " << input_width <<std::endl;
+		std::cout<<"input_height = " << input_height <<std::endl;
+		std::cout<<"filter_size = " << filter_size <<std::endl;
+		std::cout<<"stride = " << stride <<std::endl;
+
 		// Calculate number of receptive fields within a "single input channel".
 		number_of_receptive_fields_horizontal = (input_width - filter_size)/stride + 1;
 		number_of_receptive_fields_vertical = (input_height - filter_size)/stride + 1;
-//		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;
-//		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
+		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;
+		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
 		// Filters must "exactly" fit!
 		assert((number_of_receptive_fields_horizontal - 1) * stride + filter_size == input_width);
 		assert((number_of_receptive_fields_vertical - 1) * stride + filter_size == input_height);
@@ -82,13 +88,22 @@ public:
 			}//: for
 		}//: for
 
-		// Allocate (temporary) memory for "output channels".
+		// Allocate (temporary) memory for "input sample" - column vector.
+		m.add ("is", input_channels*input_height*input_width, 1);
+
+		// Allocate (temporary) memory for "input channel" - column vector.
+		m.add ("ic", input_height*input_width, 1);
+
+		// Allocate (temporary) memory for "output channels" - matrices.
 		for (size_t ic=0; ic< input_channels; ic++) {
 			for (size_t fi=0; fi< number_of_filters; fi++) {
 				// Create output channel matrix.
 				m.add ("oc"+std::to_string(ic)+std::to_string(fi), number_of_receptive_fields_horizontal, number_of_receptive_fields_vertical);
 			}//: for
 		}//: for
+
+		// Allocate (temporary) memory for "output sample" - a column vector of all channels of a given sample.
+		m.add ("os", input_channels*number_of_filters*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1);
 
 	};
 
@@ -98,75 +113,91 @@ public:
 		// Get input matrix.
 		mic::types::MatrixPtr<eT> batch = s['x'];
 
+		// Iterate through samples in the input batch.
+		for (size_t ib=0; ib< batch_size; ib++) {
+			// Get sample from batch!
+			mic::types::MatrixPtr<eT> sample = m["is"];
+			(*sample) = batch->col(ib);
+
+			// Iterate through input channels.
+			for (size_t ic=0; ic< input_channels; ic++) {
+				// Temporal solution. TODO - get input channel from image.
+				mic::types::MatrixPtr<eT> ichannel = m["ic"];
+				(*ichannel) = sample->block(ic*input_height*input_width, 0, input_height*input_width, 1);
+
+				// Resize channel using the given dimensions.
+				ichannel->resize(input_height, input_width);
+
+				// 1. Preparation.
+				// Iterate through receptive fields - vertical and horizontal
+				// and copy data from given channel to array of "input receptive fields".
+
+				// Image coordinates: ix, iy.
+				// Receptive fields coordinates: rx, ry.
+				for (size_t ry=0, iy = 0; ry< number_of_receptive_fields_vertical; ry++, iy+=stride) {
+					for (size_t rx=0, ix = 0; rx< number_of_receptive_fields_horizontal; rx++, ix+=stride) {
+						std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
+						// Get receptive field matrix...
+						mic::types::MatrixPtr<eT> field = m["irf"+std::to_string(ry)+std::to_string(rx)];
+						// And copy data from input image.
+						(*field) = ichannel->block(iy,ix,filter_size, filter_size);
+						std::cout<< "field=\n" << (*field) << std::endl;
+						// Resize the field to a vector.
+						field->resize(filter_size*filter_size, 1);
+					}//: for rx
+				}//: for ry
+
+				// 2. Convolution.
+				// Iterate through filters and calculate the result of the convolution.
+				for (size_t fi=0; fi< number_of_filters; fi++) {
+					// Get output channel matrix field matrix.
+					mic::types::MatrixPtr<eT> ochannel = m["oc"+std::to_string(ic)+std::to_string(fi)];
+
+					// Get filter weight and bias.
+					mic::types::Matrix<eT> W = (*p["W"+std::to_string(fi)]);
+					eT b = (*p["b"+std::to_string(fi)])[0];
+					for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
+						for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
+							// Get receptive field matrix of size (1, filter_size^2)...
+							mic::types::Matrix<eT> x = (*m["irf"+std::to_string(ry)+std::to_string(rx)]);
+							// ... and "convolve" it with the receptive field.
+							//std::cout << (W*x) << std::endl;
+							(*ochannel)(ry, rx) = (W*x)(0) + b;
+
+						}//: for rx
+					}//: for ry
+					// Resize to a column vector.
+					ochannel->resize(number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1);
+					std::cout << "oc = " << (*ochannel)<<std::endl;
+					//std::cout << "m = " << (*m["oc"+std::to_string(ic)+std::to_string(fi)]) <<std::endl;
+					//(*y) = W * x + b.replicate(1, x.cols());
+
+				}//: for filters
+			}//: for channels
+		}//: for batch
+
+		// 3. Produce output.
+		// Create output batch from samples one by one.
+
 		// Get output pointer - so the results will be stored!
 		mic::types::MatrixPtr<eT> y = s['y'];
 
-		// TODO - for: get sample from batch!
-		mic::types::MatrixPtr<eT> image = batch;
+		// Iterate through samples in the input batch.
+		for (size_t ib=0; ib< batch_size; ib++) {
+			// "Concatenate" output channels into one vector - "output sample".
+			mic::types::MatrixPtr<eT> output_sample = m["os"];
+			for (size_t ic=0; ic< input_channels; ic++) {
+				for (size_t fi=0; fi< number_of_filters; fi++) {
+					// TODO: concatenate.
+					std::cout << "m = " << (*m["oc"+std::to_string(ic)+std::to_string(fi)]) <<std::endl;
+					output_sample->block((ic*number_of_filters+fi)*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 0, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1) = (*m["oc"+std::to_string(ic)+std::to_string(fi)]);
+					std::cout <<"os =" << (*output_sample)<<std::endl;
+				}//: for filters
+			}//: for channels
+			// Set column in the output batch.
+			y->col(ib) = (*output_sample);
 
-		// Iterate through input channels.
-		for (size_t ic=0; ic< input_channels; ic++) {
-			// Temporal solution. TODO - get input channel from image.
-			mic::types::MatrixPtr<eT> ichannel = image;
-
-			// Resize channel using the given dimensions.
-			ichannel->resize(input_height, input_width);
-
-			// 1. Preparation.
-			// Iterate through receptive fields - vertical and horizontal
-			// and copy data from given channel to array of "input receptive fields".
-
-			// Image coordinates: ix, iy.
-			// Receptive fields coordinates: rx, ry.
-			for (size_t ry=0, iy = 0; ry< number_of_receptive_fields_vertical; ry++, iy+=stride) {
-				for (size_t rx=0, ix = 0; rx< number_of_receptive_fields_horizontal; rx++, ix+=stride) {
-					std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
-					// Get receptive field matrix...
-					mic::types::MatrixPtr<eT> field = m["irf"+std::to_string(ry)+std::to_string(rx)];
-					// And copy data from input image.
-					(*field) = ichannel->block(iy,ix,filter_size, filter_size);
-					std::cout<< (*field) << std::endl;
-					// Resize the field to a vector.
-					field->resize(filter_size*filter_size, 1);
-				}//: for rx
-			}//: for ry
-
-			// 2. Convolution.
-			// Iterate through filters and calculate the result of the convolution.
-			for (size_t fi=0; fi< number_of_filters; fi++) {
-				// Get output channel matrix field matrix.
-				mic::types::MatrixPtr<eT> ochannel = m["oc"+std::to_string(ic)+std::to_string(fi)];
-
-				// Get filter weight and bias.
-				mic::types::Matrix<eT> W = (*p["W"+std::to_string(fi)]);
-				eT b = (*p["b"+std::to_string(fi)])[0];
-				for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
-					for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
-						// Get receptive field matrix of size (1, filter_size^2)...
-						mic::types::Matrix<eT> x = (*m["irf"+std::to_string(ry)+std::to_string(rx)]);
-						// ... and "convolve" it with the receptive field.
-						std::cout << (W*x) << std::endl;
-						(*ochannel)(ry, rx) = (W*x)(0) + b;
-
-					}//: for rx
-				}//: for ry
-				std::cout << (*ochannel)<<std::endl;
-				//(*y) = W * x + b.replicate(1, x.cols());
-
-			}//: for filters
-
-		}//: for channels
-
-		// 3. Produce output.
-		// "Concatenate" output channels into one vector.
-		for (size_t ic=0; ic< input_channels; ic++) {
-			for (size_t fi=0; fi< number_of_filters; fi++) {
-				mic::types::MatrixPtr<eT> y = s['y'];
-				// TODO: concatenate.
-				(*y) = (*m["oc"+std::to_string(ic)+std::to_string(fi)]);
-				std::cout << (*y)<<std::endl;
-			}//: for filters
-		}//: for channels
+		}//: for batch
 
 	}
 

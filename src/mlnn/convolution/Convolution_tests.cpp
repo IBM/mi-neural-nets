@@ -54,7 +54,7 @@ TEST_F(Conv5x5x1Filter3x3x1Float, LayerDimensions) {
 /*!
  * Checks whether the forward is working.
  */
-TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
+/*TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
 
 	std::cout<<"W = \n" << (*layer.p["W0"]) <<std::endl;
 	std::cout<<"input = \n" << (*input) <<std::endl;
@@ -66,7 +66,29 @@ TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
 	for (size_t i=0; i<9; i++)
 		ASSERT_EQ((*output)[i], (*desired_output)[i]);
 
+}*/
+
+/*!
+ * Checks whether the forward is working.
+ */
+TEST_F(Conv3x3x2Filter2x2x3Float, Forward) {
+
+	std::cout<<"W0 = \n" << (*layer.p["W0"]) <<std::endl;
+	std::cout<<"W1 = \n" << (*layer.p["W1"]) <<std::endl;
+	std::cout<<"W2 = \n" << (*layer.p["W2"]) <<std::endl;
+	std::cout<<"input = \n" << (*input) <<std::endl;
+	std::cout<<"desired_output = \n" << (*desired_output) <<std::endl;
+
+	// Forward pass.
+	mic::types::MatrixPtr<float> output = layer.forward(input);
+	std::cout<<"output = \n" << (*output) <<std::endl;
+
+	// Check output.
+	for (size_t i=0; i<9; i++)
+		ASSERT_EQ((*output)[i], (*desired_output)[i]);
+
 }
+
 
 
 int main(int argc, char **argv) {
