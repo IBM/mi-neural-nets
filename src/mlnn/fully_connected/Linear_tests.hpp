@@ -18,6 +18,8 @@
 #include <mlnn/fully_connected/Linear.hpp>
 #include <loss/SquaredErrorLoss.hpp>
 
+namespace mic { namespace mlnn { namespace fully_connected {
+
 /*!
  * \brief Test Fixture - layer of size 1x1, floats, sets W[0] = 1.0 and b[0] = 1.0.
  * \author tkornuta
@@ -215,4 +217,8 @@ private:
 	// Loss function.
 	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
 };
+
+} } } //: namespaces
+
+
 #endif /* LINEARLAYERTESTS_HPP_ */

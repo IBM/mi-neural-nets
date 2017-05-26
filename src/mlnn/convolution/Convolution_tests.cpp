@@ -9,8 +9,11 @@
 
 #include "Convolution_tests.hpp"
 
+namespace mic { namespace mlnn { namespace fully_connected {
+
 /*!
  * Checks numbers of receptive fields for different strides.
+ * \author tkornuta
  */
 TEST(Convolutions, NumberOfReceptiveFields) {
 
@@ -34,6 +37,9 @@ TEST(Convolutions, NumberOfReceptiveFields) {
 
 /*!
  * Checks whether dimensions of inputs, outputs and filters are ok.
+ * Convolutional dimensions are nicely explained in this lecture:
+ * http://cs231n.github.io/convolutional-networks/
+  * \author tkornuta
  */
 TEST_F(Conv5x5x1Filter3x3x1Float, Dimensions) {
 
@@ -58,6 +64,7 @@ TEST_F(Conv5x5x1Filter3x3x1Float, Dimensions) {
 
 /*!
  * Checks whether the forward is working for layer of input size 5x5x1 and with filter bank of 3x3 with stride 1.
+ * \author tkornuta
  */
 TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
 
@@ -75,6 +82,7 @@ TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
 
 /*!
  * Checks whether the forward is working.
+ * \author tkornuta
  */
 TEST_F(Conv3x3x2Filter2x2x3Float, Forward) {
 
@@ -99,6 +107,7 @@ TEST_F(Conv3x3x2Filter2x2x3Float, Forward) {
 
 /*!
  * Checks whether the backward pass is working for layer of input size 5x5x1 and with filter bank of 3x3 with stride 1.
+ * \author tkornuta
  */
 TEST_F(Conv5x5x1Filter3x3x1Float, Backward) {
 
@@ -112,10 +121,9 @@ TEST_F(Conv5x5x1Filter3x3x1Float, Backward) {
 /*	for (size_t i=0; i<9; i++)
 		ASSERT_EQ((*output)[i], (*desired_output)[i]);*/
 
-
 }
 
-
+} } } //: namespaces
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

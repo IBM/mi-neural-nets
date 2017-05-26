@@ -9,8 +9,11 @@
 
 #include "Linear_tests.hpp"
 
+namespace mic { namespace mlnn { namespace fully_connected {
+
 /*!
- * Makes sure that the layer is properly initialized - initial W weights must be non zero and b must be zero.
+ * \brief Makes sure that the layer is properly initialized - initial W weights must be non zero and b must be zero.
+ * \author tkornuta
  */
 TEST_F(Linear5x2Float, WbInitialization) {
 	for (size_t i=0; i<10; i++)
@@ -21,7 +24,8 @@ TEST_F(Linear5x2Float, WbInitialization) {
 }
 
 /*!
- * Makes sure that the layer is properly initialized - all W are numbers!
+ * \brief Makes sure that the layer is properly initialized - all W are numbers!
+ * \author tkornuta
  */
 TEST_F(Linear5x2Float, WIsNaN) {
 	for (size_t i=0; i<10; i++)
@@ -29,7 +33,8 @@ TEST_F(Linear5x2Float, WIsNaN) {
 }
 
 /*!
- * Makes sure that the layer is properly initialized - all W are finite.
+ * \brief Makes sure that the layer is properly initialized - all W are finite.
+ * \author tkornuta
  */
 TEST_F(Linear5x2Float, WIsNotInf) {
 	for (size_t i=0; i<10; i++)
@@ -38,7 +43,8 @@ TEST_F(Linear5x2Float, WIsNotInf) {
 
 
 /*!
- * Makes sure that the layer is properly initialized and all W are different.
+ * \brief Makes sure that the layer is properly initialized and all W are different.
+ * \author tkornuta
  */
 TEST_F(Linear5x2Float, WAreDifferent) {
 	for (size_t i=0; i<10; i++) {
@@ -49,7 +55,8 @@ TEST_F(Linear5x2Float, WAreDifferent) {
 
 
 /*!
- * Makes sure that the layer calculates y = w*x + b, size of layer: is 1x1.
+ * \brief Makes sure that the layer calculates y = w*x + b, size of layer: is 1x1.
+ * \author tkornuta
  */
 TEST_F(Linear1x1Float, Forward_y) {
 	mic::types::MatrixPtr<float> input = MAKE_MATRIX_PTR(float, 1, 1);
@@ -62,7 +69,8 @@ TEST_F(Linear1x1Float, Forward_y) {
 }
 
 /*!
- * Makes sure that the layer calculates y = w*x + b, size of layer: is 2x3.
+ * \brief Makes sure that the layer calculates y = w*x + b, size of layer: is 2x3.
+ * \author tkornuta
  */
 TEST_F(Linear2x3Float, Forward_y) {
 	mic::types::MatrixPtr<float> y = layer.forward(const_x);
@@ -72,7 +80,8 @@ TEST_F(Linear2x3Float, Forward_y) {
 }
 
 /*!
- * Makes sure that the two stacked layers will return right result.
+ * \brief Makes sure that the two stacked layers will return right result.
+ * \author tkornuta
  */
 TEST(LinearStacked1x2x3Float, Forward_y) {
 	// Initialize network consisting  of two layers.
@@ -97,7 +106,8 @@ TEST(LinearStacked1x2x3Float, Forward_y) {
 
 
 /*!
- * Tests backward pass in the  y = w*x + b, size of layer: is 2x1.
+ * \brief Tests backward pass in the  y = w*x + b, size of layer: is 2x1.
+ * \author tkornuta
  */
 TEST(Linear2x1Float, Backward_dx) {
 	mic::mlnn::fully_connected::Linear<> layer(2,1);
@@ -115,7 +125,8 @@ TEST(Linear2x1Float, Backward_dx) {
 
 
 /*!
- * Tests backward pass in the  y = w*x + b (dx gradient), size of layer: is 2x3.
+ * \brief Tests backward pass in the  y = w*x + b (dx gradient), size of layer: is 2x3.
+ * \author tkornuta
  */
 TEST_F(Linear2x3Float, Backward_dx) {
 	mic::types::MatrixPtr<float> dx = layer.backward(const_dy);
@@ -126,7 +137,8 @@ TEST_F(Linear2x3Float, Backward_dx) {
 }
 
 /*!
- * Tests gradients dW and db, size of layer is 2x3.
+ * \brief Tests gradients dW and db, size of layer is 2x3.
+ * \author tkornuta
  */
 TEST_F(Linear2x3Float, Backward_dWdb) {
 	// Forward pass.
@@ -149,7 +161,8 @@ TEST_F(Linear2x3Float, Backward_dWdb) {
 
 
 /*!
- * Numerical gradient test dW, size of layer is 2x3.
+ * \brief Numerical gradient test dW, size of layer is 2x3.
+ * \author tkornuta
  */
 TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
 
@@ -174,7 +187,8 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dW) {
 
 
 /*!
- * Numerical gradient test db, size of layer is 2x3.
+ * \brief Numerical gradient test db, size of layer is 2x3.
+ * \author tkornuta
  */
 TEST_F(Linear2x3Double, NumericalGradientCheck_db) {
 
@@ -197,7 +211,8 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_db) {
 
 
 /*!
- * Numerical gradient test dx, size of layer is 2x3.
+ * \brief Numerical gradient test dx, size of layer is 2x3.
+ * \author tkornuta
  */
 TEST_F(Linear2x3Double, NumericalGradientCheck_dx) {
 
@@ -220,7 +235,8 @@ TEST_F(Linear2x3Double, NumericalGradientCheck_dx) {
 
 
 /*!
- * Numerical gradient test dW, size of layer is 50x100.
+ * \brief Numerical gradient test dW, size of layer is 50x100.
+ * \author tkornuta
  */
 TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
 
@@ -248,7 +264,8 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dW) {
 
 
 /*!
- * Numerical gradient test db, size of layer is 50x100.
+ * \brief Numerical gradient test db, size of layer is 50x100.
+ * \author tkornuta
  */
 TEST_F(Linear50x100Double, NumericalGradientCheck_db) {
 
@@ -275,7 +292,8 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_db) {
 
 
 /*!
- * Numerical gradient test dx, size of layer is 50x100.
+ * \brief Numerical gradient test dx, size of layer is 50x100.
+ * \author tkornuta
  */
 TEST_F(Linear50x100Double, NumericalGradientCheck_dx) {
 
@@ -296,6 +314,9 @@ TEST_F(Linear50x100Double, NumericalGradientCheck_dx) {
 	for (size_t i=0; i<(size_t)dx->size(); i++)
 		EXPECT_LE( fabs((*dx)[i] - (*nx)[i]), eps) << "Too big difference between dx and numerical dx at position i=" << i;
 }
+
+
+} } } //: namespaces
 
 
 int main(int argc, char **argv) {
