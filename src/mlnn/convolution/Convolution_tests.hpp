@@ -20,7 +20,7 @@
 
 
 /*!
- * \brief Test Fixture - layer of input size 5x5x1 and with filterbank 3x3x1, floats.
+ * \brief Test Fixture - layer of input size 5x5x1 and with filter bank of 3x3 with stride 1 (floats).
  * Math example taken from: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
  * \author tkornuta
  */
@@ -33,6 +33,7 @@ public:
 
 		desired_output = MAKE_MATRIX_PTR(float, 9, 1);
 
+		gradient = MAKE_MATRIX_PTR(float, 9, 1);
 	}
 
 protected:
@@ -44,6 +45,7 @@ protected:
 		(*input) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
 		(*desired_output) << 4, 3, 4, 2, 4, 3, 2, 3, 4;
 
+		(*gradient) << 1, 1, -1, 1, 0, -1, 0, 1, 0;
 	}
 
 private:
@@ -56,12 +58,14 @@ private:
 	/// Desired output for a given input.
 	mic::types::MatrixPtr<float> desired_output;
 
+	/// Gradient passed to backpropagation.
+	mic::types::MatrixPtr<float> gradient;
 };
 
 
 
 /*!
- * \brief Test Fixture - layer of input size 3x3x2 and with filterbank 2x3 with stride 1, floats.
+ * \brief Test Fixture - layer of input size 3x3x2 and with filter bank of 2x3 with stride 1, floats.
  * Math example taken from my whiteboard;)
  * \author tkornuta
  */

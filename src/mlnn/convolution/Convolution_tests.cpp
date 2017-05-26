@@ -9,7 +9,10 @@
 
 #include "Convolution_tests.hpp"
 
-TEST(Convolutions, NumberFfFilters) {
+/*!
+ * Checks numbers of receptive fields for different strides.
+ */
+TEST(Convolutions, NumberOfReceptiveFields) {
 
 	// Stride = 1.
 	mic::mlnn::convolution::Convolution<float> l1(5,7,1,3,1,1);
@@ -28,9 +31,9 @@ TEST(Convolutions, NumberFfFilters) {
 
 
 /*!
- * Checks whether the forward is working.
+ * Checks whether dimensions of inputs, outputs and filters are ok.
  */
-TEST_F(Conv5x5x1Filter3x3x1Float, LayerDimensions) {
+TEST_F(Conv5x5x1Filter3x3x1Float, Dimensions) {
 
 	// Check filter size - W.
 	ASSERT_EQ((*layer.p["W0"]).rows(), 1);
@@ -52,12 +55,12 @@ TEST_F(Conv5x5x1Filter3x3x1Float, LayerDimensions) {
 
 
 /*!
- * Checks whether the forward is working.
+ * Checks whether the forward is working for layer of input size 5x5x1 and with filter bank of 3x3 with stride 1.
  */
-/*TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
+TEST_F(Conv5x5x1Filter3x3x1Float, Forward) {
 
-	std::cout<<"W = \n" << (*layer.p["W0"]) <<std::endl;
-	std::cout<<"input = \n" << (*input) <<std::endl;
+/*	std::cout<<"W = \n" << (*layer.p["W0"]) <<std::endl;
+	std::cout<<"input = \n" << (*input) <<std::endl;*/
 
 	// Forward pass.
 	mic::types::MatrixPtr<float> output = layer.forward(input);
@@ -66,26 +69,47 @@ TEST_F(Conv5x5x1Filter3x3x1Float, LayerDimensions) {
 	for (size_t i=0; i<9; i++)
 		ASSERT_EQ((*output)[i], (*desired_output)[i]);
 
-}*/
+}
 
 /*!
  * Checks whether the forward is working.
  */
 TEST_F(Conv3x3x2Filter2x2x3Float, Forward) {
 
-	std::cout<<"W0 = \n" << (*layer.p["W0"]) <<std::endl;
+/*	std::cout<<"W0 = \n" << (*layer.p["W0"]) <<std::endl;
 	std::cout<<"W1 = \n" << (*layer.p["W1"]) <<std::endl;
 	std::cout<<"W2 = \n" << (*layer.p["W2"]) <<std::endl;
 	std::cout<<"input = \n" << (*input) <<std::endl;
-	std::cout<<"desired_output = \n" << (*desired_output) <<std::endl;
+	std::cout<<"desired_output = \n" << (*desired_output) <<std::endl;*/
 
 	// Forward pass.
 	mic::types::MatrixPtr<float> output = layer.forward(input);
-	std::cout<<"output = \n" << (*output) <<std::endl;
+	// Second forward - just to check whether "internal dimensions" are ok.
+	output = layer.forward(input);
+	//std::cout<<"output = \n" << (*output) <<std::endl;
 
 	// Check output.
 	for (size_t i=0; i<9; i++)
 		ASSERT_EQ((*output)[i], (*desired_output)[i]);
+
+}
+
+
+/*!
+ * Checks whether the backward pass is working for layer of input size 5x5x1 and with filter bank of 3x3 with stride 1.
+ */
+TEST_F(Conv5x5x1Filter3x3x1Float, Backward) {
+
+	/*std::cout<<"W = \n" << (*layer.p["W0"]) <<std::endl;
+	std::cout<<"input = \n" << (*input) <<std::endl;*/
+
+	// Forward pass.
+	mic::types::MatrixPtr<float> output = layer.backward(input);
+
+	// Check output.
+/*	for (size_t i=0; i<9; i++)
+		ASSERT_EQ((*output)[i], (*desired_output)[i]);*/
+
 
 }
 
