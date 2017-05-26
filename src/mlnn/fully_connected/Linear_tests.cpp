@@ -9,7 +9,7 @@
 
 #include "Linear_tests.hpp"
 
-namespace mic { namespace mlnn { namespace fully_connected {
+namespace mic { namespace neural_nets { namespace unit_tests {
 
 /*!
  * \brief Makes sure that the layer is properly initialized - initial W weights must be non zero and b must be zero.

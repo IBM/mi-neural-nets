@@ -9,7 +9,7 @@
 
 #include <mlnn/MultiLayerNeuralNetworkTests.hpp>
 
-
+namespace mic { namespace neural_nets { namespace unit_tests {
 
 /*!
  * Tests the dimensionality of nn.
@@ -182,7 +182,7 @@ TEST_F(Tutorial2LayerNN, TrainSingleStep) {
 
 }
 
-
+} } }//: namespaces
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

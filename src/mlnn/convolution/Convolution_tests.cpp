@@ -9,7 +9,7 @@
 
 #include "Convolution_tests.hpp"
 
-namespace mic { namespace mlnn { namespace fully_connected {
+namespace mic { namespace neural_nets { namespace unit_tests {
 
 /*!
  * Checks numbers of receptive fields for different strides.

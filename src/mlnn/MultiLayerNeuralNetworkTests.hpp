@@ -19,6 +19,9 @@
 #include <mlnn/BackpropagationNeuralNetwork.hpp>
 
 
+namespace mic { namespace neural_nets { namespace unit_tests {
+
+
 /*!
  * \brief Test Fixture - simple ff net with 2 layers.
  * \author tkornuta
@@ -149,5 +152,6 @@ private:
 	mic::types::MatrixPtr<double> bwpass1_lin1_pW_updated;
 };
 
+} } }//: namespaces
 
 #endif /* MULTILAYERNEURALNETSTESTS_HPP_ */

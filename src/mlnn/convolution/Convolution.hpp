@@ -17,8 +17,6 @@ namespace mic {
 namespace mlnn {
 namespace convolution {
 
-#define ADDRESS_3D_TO_1D(i, j, k, cols, channel_size) ((i) + (j) * (cols) + (k) * (channel_size))
-
 /*!
  * \brief Class representing a convolution layer.
  * \author tkornuta/krocki
@@ -111,8 +109,14 @@ public:
 
 	};
 
+	/*!
+	 * Virtual destructor - empty.
+	 */
 	virtual ~Convolution() {};
 
+	/*!
+	 * Performs forward pass through the filters. Can process batches.
+	 */
 	void forward(bool test = false) {
 		// Get input matrix.
 		mic::types::MatrixPtr<eT> batch = s['x'];
@@ -213,6 +217,9 @@ public:
 		}//: for batch
 	}//: forward
 
+	/*!
+	 * Back-propagates the gradients through the filters.
+	 */
 	void backward() {
 		// Get matrices.
 		mic::types::Matrix<eT> dy = (*g['y']);
@@ -241,7 +248,7 @@ public:
 		for (size_t y=0; y< input_height; y++) {
 			for (size_t x=0; x< input_width; x++) {
 				eT val=0;
-				// Peform "full conovlution".
+				// Perform "full conovlution".
 				for (size_t fy=0; fy< filter_size; fy++) {
 					for (size_t fx=0; fx< filter_size; fx++) {
 						//(*dy)(y,x) =
@@ -264,6 +271,8 @@ public:
 
 	}//: backward
 
+
+	//#define ADDRESS_3D_TO_1D(i, j, k, cols, channel_size) ((i) + (j) * (cols) + (k) * (channel_size))
 
 	/*!
 	 * Outer loop over image locations, all images processed in parallel

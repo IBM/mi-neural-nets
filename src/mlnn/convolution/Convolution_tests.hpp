@@ -18,7 +18,7 @@
 #include <mlnn/convolution/Convolution.hpp>
 #include <loss/SquaredErrorLoss.hpp>
 
-namespace mic { namespace mlnn { namespace fully_connected {
+namespace mic { namespace neural_nets { namespace unit_tests {
 
 /*!
  * \brief Test Fixture - layer of input size 5x5x1 and with filter bank of 3x3 with stride 1 (floats).
