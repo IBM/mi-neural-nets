@@ -108,11 +108,13 @@ public:
 		for (size_t fi=0; fi< number_of_filters; fi++) {
 			// A given filter (neuron layer) has in fact connection to all input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
-				p.add ("reW"+std::to_string(fi)+std::to_string(ic), (filter_size+number_of_receptive_fields_vertical-1), (filter_size+number_of_receptive_fields_horizontal-1));
+				p.add ("reW"+std::to_string(fi)+std::to_string(ic), (filter_size+2*(number_of_receptive_fields_vertical-1)), (filter_size+2*(number_of_receptive_fields_horizontal-1)));
 				p["reW"+std::to_string(fi)+std::to_string(ic)]->setZero();
 			}//: for channels
 		}//: for filters
 
+		// Allocate memory for "reverse" receptive field.
+		m.add ("rerf", number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
 	};
 
 	/*!
@@ -247,9 +249,9 @@ public:
 				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
 				W->resize(filter_size, filter_size);
 				// "Rotate".
-				for(size_t i=0; i < filter_size; i++)
-					for(size_t j=0; j < filter_size; j++)
-					(*reW)(filter_size-(i+1), filter_size-(j+1)) = (*W)(i,j);
+				for(size_t y=0; y < filter_size; y++)
+					for(size_t x=0; x < filter_size; x++)
+					(*reW)(y + (number_of_receptive_fields_vertical-1), x + (number_of_receptive_fields_horizontal -1)) = (*W)(y,x);
 				std::cout<<"reW=\n"<<(*reW)<<std::endl;
 				// Resize filter matrix W back to a row vector.
 				W->resize(1, filter_size*filter_size);
@@ -259,15 +261,13 @@ public:
 		// 2. Calculate dx: convolve reWs with output.
 		dx->setZero();
 		//mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)];
+		// Get pointer to "reverse receptive field".
+		mic::types::MatrixPtr<eT> rerf = p["rerf"];
 		for (size_t y=0; y< input_height; y++) {
 			for (size_t x=0; x< input_width; x++) {
 				eT val=0;
 				// Perform "full convolution".
-				for (size_t fy=0; fy< filter_size; fy++) {
-					for (size_t fx=0; fx< filter_size; fx++) {
-						//(*dx)(y,x) =
-					}//: fx
-				}//: fy
+				//(*rerf) = reW->block(filter_size-1-y, filter_size-1-y,)
 
 
 			}//: x
