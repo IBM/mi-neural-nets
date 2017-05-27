@@ -46,17 +46,17 @@ public:
 		number_of_filters(number_of_filters_)
 	{
 
-		std::cout<<"input_height = " << input_height <<std::endl;
+/*		std::cout<<"input_height = " << input_height <<std::endl;
 		std::cout<<"input_width = " << input_width <<std::endl;
 		std::cout<<"number_of_filters = " << number_of_filters <<std::endl;
 		std::cout<<"filter_size = " << filter_size <<std::endl;
-		std::cout<<"stride = " << stride <<std::endl;
+		std::cout<<"stride = " << stride <<std::endl;*/
 
 		// Calculate number of receptive fields within a "single input channel".
 		number_of_receptive_fields_vertical = (input_height - filter_size)/stride + 1;
 		number_of_receptive_fields_horizontal = (input_width - filter_size)/stride + 1;
-		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
-		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;
+/*		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
+		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;*/
 		// Filters must "exactly" fit!
 		assert((number_of_receptive_fields_vertical - 1) * stride + filter_size == input_height);
 		assert((number_of_receptive_fields_horizontal - 1) * stride + filter_size == input_width);
@@ -174,7 +174,7 @@ public:
 			// 2. Get input sample from batch!
 			mic::types::MatrixPtr<eT> sample = m["xs"];
 			(*sample) = batch->col(ib);
-			std::cout<< "sample=\n" << (*sample) << std::endl;
+			//std::cout<< "sample=\n" << (*sample) << std::endl;
 
 			// 3. Iterate through input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
@@ -184,7 +184,7 @@ public:
 				(*ichannel) = sample->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				// Resize channel using the given dimensions.
 				ichannel->resize(input_height, input_width);
-				std::cout<< "======  switching input channel = " << ic <<" ichannel=\n" << (*ichannel) << std::endl;
+				//std::cout<< "======  switching input channel = " << ic <<" ichannel=\n" << (*ichannel) << std::endl;
 
 				// 3.2. Fill receptive fields from given input channel.
 				// Iterate through receptive fields - vertical and horizontal
@@ -209,8 +209,8 @@ public:
 				for (size_t fi=0; fi< number_of_filters; fi++) {
 					// Get output channel for a given filter.
 					mic::types::MatrixPtr<eT> y_channel = m["yc"+std::to_string(fi)];
-					std::cout << "====  switching to oc = \n" << (*y_channel)<<std::endl;
-			// Get "part of a given neuron" responding to a given input channel.
+					//std::cout << "====  switching to oc = \n" << (*y_channel)<<std::endl;
+					// Get "part of a given neuron" responding to a given input channel.
 					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
 					// Not required - just in case. :]
 					W->resize(1,filter_size*filter_size);
@@ -220,14 +220,14 @@ public:
 							// Get receptive field matrix of size (1, filter_size^2)...
 							mic::types::MatrixPtr<eT> xrf = m["xrf"+std::to_string(ry)+std::to_string(rx)];
 							// ... and result of "convolution" of that filter with the part of the input "below" the receptive field.
-							std::cout<<"ic = " << ic  << "filter = " << fi << " ry =" << ry <<" rx =" << rx <<std::endl;
+							/*std::cout<<"ic = " << ic  << "filter = " << fi << " ry =" << ry <<" rx =" << rx <<std::endl;
 							std::cout<< "W=\n" << (*W) << std::endl;
 							std::cout<< "xrf=\n" << (*xrf) << std::endl;
-							std::cout<< " result = " << ((*W)*(*xrf)) << std::endl;
+							std::cout<< " result = " << ((*W)*(*xrf)) << std::endl;*/
 							(*y_channel)(ry, rx) += ((*W)*(*xrf))(0);
 						}//: for rx
 					}//: for ry
-					std::cout << "====  ic = " << ic << "filter= " << fi << " oc = \n" << (*y_channel)<<std::endl;
+					//std::cout << "====  ic = " << ic << "filter= " << fi << " oc = \n" << (*y_channel)<<std::endl;
 				}//: for filters
 			}//: for channels
 		}//: for batch
@@ -300,7 +300,7 @@ public:
 
 		// 1. Fill the "rotated-expanded" filters.
 		for (size_t ic=0; ic< input_channels; ic++) {
-			std::cout<<"Channel: " << ic <<std::endl;
+			//std::cout<<"Channel: " << ic <<std::endl;
 			for (size_t fi=0; fi< number_of_filters; fi++) {
 				mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
 				reW->setZero();
@@ -311,7 +311,7 @@ public:
 				for(size_t y=0; y < filter_size; y++)
 					for(size_t x=0; x < filter_size; x++)
 					(*reW)(stride*y + (number_of_receptive_fields_vertical-1), stride*x + (number_of_receptive_fields_horizontal -1)) = (*W)(filter_size-y-1,filter_size-x-1);
-				std::cout<<"reW=\n"<<(*reW)<<std::endl;
+				//std::cout<<"reW=\n"<<(*reW)<<std::endl;
 				// Resize filter matrix W back to a row vector.
 				W->resize(1, filter_size*filter_size);
 			}//: for filters
@@ -331,7 +331,7 @@ public:
 
 			// Convolve reWs with sample channel by channel.
 			for (size_t ic=0; ic< input_channels; ic++) {
-				std::cout<<"Input channel: " << ic <<std::endl;
+				//std::cout<<"Input channel: " << ic <<std::endl;
 
 				// Get pointer to x gradient channel "storage".
 				mic::types::MatrixPtr<eT> gxc = m["gxc"];
@@ -347,10 +347,8 @@ public:
 					mic::types::MatrixPtr<eT> gyc = m["gyc"];
 					// Copy block - resizes the input channel matrix.
 					(*gyc) = gys->block(fi*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 0, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1);
-					std::cout<< "fi = " << fi << "(*gyc) = \n" << (*gyc) << std::endl;
-
-					// Resize channel using the given dimensions.
-					//ichannel->resize(input_height, input_width);
+					(*gyc).resize(number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal,1);
+					//std::cout<< "fi = " << fi << "(*gyc) = \n" << (*gyc) << std::endl;
 
 					// Get reW.
 					mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
@@ -359,21 +357,20 @@ public:
 					for (size_t y=0, rew_y= rew_height - number_of_receptive_fields_vertical; y< input_height; y++, rew_y--) {
 						for (size_t x=0, rew_x= rew_width - number_of_receptive_fields_horizontal; x< input_width; x++, rew_x--) {
 							// Get block under "reverse receptive field".
-							std::cout<< "filter = " << fi <<" y=" << y<< " x=" << x <<" rew_y=" << rew_y<< " rew_x=" << rew_x << std::endl;
 							(*rerf) = reW->block(rew_y, rew_x, number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
 							rerf->resize(1, number_of_receptive_fields_vertical * number_of_receptive_fields_horizontal);
+							/*std::cout<< "filter = " << fi <<" y=" << y<< " x=" << x <<" rew_y=" << rew_y<< " rew_x=" << rew_x << std::endl;
 							std::cout<< "     (*rerf) = \n" << (*rerf) << std::endl;
-							(*gyc).resize(number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal,1);
 							std::cout<< "     (*gyc) = \n" << (*gyc) << std::endl;
+							std::cout<< "     calculated value= " << ((*rerf)*(*gyc))(0) << std::endl;*/
 							// Convolve.
-							std::cout<< "     calculated value= " << ((*rerf)*(*gyc))(0) << std::endl;
 							(*gxc)(y,x) += ((*rerf)*(*gyc))(0);
-							std::cout<< "     tmp (*gxc) = \n" << (*gxc) << std::endl;
+							//std::cout<< "     tmp (*gxc) = \n" << (*gxc) << std::endl;
 						}//: x
 					}//: y
-					std::cout<< "filter = "<< fi << " resulting (*gxc) = \n" << (*gxc) << std::endl;
+					//std::cout<< "filter = "<< fi << " resulting (*gxc) = \n" << (*gxc) << std::endl;
 				}//: for filters
-				std::cout<< "result for input channel = "<< ic << " (*gxc) = \n" << (*gxc) << std::endl;
+				//std::cout<< "result for input channel = "<< ic << " (*gxc) = \n" << (*gxc) << std::endl;
 				// Resize gradient channel to a column vector.
 				gxc->resize(input_height * input_width, 1);
 
@@ -381,7 +378,7 @@ public:
 				gxs->block(ic*input_height*input_width, 0, input_height*input_width, 1)
 						= (*gxc);
 
-				std::cout<< "(*gs) = \n" << (*gxs) << std::endl;
+				//std::cout<< "(*gs) = \n" << (*gxs) << std::endl;
 			}//: for channels
 
 			// Set column in the gradient batch.
@@ -413,7 +410,7 @@ public:
 			// Get x sample from batch.
 			mic::types::MatrixPtr<eT> xs = m["xs"];
 			(*xs) = batch_x->col(ib);
-			std::cout<< "xs=\n" << (*xs) << std::endl;
+			//std::cout<< "xs=\n" << (*xs) << std::endl;
 
 			// Iterate through input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
@@ -423,7 +420,7 @@ public:
 				(*x_channel) = xs->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				// Resize channel using the given dimensions.
 				x_channel->resize(input_height, input_width);
-				std::cout<< "x_channel=\n" << (*x_channel) << std::endl;
+				//std::cout<< "======  switching input channel = " << ic << " x_channel=\n" << (*x_channel) << std::endl;
 
 				// Fill "inverse input receptive fields" from given input channel.
 				// Image coordinates: ix, iy.
@@ -432,6 +429,8 @@ public:
 					for (size_t rx=0; rx< filter_size; rx++) {
 						// Get inverse receptive field matrix.
 						mic::types::MatrixPtr<eT> x_field = m["ixrf"+std::to_string(ry)+std::to_string(rx)];
+						//std::cout<< "x_field=\n" << (*x_field) << std::endl;
+						x_field->resize(number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
 						// Iterate through the input channel using stride.
 						for (size_t iy=0, fy=0; iy< input_height; iy+=stride, fy++) {
 							for (size_t ix=0, fx=0; ix< input_width; ix+=stride, fx++) {
@@ -443,16 +442,17 @@ public:
 						}//: for iy
 						// Resize the field to a column vector.
 						x_field->resize(1, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal);
-						std::cout<< "x_field=\n" << (*x_field) << std::endl;
+						//std::cout<< "x_field=\n" << (*x_field) << std::endl;
 					}//: for rx
 				}//: for ry
+
 
 				// For each filter (= each output channel).
 				for (size_t fi=0; fi< number_of_filters; fi++) {
 					// Get output channel for a given filter.
 					mic::types::MatrixPtr<eT> gyc = m["yc"+std::to_string(fi)];
 					(*gyc) = gys->block(fi*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 0, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1);
-					std::cout<< "gyc=\n" << (*gyc) << std::endl;
+					//std::cout<< "gyc=\n" << (*gyc) << std::endl;
 
 					// Get matrix of a given "part of a given neuron".
 					mic::types::MatrixPtr<eT> dW = g["W"+std::to_string(fi)+std::to_string(ic)];
@@ -461,15 +461,17 @@ public:
 					// Iterate through inverse receptive fields and CONVOLVE.
 					for (size_t ry=0; ry< filter_size; ry++) {
 						for (size_t rx=0; rx< filter_size; rx++) {
+							//std::cout<<"filter = " << fi << " ry =" << ry <<" rx =" << rx <<std::endl;
 							// Get inverse receptive field matrix of size (filter_size^2, 1)...
 							mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(ry)+std::to_string(rx)];
-							std::cout<< "x_field=\n" << (*ixrf) << std::endl;
+							/*std::cout<< "x_field=\n" << (*ixrf) << std::endl;
+							std::cout<< "gyc=\n" << (*gyc) << std::endl;
+							std::cout<< " result = \n" << ((*ixrf)*(*gyc)) << std::endl;*/
 							// ... and convolve it with dy channel.
 							(*dW)(ry, rx) += ((*ixrf)*(*gyc))(0);
-							std::cout<<"filter = " << fi << " ry =" << ry <<" rx =" << rx << " result = " << ((*gyc)*(*ixrf)) << std::endl;
 						}//: for rx
 					}//: for ry
-					std::cout << "filter= " << fi << " dW = " << (*dW)<<std::endl;
+					//std::cout << "==== result: dW [" << fi << ic <<"] = " << (*dW)<<std::endl;
 
 				}//: for filter
 
@@ -492,231 +494,13 @@ public:
 		for (size_t fi=0; fi< number_of_filters; fi++) {
 			// Sum block [output_channel x batch].
 			eT channel_bach_sum = batch_dy->block(fi*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 0, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, batch_size).sum();
-			std::cout<< "fi = " << fi << "channel_bach_sum = " << channel_bach_sum << std::endl;
+			//std::cout<< "fi = " << fi << "channel_bach_sum = " << channel_bach_sum << std::endl;
 			(*db)[fi] = channel_bach_sum;
 		}//: for filters
 
 		// And that's it! :)
 	}
 
-	//#define ADDRESS_3D_TO_1D(i, j, k, cols, channel_size) ((i) + (j) * (cols) + (k) * (channel_size))
-
-	/*!
-	 * Outer loop over image locations, all images processed in parallel
-	 * @param out
-	 * @param in
-	 */
-/*	void forwardGemm(mic::types::Matrix<eT>& out, mic::types::Matrix<eT>& in) {
-
-		//W is size [kernel_length x filters]
-		//I is size [batch_size x kernel_length]
-		//O is [batch_size x filters] = [batch_size x kernel_length] * [kernel_length x filters]
-
-		//total number of operations proportional to
-		//out_image_size * out_image_size * batch_size * kernel_length * filters
-
-		size_t kernel_size = sqrt(W.cols() / input_channels);
-		size_t channel_length = in.rows() / input_channels;
-		size_t kernel_length = kernel_size * kernel_size * input_channels;
-		size_t kernel_length_channel = kernel_size * kernel_size;
-		size_t image_size = sqrt(in.rows() / input_channels);
-		size_t batch_size = in.cols();
-		size_t out_image_size = image_size - kernel_size + 1;
-		size_t out_image_channel_length = out_image_size * out_image_size;
-		size_t filters = W.rows();
-
-		#pragma omp parallel for collapse(2)
-		for (size_t x = 0; x < out_image_size; x++) {
-			for (size_t y = 0; y < out_image_size; y++) {
-
-				mic::types::Matrix<eT> O = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(batch_size, filters);
-				mic::types::Matrix<eT> I = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(batch_size, kernel_length);
-
-				//inputs(:, :) = images(:, x, y, :);
-				for (size_t k0 = 0; k0 < kernel_size; k0++) {
-					for (size_t k1 = 0; k1 < kernel_size; k1++) {
-
-						for (size_t channel = 0; channel < input_channels; channel++) {
-
-							size_t i = x + k0;
-							size_t j = y + k1;
-							size_t k = channel * kernel_length_channel + k0 * kernel_size + k1;
-							I.col(k) = in.row(ADDRESS_3D_TO_1D(i, j, channel, image_size, channel_length));
-
-						}
-
-					}
-				}
-
-
-				O = I * W.transpose();
-				O = O + b.transpose().replicate(batch_size, 1);
-
-				for (size_t k = 0; k < filters; k++) {
-
-					out.row(ADDRESS_3D_TO_1D(x, y, k, out_image_size, out_image_channel_length)) = O.col(k);
-
-				}
-
-			} 	// y loop
-		}	// x loop
-
-	}
-
-	void backwardGemm(mic::types::Matrix<eT>& out, mic::types::Matrix<eT>& in)  {
-
-		//W is size [filters x kernel_length]
-		//I is size [batch_size x kernel_length]
-		//O is [batch_size x filters] = [batch_size x kernel_length] * [kernel_length x filters]
-
-		//total number of operations proportional to
-		//out_image_size * out_image_size * batch_size * kernel_length * filters
-		size_t channel_length = in.rows() / input_channels;
-		size_t kernel_size = sqrt(W.cols() / input_channels);
-		size_t kernel_length = kernel_size * kernel_size * input_channels;
-		size_t kernel_length_channel = kernel_size * kernel_size;
-		size_t image_size = sqrt(in.rows() / input_channels);
-		size_t batch_size = in.cols();
-		size_t out_image_size = image_size - kernel_size + 1;
-		size_t out_image_channel_length = out_image_size * out_image_size;
-		size_t filters = W.rows();
-
-		W.setZero();
-		b.setZero();
-		#pragma omp parallel for collapse(2)
-		for (size_t x = 0; x < out_image_size; x++) {
-
-			for (size_t y = 0; y < out_image_size; y++) {
-
-				mic::types::Matrix<eT> dW = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(W.rows(), W.cols());
-				mic::types::Matrix<eT> db = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(b.rows(), b.cols());
-				mic::types::Matrix<eT> O = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(batch_size, filters);
-				mic::types::Matrix<eT> I = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(batch_size, kernel_length);
-
-				//inputs(:, : ) = images(:, x, y, : );
-				for (size_t k0 = 0; k0 < kernel_size; k0++) {
-
-					for (size_t k1 = 0; k1 < kernel_size; k1++) {
-
-						for (size_t channel = 0; channel < input_channels; channel++) {
-
-							size_t i = x + k0;
-							size_t j = y + k1;
-							size_t k = channel * kernel_length_channel + k0 * kernel_size + k1;
-
-							I.col(k) = in.row(ADDRESS_3D_TO_1D(i, j, channel, image_size, channel_length));
-
-						}
-
-					}
-				}
-
-				for (size_t k = 0; k < filters; k++) {
-
-					O.col(k) = out.row(ADDRESS_3D_TO_1D(x, y, k, out_image_size, out_image_channel_length));
-					db(k) = O.col(k).sum() / batch_size;
-				}
-
-				dW = (O.transpose() * I);
-
-				//reduction
-				#pragma omp critical
-				{
-					W = W + dW / batch_size;
-					b = b + db;
-				}
-
-			} 	// y loop
-		}	// x loop
-
-	}
-
-	void backwardFullGemm(mic::types::Matrix<eT>& out, mic::types::Matrix<eT>& in)  {
-
-		size_t channel_length = in.rows() / input_channels;
-		size_t kernel_size = sqrt(W.cols() / input_channels);
-		size_t kernel_length_channel = kernel_size * kernel_size;
-		size_t image_size = sqrt(in.rows() / input_channels);
-		size_t batch_size = in.cols();
-		size_t out_image_size = image_size - kernel_size + 1;
-		size_t filters = W.rows();
-
-		//pad matrices
-		size_t padded_size = image_size + kernel_size - 1;
-		mic::types::Matrix<eT> out_padded = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(padded_size * padded_size * filters, batch_size);
-
-		#pragma omp parallel for shared(out_padded)
-		for (size_t b = 0; b < batch_size; b++) {
-
-			mic::types::Matrix<eT> out_resized = (Eigen::Matrix<eT>)out.col(b);
-			mic::types::Matrix<eT> padded_temp = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(padded_size, padded_size * filters);
-			out_resized.resize(out_image_size, out_image_size * filters);
-
-			for (size_t f = 0; f < filters; f++) {
-
-				mic::types::Matrix<eT> padded_temp2 = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(padded_size, padded_size);
-				mic::types::Matrix<eT> out_temp2 = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(out_image_size, out_image_size);
-				out_temp2 = out_resized.block(0, f * out_image_size, out_image_size, out_image_size);
-				padded_temp2.block(kernel_size - 1, kernel_size - 1, out_image_size, out_image_size) = out_temp2;
-				padded_temp.block(0, f * padded_size, padded_size, padded_size) = padded_temp2;
-
-			}
-
-			padded_temp.resize(padded_size * padded_size * filters, 1);
-			out_padded.col(b) = padded_temp;
-
-		}
-
-		mic::types::Matrix<eT> W_permuted = mic::types::Matrix<eT>(kernel_size * kernel_size * filters, input_channels);
-		mic::types::Matrix<eT> temp_W2 = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(1, kernel_size * kernel_size);
-
-		for (size_t c = 0; c < input_channels; c++) {
-
-			for (size_t f = 0; f < filters; f++) {
-
-				mic::types::Matrix<eT> temp_W2 = (Eigen::Matrix<eT>)W.block(f, c * kernel_size * kernel_size, 1, kernel_size * kernel_size);
-				temp_W2.reverseInPlace();
-				W_permuted.block(f * kernel_size * kernel_size, c, kernel_size * kernel_size, 1) = temp_W2.transpose().eval();
-			}
-
-		}
-
-		#pragma omp parallel for collapse(2)
-
-		for (size_t x = 0; x < image_size; x++) {
-			for (size_t y = 0; y < image_size; y++) {
-
-				mic::types::Matrix<eT> O = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(batch_size, kernel_size * kernel_size * filters);
-				mic::types::Matrix<eT> I = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(batch_size, input_channels);
-
-				//inputs(:, :) = images(:, x, y, :);
-				for (size_t k0 = 0; k0 < kernel_size; k0++) {
-
-					for (size_t k1 = 0; k1 < kernel_size; k1++) {
-
-						for (size_t channel = 0; channel < filters; channel++) {
-
-							size_t i = x + k0;
-							size_t j = y + k1;
-							size_t k = channel * kernel_length_channel + k0 * kernel_size + k1;
-							O.col(k) = out_padded.row(ADDRESS_3D_TO_1D(i, j, channel, padded_size, padded_size * padded_size));
-
-						}
-
-					}
-				}
-
-				I = O * W_permuted;
-
-				for (size_t k = 0; k < input_channels; k++) {
-
-					in.row(ADDRESS_3D_TO_1D(x, y, k, image_size, channel_length)) = I.col(k);
-
-				}
-
-			}
-		}
-	}*/
 
 	void resetGrads()  {
 
