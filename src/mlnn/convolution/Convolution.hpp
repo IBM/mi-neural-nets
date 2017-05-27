@@ -46,16 +46,16 @@ public:
 		number_of_filters(number_of_filters_)
 	{
 
-/*		std::cout<<"input_height = " << input_height <<std::endl;
+		std::cout<<"input_height = " << input_height <<std::endl;
 		std::cout<<"input_width = " << input_width <<std::endl;
 		std::cout<<"filter_size = " << filter_size <<std::endl;
-		std::cout<<"stride = " << stride <<std::endl;*/
+		std::cout<<"stride = " << stride <<std::endl;
 
 		// Calculate number of receptive fields within a "single input channel".
 		number_of_receptive_fields_vertical = (input_height - filter_size)/stride + 1;
 		number_of_receptive_fields_horizontal = (input_width - filter_size)/stride + 1;
-/*		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
-		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;*/
+		std::cout<<"number_of_receptive_fields_vertical = " << number_of_receptive_fields_vertical <<std::endl;
+		std::cout<<"number_of_receptive_fields_horizontal = " << number_of_receptive_fields_horizontal <<std::endl;
 		// Filters must "exactly" fit!
 		assert((number_of_receptive_fields_vertical - 1) * stride + filter_size == input_height);
 		assert((number_of_receptive_fields_horizontal - 1) * stride + filter_size == input_width);
@@ -114,7 +114,7 @@ public:
 		for (size_t fi=0; fi< number_of_filters; fi++) {
 			// A given filter (neuron layer) has in fact connection to all input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
-				p.add ("reW"+std::to_string(fi)+std::to_string(ic), (filter_size+2*(number_of_receptive_fields_vertical-1)), (filter_size+2*(number_of_receptive_fields_horizontal-1)));
+				p.add ("reW"+std::to_string(fi)+std::to_string(ic), (filter_size+(1+stride)*(number_of_receptive_fields_vertical-1)), (filter_size+(1+stride)*(number_of_receptive_fields_horizontal-1)));
 				p["reW"+std::to_string(fi)+std::to_string(ic)]->setZero();
 			}//: for channels
 		}//: for filters
@@ -262,13 +262,13 @@ public:
 	void backward() {
 
 		// To dx.
-//		backpropagade_dy_to_dx();
+		backpropagade_dy_to_dx();
 
 		// To dW.
 		backpropagade_dy_to_dW();
 
 		// To db.
-//		backpropagade_dy_to_db();
+		backpropagade_dy_to_db();
 
 	}//: backward
 
@@ -284,8 +284,8 @@ public:
 		mic::types::MatrixPtr<eT> batch_dx = g['x'];
 
 		// reW sizes.
-		size_t rew_height = filter_size+2*(number_of_receptive_fields_vertical-1);
-		size_t rew_width = filter_size+2*(number_of_receptive_fields_horizontal-1);
+		size_t rew_height = filter_size+(stride+1)*(number_of_receptive_fields_vertical-1);
+		size_t rew_width = filter_size+(stride+1)*(number_of_receptive_fields_horizontal-1);
 
 		// Backpropagate gradient from dy to dx.
 
@@ -301,7 +301,7 @@ public:
 				// "Rotate" and insert filter values into right positions of "rotated-expanded" filter.
 				for(size_t y=0; y < filter_size; y++)
 					for(size_t x=0; x < filter_size; x++)
-					(*reW)(y + (number_of_receptive_fields_vertical-1), x + (number_of_receptive_fields_horizontal -1)) = (*W)(filter_size-y-1,filter_size-x-1);
+					(*reW)(stride*y + (number_of_receptive_fields_vertical-1), stride*x + (number_of_receptive_fields_horizontal -1)) = (*W)(filter_size-y-1,filter_size-x-1);
 				std::cout<<"reW=\n"<<(*reW)<<std::endl;
 				// Resize filter matrix W back to a row vector.
 				W->resize(1, filter_size*filter_size);

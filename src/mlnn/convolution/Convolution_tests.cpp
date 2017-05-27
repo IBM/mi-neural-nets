@@ -124,6 +124,26 @@ TEST_F(Conv4x4x1Filter1x2x2s2Float, Forward) {
 
 
 /*!
+ * Checks whether the backward gradient pass is working for layer of input size 4x4x1 and with filter bank of 1 filters of size 2x2 with stride 2.
+ * \author tkornuta
+ */
+TEST_F(Conv4x4x1Filter1x2x2s2Float, Backward) {
+
+	// Backward pass.
+	mic::types::MatrixPtr<float> dx = layer.backward(dy);
+
+	// Check resulting dx gradient.
+/*	for (size_t i=0; i<8; i++)
+		ASSERT_EQ((*desired_dx)[i], (*dx)[i]) << "at position " << i;*/
+
+	// Check resulting db gradient.
+	mic::types::MatrixPtr<float> db = layer.g["b"];
+	ASSERT_EQ((*desired_db)[0], (*db)[0]);
+
+}
+
+
+/*!
  * Checks whether dimensions of xs, outputs and filters are ok.
  * Convolutional dimensions are nicely explained in this lecture:
  * http://cs231n.github.io/convolutional-networks/
@@ -157,11 +177,11 @@ TEST_F(Conv5x5x1Filter1x3x3s1Float, DISABLED_Dimensions) {
 TEST_F(Conv5x5x1Filter1x3x3s1Float, DISABLED_Forward) {
 
 	// Forward pass.
-	mic::types::MatrixPtr<float> output = layer.forward(x);
+	mic::types::MatrixPtr<float> y = layer.forward(x);
 
-	// Check output.
+	// Check y.
 	for (size_t i=0; i<9; i++)
-		ASSERT_EQ((*output)[i], (*desired_y)[i]) << "at position " << i;
+		ASSERT_EQ((*y)[i], (*desired_y)[i]) << "at position " << i;
 
 }
 

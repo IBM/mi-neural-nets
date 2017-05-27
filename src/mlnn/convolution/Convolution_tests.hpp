@@ -130,7 +130,7 @@ protected:
 		//(*desired_dx) <<  ;
 
 		//(*desired_dW) <<  ;
-		//(*desired_db) <<  ;
+		(*desired_db) << 6;
 	}
 
 private:
@@ -339,7 +339,7 @@ private:
 
 /*!
  * \brief Test Fixture - layer of input size 5x6x1 and with filter bank of 1 filter of size 4x4 with stride 1, floats.
- * Math example taken from: http://soumith.ch/ex/pages/2014/08/07/why-rotate-weights-convolution-dy/
+ * Math example taken from: http://soumith.ch/ex/pages/2014/08/07/why-rotate-weights-convolution-gradient/
  * \author tkornuta
  */
 class Conv5x6x1Filter1x4x4s1Float : public ::testing::Test {
