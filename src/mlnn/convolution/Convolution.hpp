@@ -115,8 +115,8 @@ public:
 		for (size_t fi=0; fi< number_of_filters; fi++) {
 			// A given filter (neuron layer) has in fact connection to all input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
-				p.add ("reW"+std::to_string(fi)+std::to_string(ic), (filter_size+(1+stride)*(number_of_receptive_fields_vertical-1)), (filter_size+(1+stride)*(number_of_receptive_fields_horizontal-1)));
-				p["reW"+std::to_string(fi)+std::to_string(ic)]->setZero();
+				m.add ("reW"+std::to_string(fi)+std::to_string(ic), (filter_size+(1+stride)*(number_of_receptive_fields_vertical-1)), (filter_size+(1+stride)*(number_of_receptive_fields_horizontal-1)));
+				m["reW"+std::to_string(fi)+std::to_string(ic)]->setZero();
 			}//: for channels
 		}//: for filters
 
@@ -143,6 +143,8 @@ public:
 			}//: for
 		}//: for
 
+		// Set gradient descent as default optimization function.
+		Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
 	};
 
 	/*!
@@ -268,7 +270,6 @@ public:
 	 * Back-propagates the gradients through the layer.
 	 */
 	void backward() {
-
 		// To dx.
 		backpropagade_dy_to_dx();
 
@@ -302,7 +303,7 @@ public:
 		for (size_t ic=0; ic< input_channels; ic++) {
 			//std::cout<<"Channel: " << ic <<std::endl;
 			for (size_t fi=0; fi< number_of_filters; fi++) {
-				mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
+				mic::types::MatrixPtr<eT> reW = m["reW"+std::to_string(fi)+std::to_string(ic)];
 				reW->setZero();
 				// Get filter.
 				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
@@ -351,7 +352,7 @@ public:
 					//std::cout<< "fi = " << fi << "(*gyc) = \n" << (*gyc) << std::endl;
 
 					// Get reW.
-					mic::types::MatrixPtr<eT> reW = p["reW"+std::to_string(fi)+std::to_string(ic)];
+					mic::types::MatrixPtr<eT> reW = m["reW"+std::to_string(fi)+std::to_string(ic)];
 					// Get pointer to "reverse receptive field".
 					mic::types::MatrixPtr<eT> rerf = m["rerf"];
 					for (size_t y=0, rew_y= rew_height - number_of_receptive_fields_vertical; y< input_height; y++, rew_y--) {
@@ -429,11 +430,12 @@ public:
 					for (size_t rx=0; rx< filter_size; rx++) {
 						// Get inverse receptive field matrix.
 						mic::types::MatrixPtr<eT> x_field = m["ixrf"+std::to_string(ry)+std::to_string(rx)];
+						//std::cout << (*x_field).rows() << "x" << (*x_field).cols() <<std::endl;
 						//std::cout<< "x_field=\n" << (*x_field) << std::endl;
 						x_field->resize(number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
 						// Iterate through the input channel using stride.
-						for (size_t iy=0, fy=0; iy< input_height; iy+=stride, fy++) {
-							for (size_t ix=0, fx=0; ix< input_width; ix+=stride, fx++) {
+						for (size_t iy=0, fy=0; fy< number_of_receptive_fields_vertical; iy+=stride, fy++) {
+							for (size_t ix=0, fx=0; fx< number_of_receptive_fields_horizontal; ix+=stride, fx++) {
 								//std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
 								// Copy cell - one by one :]
 								(*x_field)(fy, fx) = (*x_channel)(ry+iy,rx+ix);
@@ -445,7 +447,6 @@ public:
 						//std::cout<< "x_field=\n" << (*x_field) << std::endl;
 					}//: for rx
 				}//: for ry
-
 
 				// For each filter (= each output channel).
 				for (size_t fi=0; fi< number_of_filters; fi++) {
@@ -502,22 +503,27 @@ public:
 	}
 
 
+	/*!
+	 * Resets all gradients. Warning: including gx and gy!
+	 */
 	void resetGrads()  {
-
-/*		dW = (Eigen::Matrix<eT>)Eigen::Matrix<eT>::Zero(W.rows(), W.cols());
-		db = mic::types::Vector<eT>::Zero(b.rows());;*/
-
+		// Reset array matrix with gradients.
+		g.setZero();
 	}
 
-	void applyGrads(double alpha)  {
 
-		//adagrad
-/*		mW += dW.cwiseProduct(dW);
-		mb += db.cwiseProduct(db);
+	/*!
+	 * Applies the gradient update, using the selected optimization method.
+	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
+	 */
+	void update(eT alpha_, eT decay_  = 0.0f) {
+		// Get keys of all parameters.
+		std::map<std::string, size_t> keys = p.keys();
 
-		W = (1 - decay) * W + alpha * dW.cwiseQuotient(mW.unaryExpr(std::ptr_fun(sqrt_eps)));
-		b += alpha * db.cwiseQuotient(mb.unaryExpr(std::ptr_fun(sqrt_eps)));*/
-
+		for (auto& i: keys) {
+			opt[i.first]->update(p[i.first], g[i.first], alpha_, decay_);
+		}//: for
 	}
 
 	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.

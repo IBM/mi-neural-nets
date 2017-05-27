@@ -107,7 +107,7 @@ public:
 	}
 
 	/*!
-	 * Resets the gradients - empty, to be overridden by the inherited classes.
+	 * Resets the gradients for W and b.
 	 */
 	void resetGrads() {
 		g['W']->setZero();

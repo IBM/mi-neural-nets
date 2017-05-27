@@ -113,7 +113,7 @@ void batch_function (void) {
 				}//: if
 
 				iteration++;
-				LOG(LINFO) << "Iteration: " << iteration;
+				LOG(LINFO) << "Iteration: " << iteration << "loss= " << loss;
 			}//: end of critical section
 
 		}//: if

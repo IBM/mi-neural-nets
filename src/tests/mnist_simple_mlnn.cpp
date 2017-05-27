@@ -21,7 +21,7 @@ using namespace mic::types;
 
 int main() {
 	// Task parameters.
-	size_t batch_size = 100;
+	size_t batch_size = 1;
 	size_t iterations = 60000/batch_size;
 
 	// Set console output.
@@ -56,12 +56,20 @@ int main() {
 	// Create a simple NN for classification (should give around 95.3% accuracy)
 	//MNIST - 28x28 -> 256 -> 100 -> 10
 	BackpropagationNeuralNetwork<float> nn("3layerReLUSofmax");
-	nn.pushLayer(new Linear<float>(28 * 28, 256));
+	/*nn.pushLayer(new Linear<float>(28 * 28, 256));
 	nn.pushLayer(new ReLU<float>(256));
 	nn.pushLayer(new Linear<float>(256, 100));
 	nn.pushLayer(new ReLU<float>(100));
 	nn.pushLayer(new Linear<float>(100, 10));
-	nn.pushLayer(new ReLU<float>(10));
+	nn.pushLayer(new Softmax<float>(10));
+	*/
+	nn.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 10, 5, 1));
+	nn.pushLayer(new ReLU<float>(5760));
+	nn.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 10, 10, 5, 1));
+	nn.pushLayer(new ReLU<float>(4000));
+	nn.pushLayer(new Linear<float>(4000, 400));
+	nn.pushLayer(new ReLU<float>(400));
+	nn.pushLayer(new Linear<float>(400, 10));
 	nn.pushLayer(new Softmax<float>(10));
 
 	LOG(LSTATUS) << "Starting the training of neural network...";
@@ -78,8 +86,8 @@ int main() {
 		encoded_targets  = label_encoder.encodeBatch(rand_batch.labels());
 
 		// Train network with batch.
-		nn.train (encoded_batch, encoded_targets, learning_rate);
-
+		float loss = nn.train (encoded_batch, encoded_targets, learning_rate);
+		LOG(LINFO) << "Training  : loss = " << std::setprecision(3) << loss;
 	}//: for
 	LOG(LSTATUS) << "Training finished";
 

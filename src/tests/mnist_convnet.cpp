@@ -13,11 +13,12 @@ using namespace mic::logger;
 #include <encoders/MatrixXfMatrixXfEncoder.hpp>
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
-#include <mlnn/MultiLayerNeuralNetwork.hpp>
+#include <mlnn/BackpropagationNeuralNetwork.hpp>
 
+using namespace mic::types;
 // Using multi layer neural networks
 using namespace mic::mlnn;
-using namespace mic::types;
+using namespace mic::mlnn::convolution;
 
 int main() {
 	// Task parameters.
@@ -68,36 +69,41 @@ int main() {
 
 	size_t  fully_connected_size = 256;
 
-	MultiLayerNeuralNetwork<float> nn("ConvNet", mic::neural_nets::loss::CrossEntropyLoss<float>);
+	// Neural net.
+	BackpropagationNeuralNetwork<float> nn("ConvNet");
 
 	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution(28*28, input_channels, filter_size[0], filters[0]));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[0], filters[0], filter_size[1], filters[1]));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[2]));
+	nn.pushLayer(new Convolution<float>(28*28, input_channels, filter_size[0], filters[0]));
+	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[0], filters[0], filter_size[1], filters[1]));
+	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Pooling<float>(nn.lastLayerOutputsSize(), pooling_window, filters[2]));
 
 	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[1], filters[1], filter_size[2], filters[2]));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[2], filters[2], filter_size[3], filters[3]));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[3]));
+	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[1], filters[1], filter_size[2], filters[2]));
+	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[2], filters[2], filter_size[3], filters[3]));
+	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Pooling<float>(nn.lastLayerOutputsSize(), pooling_window, filters[3]));
 
 	//CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution(nn.lastLayerOutputsSize() / filters[3], filters[3], filter_size[4], filters[4]));
-	nn.pushLayer(new Pooling(nn.lastLayerOutputsSize(), pooling_window, filters[4]));
+	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[3], filters[3], filter_size[4], filters[4]));
+	nn.pushLayer(new Pooling<float>(nn.lastLayerOutputsSize(), pooling_window, filters[4]));
 
 	//FULLY CONNECTED
-	nn.pushLayer(new Linear(nn.lastLayerOutputsSize(), fully_connected_size));
-	nn.pushLayer(new ReLU(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Dropout(nn.lastLayerOutputsSize(), dropout));
+	nn.pushLayer(new Linear<float>(nn.lastLayerOutputsSize(), fully_connected_size));
+	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
+	nn.pushLayer(new Dropout<float>(nn.lastLayerOutputsSize(), dropout));
 
 	//SOFTMAX
-	nn.pushLayer(new Linear(nn.lastLayerOutputsSize(), 10));
-	nn.pushLayer(new Softmax(10));
+	nn.pushLayer(new Linear<float>(nn.lastLayerOutputsSize(), 10));
+	nn.pushLayer(new Softmax<float>(10));
 
+	// Set batch size.
 	nn.resizeBatch(batch_size);
+
+	// Change optimization function from default GradientDescent to Adam.
+	nn.setOptimization<mic::neural_nets::optimization::Adam<float> >();
 
 	// Set training parameters.
 	double 	learning_rate = 1e-2;

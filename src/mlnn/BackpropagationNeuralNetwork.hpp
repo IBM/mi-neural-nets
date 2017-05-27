@@ -77,6 +77,10 @@ public:
 			// Set pointers - pass result to the next layer: x(next layer) = y(current layer).
 			if (layers.size() > 1)
 				for (size_t i = 0; i < layers.size()-1; i++) {
+					// Assert sizes.
+					assert(layers[i+1]->s['x']->rows() == layers[i]->s['y']->rows());
+					assert(layers[i]->g['y']->rows() == layers[i+1]->g['x']->rows());
+					// Connect pointers.
 					layers[i+1]->s['x'] = layers[i]->s['y'];
 					layers[i]->g['y'] = layers[i+1]->g['x'];
 				}//: for

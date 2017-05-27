@@ -18,9 +18,9 @@
 
 // Convolution-related lyers.
 
-/*#include <mlnn/convolution/Convolution.hpp>
+#include <mlnn/convolution/Convolution.hpp>
 
-#include <mlnn/convolution/Pooling.hpp>
+/*#include <mlnn/convolution/Pooling.hpp>
 
 #include <mlnn/convolution/Padding.hpp>*/
 

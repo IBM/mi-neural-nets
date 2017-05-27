@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Build and install - mlnn sample test.
 # =======================================================================
 
-set(BUILD_TEST_SAMPLE_TRAINING_MLNN ON CACHE BOOL "Build the application for testing of training of a multi-layer neural network")
+set(BUILD_TEST_SAMPLE_TRAINING_MLNN ON CACHE BOOL "Build the application for testing of sample training of a multi-layer neural network")
 
 if(${BUILD_TEST_SAMPLE_TRAINING_MLNN})
 	# Create exeutable.
@@ -32,7 +32,7 @@ endif(${BUILD_TEST_SAMPLE_TRAINING_MLNN})
 # Build and install - mlnn batch training test.
 # =======================================================================
 
-set(BUILD_TEST_BATCH_TRAINING_MLNN ON CACHE BOOL "Build the application for ttesting batch training of a multi-layer neural network")
+set(BUILD_TEST_BATCH_TRAINING_MLNN ON CACHE BOOL "Build the application for testing batch training of a multi-layer neural network")
 
 if(${BUILD_TEST_BATCH_TRAINING_MLNN})
 	# Create executable.
@@ -88,9 +88,9 @@ endif(${BUILD_MNIST_CNN_APP})
 # Build and install -  MNIST recognition based on MLNN.
 # =======================================================================
 
-set(BUILD_MNIST_MLP_APP ON CACHE BOOL "Build the application using a simple multi-Layer neural net for recognition of MNIST digits")
+set(BUILD_MNIST_MLNN_APP ON CACHE BOOL "Build the application using a simple multi-Layer neural net for recognition of MNIST digits")
 
-if(${BUILD_MNIST_MLP_APP})
+if(${BUILD_MNIST_MLNN_APP})
         # Create exeutable.
         ADD_EXECUTABLE(mnist_simple_mlnn_app mnist_simple_mlnn.cpp)
         # Link it with shared libraries.
@@ -109,7 +109,7 @@ if(${BUILD_MNIST_MLP_APP})
         # install test to bin directory
         install(TARGETS mnist_simple_mlnn_app RUNTIME DESTINATION bin)
 
-endif(${BUILD_MNIST_MLP_APP})
+endif(${BUILD_MNIST_MLNN_APP})
 
 
 # =======================================================================
