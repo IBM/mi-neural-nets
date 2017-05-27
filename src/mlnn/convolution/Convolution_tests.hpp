@@ -105,7 +105,6 @@ protected:
 		(*x) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
 		(*desired_y) << 4, 3, 4, 2, 4, 3, 2, 3, 4;
 
-		(*dy) << 1, 1, -1, 1, 0, -1, 0, 1, 0;
 	}
 
 private:
@@ -141,10 +140,6 @@ public:
 
 		desired_y = MAKE_MATRIX_PTR(float, 12, 1);
 
-		dy = MAKE_MATRIX_PTR(float, 12, 1);
-
-		desired_dx = MAKE_MATRIX_PTR(float, 18, 1);
-
 	}
 
 protected:
@@ -163,9 +158,6 @@ protected:
 		(*x) << 1, 4, 7, 2, 5, 8, 3, 6, 9, 9, 6, 3, 8, 5, 2, 7, 4, 1;
 		(*desired_y) << -7, 5, -3, 9, 8, 8, 8, 8, -7, 5, -3, 9;
 
-		(*dy) << 1, 3, 2, 4, 5, 7, 6, 8, 9, 11, 10, 12;
-		(*desired_dx) <<  -1, -2, 3, 0, 6, 10, 4, 12, 8, 5, 2, -7, -4, -22, -22, -12, -28, -16;
-
 	}
 
 private:
@@ -177,12 +169,6 @@ private:
 
 	/// Desired output for a given x.
 	mic::types::MatrixPtr<float> desired_y;
-
-	/// Gradient passed to backpropagation.
-	mic::types::MatrixPtr<float> dy;
-
-	/// Desired gradient dy from backpropagation.
-	mic::types::MatrixPtr<float> desired_dx;
 
 };
 
@@ -306,7 +292,8 @@ protected:
 		//std::cout<<"*desired_y = \n" << (*desired_y) << std::endl;
 
 		(*dy) << 1, 4, 2, 5, 3, 6;
-		(*desired_dx) <<  1, 9, 29, 49, 52, 4, 29, 77, 125, 121, 10, 62, 146, 230, 208, 16, 83, 167, 251, 223, 17, 75, 139, 203, 170, 12, 48, 84, 120, 96;
+		// IMPROPER VALUES!
+		// (*desired_dx) <<  1, 9, 29, 49, 52, 4, 29, 77, 125, 121, 10, 62, 146, 230, 208, 16, 83, 167, 251, 223, 17, 75, 139, 203, 170, 12, 48, 84, 120, 96;
 	}
 
 private:

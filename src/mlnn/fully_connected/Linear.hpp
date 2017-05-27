@@ -99,7 +99,7 @@ public:
 
 		// Backward pass.
 		(*dW) = dy * x.transpose();
-		(*db) = dy.rowwise().mean(); // take mean value, instead of sum!
+		(*db) = dy.rowwise().sum(); // Sum for all samples in batch, similarly as it is done for dW.
 		(*dx) = W.transpose() * dy;
 
 /*		std::cout << "Linear backward: g['y'] = \n" << (*g['y']) << std::endl;

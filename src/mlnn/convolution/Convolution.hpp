@@ -74,11 +74,16 @@ public:
 				// Initialize weights of the W matrix.
 				p["W"+std::to_string(fi)+std::to_string(ic)]->rand(-range, range);
 				//std::cout<<"W.dims = " << p["W"+std::to_string(fi)+std::to_string(ic)]->rows() << "," << p["W"+std::to_string(fi)+std::to_string(ic)]->cols() << "\n";
+
+				// Create the weights matrix for updates/gradients.
+				g.add ("W"+std::to_string(fi)+std::to_string(ic), 1, filter_size*filter_size);
 			}//: for input channels.
 
 			// Create the bias for a given filter.
 			p.add ("b"+std::to_string(fi), 1, 1);
 			p["b"+std::to_string(fi)]->setZero();
+			// Bias gradient.
+			g.add ("b"+std::to_string(fi), 1, 1);
 		}//: for filter
 
 		// Allocate (temporary) memory for "input receptive fields".
@@ -243,9 +248,26 @@ public:
 	}//: forward
 
 	/*!
-	 * Back-propagates the gradients through the filters.
+	 * Back-propagates the gradients through the layer.
 	 */
 	void backward() {
+
+		// To dx.
+		backpropagade_dy_to_dx();
+
+		// To dW.
+		backpropagade_dy_to_dW();
+
+		// To db.
+		backpropagade_dy_to_db();
+
+	}//: backward
+
+
+	/*!
+	 * Back-propagates the gradients from dy to dx.
+	 */
+	void backpropagade_dy_to_dx() {
 		// Get matrices.
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
 		mic::types::MatrixPtr<eT> batch_x = s['x'];
@@ -255,6 +277,8 @@ public:
 		// reW sizes.
 		size_t rew_height = filter_size+2*(number_of_receptive_fields_vertical-1);
 		size_t rew_width = filter_size+2*(number_of_receptive_fields_horizontal-1);
+
+		// Backpropagate gradient from dy to dx.
 
 		// 1. Fill the "rotated-expanded" filters.
 		for (size_t ic=0; ic< input_channels; ic++) {
@@ -346,18 +370,57 @@ public:
 			batch_dx->col(ib) = (*gxs);
 
 		}//: batch
-		/*
-		mic::types::Matrix<eT> W = (*p['W']);
-		mic::types::MatrixPtr<eT> dW = g['W'];
-		mic::types::MatrixPtr<eT> db = g['b'];*/
 
-		// Backward pass.
-		/*(*dW) = dy * x.transpose();
-		(*db) = dy.rowwise().mean(); // take mean value, instead of sum!
-		(*dx) = W.transpose() * dy;*/
+	}
 
-	}//: backward
+	/*!
+	 * Back-propagates the gradients from dy to dW.
+	 */
+	void backpropagade_dy_to_dW() {
+		// Get weight delta matrix.
+		//mic::types::MatrixPtr<eT> dW = g['W'];
 
+		// Finally, calculated bias delta.
+		/*mic::types::MatrixPtr<eT> db = g['b'];
+		(*db) = dy.rowwise().sum(); // Sum for all samples in batch, similarly as it is done for dW.*/
+
+/*		// Iterate through samples in the input batch.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get y gradient sample from batch.
+			mic::types::MatrixPtr<eT> gys = m["gys"];
+			(*gys) = batch_dy->col(ib);
+
+			// Get pointer to x gradient sample matrix.
+			mic::types::MatrixPtr<eT> gxs = m["gxs"];
+			gxs->setZero();
+
+			// Convolve reWs with sample channel by channel.
+			for (size_t ic=0; ic< input_channels; ic++) {
+				std::cout<<"Input channel: " << ic <<std::endl;
+
+				// Get pointer to x gradient channel "storage".
+				mic::types::MatrixPtr<eT> gxc = m["gxc"];
+				// Clean it up!
+				gxc->setZero();
+				// Resize just in case.
+				gxc->resize(input_height, input_width);
+
+				// For each filter.
+				for (size_t fi=0; fi< number_of_filters; fi++) {*/
+
+	}
+
+
+
+	/*!
+	 * Back-propagates the gradients from dy to dx.
+	 */
+	void backpropagade_dy_to_db() {
+		// Finally, calculated bias delta.
+		/*mic::types::MatrixPtr<eT> db = g['b'];
+		(*db) = dy.rowwise().sum(); // Sum for all samples in batch, similarly as it is done for dW.*/
+	}
 
 	//#define ADDRESS_3D_TO_1D(i, j, k, cols, channel_size) ((i) + (j) * (cols) + (k) * (channel_size))
 
