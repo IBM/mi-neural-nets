@@ -46,10 +46,12 @@ protected:
 	virtual void SetUp() {
 		(*layer.p["W00"]) << 0;
 		(*layer.p["W01"]) << -1;
-		(*layer.p["b0"]) << 1;
+
 		(*layer.p["W10"]) << 1;
 		(*layer.p["W11"]) << 2;
-		(*layer.p["b1"]) << 0;
+
+		// Set biases of both neurons.
+		(*layer.p["b"]) << 1, 0;
 
 		(*x) << 2, 1, 0, 0, 1, 2, -1, 0;
 		(*desired_y) << 0, -1, 2, 1, 4, 5, -2, 0;
@@ -100,7 +102,7 @@ protected:
 	// Sets values
 	virtual void SetUp() {
 		(*layer.p["W00"]) << 1, 0, 1, 0, 1, 0, 1, 0, 1;
-		(*layer.p["b0"]) << 0;
+		(*layer.p["b"]) << 0;
 
 		(*x) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
 		(*desired_y) << 4, 3, 4, 2, 4, 3, 2, 3, 4;
@@ -147,13 +149,15 @@ protected:
 	virtual void SetUp() {
 		(*layer.p["W00"]) << 0, 1, 1, 0;
 		(*layer.p["W01"]) << 0, -1, -1, 0;
-		(*layer.p["b0"]) << 1;
+
 		(*layer.p["W10"]) << -1, 0, 0, 1;
 		(*layer.p["W11"]) << 1, 0, 0, -1;
-		(*layer.p["b1"]) << 0;
+
 		(*layer.p["W20"]) << 0, 0, 1, 1;
 		(*layer.p["W21"]) << 0, 0, -1, -1;
-		(*layer.p["b2"]) << -1;
+
+		// Set biases of all three neurons.
+		(*layer.p["b"]) << 1, 0, -1;
 
 		(*x) << 1, 4, 7, 2, 5, 8, 3, 6, 9, 9, 6, 3, 8, 5, 2, 7, 4, 1;
 		(*desired_y) << -7, 5, -3, 9, 8, 8, 8, 8, -7, 5, -3, 9;
@@ -194,16 +198,18 @@ protected:
 	// Sets values
 	virtual void SetUp() {
 
+		// Set weights of first neuron.
 		(*layer.p["W00"]) << 0, -1, 0, 0, 1, -1, 1, 1, -1;
 		(*layer.p["W01"]) << 1, 0, 1, 0, -1, -1, 1, 1, -1;
 		(*layer.p["W02"]) << 1, 1, 0, -1, 1, -1, 1, 0, 1;
-		(*layer.p["b0"]) << 1;
 
+		// Set weights of second neuron.
 		(*layer.p["W10"]) << 1, 1, -1, -1, -1, 1, 0, -1, -1;
 		(*layer.p["W11"]) << 0, 1, 1, -1, 1, -1, 0, -1, -1;
 		(*layer.p["W12"]) << 0, 0, 0, 1, 1, -1, -1, 0, 1;
-		(*layer.p["b1"]) << 0;
 
+		// Set biases of both neurons.
+		(*layer.p["b"]) << 1, 0;
 
 		(*x) <<
 				// x[:,:,0]
@@ -280,7 +286,9 @@ protected:
 		(*layer.p["W00"]).transposeInPlace();
 		//std::cout<<"*layer.p[W00] = \n" << (*layer.p["W00"]) << std::endl;
 		(*layer.p["W00"]).resize(1, 4*4);
-		(*layer.p["b0"]) << 0;
+
+		// Set neuron bias.
+		(*layer.p["b"]) << 0;
 
 		for (size_t i=0; i<30; i++)
 			(*x)(i) = i+1;

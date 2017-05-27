@@ -79,12 +79,13 @@ public:
 				g.add ("W"+std::to_string(fi)+std::to_string(ic), 1, filter_size*filter_size);
 			}//: for input channels.
 
-			// Create the bias for a given filter.
-			p.add ("b"+std::to_string(fi), 1, 1);
-			p["b"+std::to_string(fi)]->setZero();
-			// Bias gradient.
-			g.add ("b"+std::to_string(fi), 1, 1);
 		}//: for filter
+
+		// Create a single bias vector for all filters.
+		p.add ("b", number_of_filters, 1);
+		p["b"]->setZero();
+		// Bias gradient.
+		g.add ("b", number_of_filters, 1);
 
 		// Allocate (temporary) memory for "input receptive fields".
 		for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
@@ -156,7 +157,7 @@ public:
 				// Resize it to a matrix (!).
 				ochannel->resize(number_of_receptive_fields_vertical, number_of_receptive_fields_horizontal);
 				// And "reset" i.e. set bias (so we can skip adding it later).
-				eT b = (*p["b"+std::to_string(fi)])[0];
+				eT b = (*p["b"])[fi];
 				ochannel->setValue(b);
 			}//: filters
 

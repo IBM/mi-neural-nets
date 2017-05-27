@@ -116,8 +116,8 @@ TEST_F(Conv5x5x1Filter1x3x3s1Float, Dimensions) {
 	ASSERT_EQ((*layer.p["W00"]).cols(), 9);
 
 	// Check filter size - b.
-	ASSERT_EQ((*layer.p["b0"]).rows(), 1);
-	ASSERT_EQ((*layer.p["b0"]).cols(), 1);
+	ASSERT_EQ((*layer.p["b"]).rows(), 1);
+	ASSERT_EQ((*layer.p["b"]).cols(), 1);
 
 	// Assert input size.
 	ASSERT_EQ((*layer.s["x"]).rows(), 25);
