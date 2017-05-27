@@ -129,17 +129,22 @@ TEST_F(Conv4x4x1Filter1x2x2s2Float, Forward) {
  */
 TEST_F(Conv4x4x1Filter1x2x2s2Float, Backward) {
 
-	// Backward pass.
+	// Backward pass - need to set x.
+	layer.forward(x);
 	mic::types::MatrixPtr<float> dx = layer.backward(dy);
 
 	// Check resulting dx gradient.
-/*	for (size_t i=0; i<8; i++)
-		ASSERT_EQ((*desired_dx)[i], (*dx)[i]) << "at position " << i;*/
+	for (size_t i=0; i<8; i++)
+		ASSERT_EQ((*desired_dx)[i], (*dx)[i]) << "at position " << i;
 
 	// Check resulting db gradient.
 	mic::types::MatrixPtr<float> db = layer.g["b"];
 	ASSERT_EQ((*desired_db)[0], (*db)[0]);
 
+	// Check resulting dW gradient.
+	mic::types::MatrixPtr<float> dW = layer.g["W00"];
+	for (size_t i=0; i<4; i++)
+		ASSERT_EQ((*desired_dW)[i], (*dW)[i]) << "at position " << i;
 }
 
 

@@ -155,6 +155,7 @@ public:
 	void forward(bool test = false) {
 		// Get input matrix.
 		mic::types::MatrixPtr<eT> batch = s['x'];
+		//std::cout<< "forward batch_x=\n" << (*batch) << std::endl;
 
 		// Iterate through samples in the input batch.
 		for (size_t ib=0; ib< batch_size; ib++) {
@@ -280,6 +281,7 @@ public:
 		// Get matrices.
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
 		mic::types::MatrixPtr<eT> batch_x = s['x'];
+		//std::cout<< "backpropagate to dx batch_x=\n" << (*batch_x) << std::endl;
 		// Get output pointers - so the results will be stored!
 		mic::types::MatrixPtr<eT> batch_dx = g['x'];
 
@@ -392,6 +394,7 @@ public:
 		// Get matrices.
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
 		mic::types::MatrixPtr<eT> batch_x = s['x'];
+		//std::cout<< "backpropagate to dW batch_x=\n" << (*batch_x) << std::endl;
 
 		// Iterate through samples in the input batch.
 		for (size_t ib=0; ib< batch_size; ib++) {
@@ -403,6 +406,7 @@ public:
 			// Get x sample from batch.
 			mic::types::MatrixPtr<eT> xs = m["xs"];
 			(*xs) = batch_x->col(ib);
+			std::cout<< "xs=\n" << (*xs) << std::endl;
 
 			// Iterate through input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
@@ -412,6 +416,7 @@ public:
 				(*x_channel) = xs->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				// Resize channel using the given dimensions.
 				x_channel->resize(input_height, input_width);
+				std::cout<< "x_channel=\n" << (*x_channel) << std::endl;
 
 				// Fill "inverse input receptive fields" from given input channel.
 				// Image coordinates: ix, iy.
@@ -421,19 +426,17 @@ public:
 						// Get inverse receptive field matrix.
 						mic::types::MatrixPtr<eT> x_field = m["ixrf"+std::to_string(ry)+std::to_string(rx)];
 						// Iterate through the input channel using stride.
-						for (size_t iy=0; iy< number_of_receptive_fields_vertical; iy+=stride) {
-							for (size_t ix=0; ix< number_of_receptive_fields_horizontal; ix+=stride) {
+						for (size_t iy=0, fy=0; iy< input_height; iy+=stride, fy++) {
+							for (size_t ix=0, fx=0; ix< input_width; ix+=stride, fx++) {
+								//std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
 								// Copy cell - one by one :]
-								//(*x_field)(yi) = x_channel->block(iy,ix,filter_size, filter_size);
+								(*x_field)(fy, fx) = (*x_channel)(ry+iy,rx+ix);
 
 							}//: for ix
 						}//: for iy
-
-						//std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
-						// Copy block from channel - resizes the field matrix.
-						//std::cout<< "field=\n" << (*field) << std::endl;
 						// Resize the field to a column vector.
-						x_field->resize(filter_size*filter_size, 1);
+						x_field->resize(1, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal);
+						std::cout<< "x_field=\n" << (*x_field) << std::endl;
 					}//: for rx
 				}//: for ry
 
@@ -442,22 +445,24 @@ public:
 					// Get output channel for a given filter.
 					mic::types::MatrixPtr<eT> gyc = m["yc"+std::to_string(fi)];
 					(*gyc) = gys->block(fi*number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 0, number_of_receptive_fields_vertical*number_of_receptive_fields_horizontal, 1);
+					std::cout<< "gyc=\n" << (*gyc) << std::endl;
 
 					// Get matrix of a given "part of a given neuron".
 					mic::types::MatrixPtr<eT> dW = g["W"+std::to_string(fi)+std::to_string(ic)];
 					// Not required - just in case. :]
 					dW->resize(filter_size, filter_size);
-					// Iterate through receptive fields and CONVOLVE.
-					for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
-						for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
-							// Get receptive field matrix of size (1, filter_size^2)...
-							mic::types::MatrixPtr<eT> xrf = m["xrf"+std::to_string(ry)+std::to_string(rx)];
-							// ... and result of "convolution" of that filter with the part of the input "below" the receptive field.
-							//(*y_channel)(ry, rx) += ((*W)*(*x))(0);
-							//std::cout<<"filter = " << fi << " ry =" << ry <<" rx =" << rx << " result = " << ((*W)*(*x)) << std::endl;
+					// Iterate through inverse receptive fields and CONVOLVE.
+					for (size_t ry=0; ry< filter_size; ry++) {
+						for (size_t rx=0; rx< filter_size; rx++) {
+							// Get inverse receptive field matrix of size (filter_size^2, 1)...
+							mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(ry)+std::to_string(rx)];
+							std::cout<< "x_field=\n" << (*ixrf) << std::endl;
+							// ... and convolve it with dy channel.
+							(*dW)(ry, rx) += ((*ixrf)*(*gyc))(0);
+							std::cout<<"filter = " << fi << " ry =" << ry <<" rx =" << rx << " result = " << ((*gyc)*(*ixrf)) << std::endl;
 						}//: for rx
 					}//: for ry
-					//std::cout << "filter= " << fi << " oc = " << (*y_channel)<<std::endl;
+					std::cout << "filter= " << fi << " dW = " << (*dW)<<std::endl;
 
 				}//: for filter
 

@@ -127,9 +127,9 @@ protected:
 		(*desired_y) << 24, 36, 72, 84;
 
 		(*dy) << 0, 1, 2, 3;
-		//(*desired_dx) <<  ;
+		(*desired_dx) <<  0, 0, 0, 1, 0, 0, 2, 3, 0, 2, 0, 3, 4, 6, 6, 9;
 
-		//(*desired_dW) <<  ;
+		(*desired_dW) << 48, 54, 72, 78;
 		(*desired_db) << 6;
 	}
 
