@@ -48,22 +48,22 @@ protected:
 	// Sets values
 	virtual void SetUp() {
 		(*layer.p["W00"]) << 0;
-		(*layer.p["W01"]) << -1;
+		(*layer.p["W01"]) << 2;
 
-		(*layer.p["W10"]) << 1;
-		(*layer.p["W11"]) << 2;
+		(*layer.p["W10"]) << 3;
+		(*layer.p["W11"]) << 1;
 
 		// Set biases of both neurons.
-		(*layer.p["b"]) << 1, 0;
+		(*layer.p["b"]) << 0, 1;
 
-		(*x) << 2, 1, 0, 0, 1, 2, -1, 0;
-		(*desired_y) << 0, -1, 2, 1, 4, 5, -2, 0;
+		(*x) << 0, 1, 2, 3, 4, 5, 6, 7;
+		(*desired_y) << 8, 10, 12, 14, 5, 9 ,13, 17;
 
-		(*dy) << 1, 0, -1, 2, 0, 1, 1, -1;
-		(*desired_dx) <<  0, 1, 1, -1, -1, 2, 3, -4;
+		(*dy) << 0, 1, 2, 3, 4, 5, 6, 7;
+		(*desired_dx) << 12, 16, 18, 21, 4, 7, 10, 13;
 
-		//(*desired_dW) <<  0, 1, 1, -1, -1, 2, 3, -4;
-		(*desired_db) <<  2, 1;
+		(*desired_dW) <<  6, 126, 38, 38;
+		(*desired_db) <<  6, 22;
 	}
 
 private:

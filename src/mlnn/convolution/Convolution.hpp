@@ -48,6 +48,7 @@ public:
 
 		std::cout<<"input_height = " << input_height <<std::endl;
 		std::cout<<"input_width = " << input_width <<std::endl;
+		std::cout<<"number_of_filters = " << number_of_filters <<std::endl;
 		std::cout<<"filter_size = " << filter_size <<std::endl;
 		std::cout<<"stride = " << stride <<std::endl;
 
@@ -173,6 +174,7 @@ public:
 			// 2. Get input sample from batch!
 			mic::types::MatrixPtr<eT> sample = m["xs"];
 			(*sample) = batch->col(ib);
+			std::cout<< "sample=\n" << (*sample) << std::endl;
 
 			// 3. Iterate through input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
@@ -182,6 +184,7 @@ public:
 				(*ichannel) = sample->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				// Resize channel using the given dimensions.
 				ichannel->resize(input_height, input_width);
+				std::cout<< "======  switching input channel = " << ic <<" ichannel=\n" << (*ichannel) << std::endl;
 
 				// 3.2. Fill receptive fields from given input channel.
 				// Iterate through receptive fields - vertical and horizontal
@@ -206,7 +209,8 @@ public:
 				for (size_t fi=0; fi< number_of_filters; fi++) {
 					// Get output channel for a given filter.
 					mic::types::MatrixPtr<eT> y_channel = m["yc"+std::to_string(fi)];
-					// Get "part of a given neuron" responding to a given input channel.
+					std::cout << "====  switching to oc = \n" << (*y_channel)<<std::endl;
+			// Get "part of a given neuron" responding to a given input channel.
 					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
 					// Not required - just in case. :]
 					W->resize(1,filter_size*filter_size);
@@ -214,13 +218,16 @@ public:
 					for (size_t ry=0; ry< number_of_receptive_fields_vertical; ry++) {
 						for (size_t rx=0; rx< number_of_receptive_fields_horizontal; rx++) {
 							// Get receptive field matrix of size (1, filter_size^2)...
-							mic::types::MatrixPtr<eT> x = m["xrf"+std::to_string(ry)+std::to_string(rx)];
+							mic::types::MatrixPtr<eT> xrf = m["xrf"+std::to_string(ry)+std::to_string(rx)];
 							// ... and result of "convolution" of that filter with the part of the input "below" the receptive field.
-							(*y_channel)(ry, rx) += ((*W)*(*x))(0);
-							//std::cout<<"filter = " << fi << " ry =" << ry <<" rx =" << rx << " result = " << ((*W)*(*x)) << std::endl;
+							std::cout<<"ic = " << ic  << "filter = " << fi << " ry =" << ry <<" rx =" << rx <<std::endl;
+							std::cout<< "W=\n" << (*W) << std::endl;
+							std::cout<< "xrf=\n" << (*xrf) << std::endl;
+							std::cout<< " result = " << ((*W)*(*xrf)) << std::endl;
+							(*y_channel)(ry, rx) += ((*W)*(*xrf))(0);
 						}//: for rx
 					}//: for ry
-					//std::cout << "filter= " << fi << " oc = " << (*y_channel)<<std::endl;
+					std::cout << "====  ic = " << ic << "filter= " << fi << " oc = \n" << (*y_channel)<<std::endl;
 				}//: for filters
 			}//: for channels
 		}//: for batch
