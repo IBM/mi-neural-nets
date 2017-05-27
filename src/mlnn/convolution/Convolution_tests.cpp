@@ -40,16 +40,16 @@ TEST(Convolutions, NumberOfReceptiveFields) {
  */
 TEST_F(Conv2x2x2Filter2x1x1s1Float, Forward) {
 
-	std::cout<<"W00 = \n" << (*layer.p["W00"]) <<std::endl;
+	/*std::cout<<"W00 = \n" << (*layer.p["W00"]) <<std::endl;
 	std::cout<<"W01 = \n" << (*layer.p["W01"]) <<std::endl;
 	std::cout<<"W10 = \n" << (*layer.p["W10"]) <<std::endl;
 	std::cout<<"W11 = \n" << (*layer.p["W11"]) <<std::endl;
 	std::cout<<"x = \n" << (*x) <<std::endl;
-	std::cout<<"desired_y = \n" << (*desired_y) <<std::endl;
+	std::cout<<"desired_y = \n" << (*desired_y) <<std::endl;*/
 
 	// Forward pass.
 	mic::types::MatrixPtr<float> y = layer.forward(x);
-	//std::cout<<"output = \n" << (*output) <<std::endl;
+	//std::cout<<"y = \n" << (*y) <<std::endl;
 
 	// Check output.
 	for (size_t i=0; i<8; i++)
@@ -62,15 +62,20 @@ TEST_F(Conv2x2x2Filter2x1x1s1Float, Forward) {
  * Checks whether the backward pass is working for layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1.
  * \author tkornuta
  */
-TEST_F(Conv2x2x2Filter2x1x1s1Float,  Backward) {
+TEST_F(Conv2x2x2Filter2x1x1s1Float, Backward) {
 
 	// Forward pass.
 	mic::types::MatrixPtr<float> dx = layer.backward(dy);
 	//std::cout<<"dx = \n" << (*dx).transpose() <<std::endl;
 
-	// Check output.
+	// Check resulting dx gradient.
 	for (size_t i=0; i<8; i++)
 		ASSERT_EQ((*desired_dx)[i], (*dx)[i]) << "at position " << i;
+
+	mic::types::MatrixPtr<float> db = layer.g["b"];
+	// Check resulting db gradient.
+	for (size_t i=0; i<2; i++)
+		ASSERT_EQ((*desired_db)[i], (*db)[i]) << "at position " << i;
 
 	// Second backward - just to assure that all the "internal dimensions" are ok after the first pass.
 	//layer.backward(dy);

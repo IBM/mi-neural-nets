@@ -38,7 +38,10 @@ public:
 		dy = MAKE_MATRIX_PTR(float, 8, 1);
 
 		desired_dx = MAKE_MATRIX_PTR(float, 8, 1);
-
+		// Number of filters * input channels.
+		desired_dW = MAKE_MATRIX_PTR(float, 4, 1);
+		// Number of "real neurons".
+		desired_db = MAKE_MATRIX_PTR(float, 2, 1);
 	}
 
 protected:
@@ -59,6 +62,8 @@ protected:
 		(*dy) << 1, 0, -1, 2, 0, 1, 1, -1;
 		(*desired_dx) <<  0, 1, 1, -1, -1, 2, 3, -4;
 
+		//(*desired_dW) <<  0, 1, 1, -1, -1, 2, 3, -4;
+		(*desired_db) <<  2, 1;
 	}
 
 private:
@@ -74,8 +79,14 @@ private:
 	/// Gradient passed to backpropagation.
 	mic::types::MatrixPtr<float> dy;
 
-	/// Desired gradient dy from backpropagation.
+	/// Desired gradient dx from backpropagation.
 	mic::types::MatrixPtr<float> desired_dx;
+
+	/// Desired gradient dW from backpropagation.
+	mic::types::MatrixPtr<float> desired_dW;
+
+	/// Desired gradient db from backpropagation.
+	mic::types::MatrixPtr<float> desired_db;
 
 };
 
