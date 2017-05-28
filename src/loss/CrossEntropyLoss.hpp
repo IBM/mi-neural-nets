@@ -28,7 +28,7 @@ template <typename dtype=float>
 class CrossEntropyLoss : public Loss<dtype> {
 public:
 	/*!
-	 * \brief Calculates cross entropy (using log 2) [BPC] and returns cross-entropy error (CE).
+	 * \brief Calculates cross entropy(using log)	 and returns cross-entropy error (CE).
 	 */
 	dtype calculateLoss (mic::types::MatrixPtr<dtype> target_y_, mic::types::MatrixPtr<dtype> predicted_y_) {
 		// Sizes must match.
@@ -39,10 +39,11 @@ public:
 		dtype eps = 1e-15;
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
 			// -t * log (y + eps!)
-			loss -= (*target_y_)[i] * std::log2((*predicted_y_)[i] + eps);
+			loss -= (*target_y_)[i] * std::log((*predicted_y_)[i] + eps);
 		}
 		// Return cross-entropy error (CE).
 		// The average cross entropy error (ACE) is loss divided by the batch size.
+		//assert(std::isfinite(loss));
 		return loss;
 	}
 

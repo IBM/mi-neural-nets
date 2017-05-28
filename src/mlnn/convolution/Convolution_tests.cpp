@@ -29,7 +29,7 @@ TEST(Convolutions, NumberOfReceptiveFields) {
 
 	ASSERT_EQ(l2.number_of_receptive_fields_vertical, 2);
 	ASSERT_EQ(l2.number_of_receptive_fields_horizontal, 3);
-	ASSERT_EQ(l1.s["y"]->rows(), 3*5*1);
+	ASSERT_EQ(l2.s["y"]->rows(), 2*3*1);
 
 }
 

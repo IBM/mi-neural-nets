@@ -22,75 +22,125 @@ TEST_F(Conv2x2x2Filter2x1x1s1Double, NumericalGradientCheck) {
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(x);
 	mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
 	layer.backward(dy);
+
+	// Get differentiable parameters.
+	std::map<std::string, size_t> keys = layer.p.keys();
+
 	// Store resulting gradients - make a copy!
-	mic::types::MatrixPtr<double> dW00 = MAKE_MATRIX_PTR(double, *layer.g["W00"]);
-	mic::types::MatrixPtr<double> dW01 = MAKE_MATRIX_PTR(double, *layer.g["W01"]);
-	mic::types::MatrixPtr<double> dW10 = MAKE_MATRIX_PTR(double, *layer.g["W10"]);
-	mic::types::MatrixPtr<double> dW11 = MAKE_MATRIX_PTR(double, *layer.g["W11"]);
-	mic::types::MatrixPtr<double> db = MAKE_MATRIX_PTR(double, *layer.g["b"]);
+	mic::types::MatrixArray<double> grads;
+	for (auto& i: keys) {
+		grads.add(i.first, MAKE_MATRIX_PTR(double, *layer.g[i.first]));
+		std::cout << "** d" << i.first << " = \n" << *(grads[i.first]) << std::endl;
+	}//: for
 
 	// Calculate numerical gradients.
 	double delta = 1e-5;
-	mic::types::MatrixPtr<double> nW00 = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p["W00"], loss, delta);
-	mic::types::MatrixPtr<double> nW01 = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p["W01"], loss, delta);
-	mic::types::MatrixPtr<double> nW10 = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p["W10"], loss, delta);
-	mic::types::MatrixPtr<double> nW11 = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p["W11"], loss, delta);
-	mic::types::MatrixPtr<double> nb = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p["b"], loss, delta);
+	mic::types::MatrixArray<double> ngrads;
+	for (auto& i: keys) {
+		mic::types::MatrixPtr<double> ngrad = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p[i.first], loss, delta);
+		// Store gradient - make a copy as well.
+		ngrads.add(i.first, MAKE_MATRIX_PTR(double, *ngrad));
+		std::cout << "** n" << i.first << " = \n" << *(ngrads[i.first]) << std::endl;
+	}//: for
+
 
 	// Compare gradients.
 	double eps = 1e-8;
-/*	std::cout << "(*dW00)= " << (*dW00) << " (*nW00)= " << (*nW00) << std::endl;
-	std::cout << "(*dW01)= " << (*dW01) << " (*nW01)= " << (*nW01) << std::endl;
-	std::cout << "(*dW10)= " << (*dW10) << " (*nW10)= " << (*nW10) << std::endl;
-	std::cout << "(*dW11)= " << (*dW11) << " (*nW11)= " << (*nW11) << std::endl;
-	std::cout << "(*db0)= " << (*db)(0) << " (*nb0)= " << (*nb)(0) << std::endl;
-	std::cout << "(*db1)= " << (*db)(1) << " (*nb1)= " << (*nb)(1) << std::endl;*/
-	EXPECT_LE( fabs((*dW00)(0) - (*nW00)(0)), eps) << "Too big difference between dW and numerical dW";
-	EXPECT_LE( fabs((*dW10)(0) - (*nW10)(0)), eps) << "Too big difference between dW and numerical dW";
-	EXPECT_LE( fabs((*dW01)(0) - (*nW01)(0)), eps) << "Too big difference between dW and numerical dW";
-	EXPECT_LE( fabs((*dW11)(0) - (*nW11)(0)), eps) << "Too big difference between dW and numerical dW";
-	EXPECT_LE( fabs((*db)(0) - (*nb)(0)), eps) << "Too big difference between dW and numerical dW";
-	EXPECT_LE( fabs((*db)(1) - (*nb)(1)), eps) << "Too big difference between dW and numerical dW";
+	for (auto& i: keys) {
+		// Get gradient and numerical gradient.
+		mic::types::MatrixPtr<double> grad = grads[i.first];
+		mic::types::MatrixPtr<double> ngrad = ngrads[i.first];
+		// Iterate through params.
+		for (size_t j=0; j<(size_t)grad->size(); j++){
+			std::cout << "param " << i.first << " j=" << j << " (*grad)[j]= " << (*grad)[j] << " (*ngrad)[j]= " << (*ngrad)[j] << std::endl;
+			EXPECT_LE( fabs((*grad)[j] - (*ngrad)[j]), eps) << "Too big difference between grad and numerical grad of " << i.first << " at position j=" << j;
+		}//: for
+
+	}//: for
+
 }
 
 
 
 /*!
- * Checks whether the forward is working for layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1.
+ * \brief Numerical gradient test of all parameters for layer of input size 28x28x1 and with filter bank of 2 filters of size 28x28 with stride 1, double.
  * \author tkornuta
  */
-TEST_F(Conv2x2x2Filter2x1x1s1Double, DISABLED_Convergence) {
+TEST_F(Conv28x28x1Filter2x28x28s1Double, NumericalGradientCheck) {
 
-	std::cout<<" W00 = " << (*layer.p["W00"]) <<std::endl;
-	std::cout<<" W01 = " << (*layer.p["W01"]) <<std::endl;
-	std::cout<<" W10 = " << (*layer.p["W10"]) <<std::endl;
-	std::cout<<" W11 = " << (*layer.p["W11"]) <<std::endl;
-	for (size_t i=0; i<2; i++)
-		std::cout<<" b"<<i<< " = "<< (*layer.p["b"])[i] << std::endl;
+	// Calculate gradients.
+	mic::types::MatrixPtr<double> predicted_y = layer.forward(x);
+	mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
+	layer.backward(dy);
 
-	// Training.
+	// Get differentiable parameters.
+	std::map<std::string, size_t> keys = layer.p.keys();
+
+	// Store resulting gradients - make a copy!
+	mic::types::MatrixArray<double> grads;
+	for (auto& i: keys) {
+		grads.add(i.first, MAKE_MATRIX_PTR(double, *layer.g[i.first]));
+		//std::cout << "** d" << i.first << " = \n" << *(grads[i.first]) << std::endl;
+	}//: for
+
+	// Calculate numerical gradients.
+	double delta = 1e-7;
+	mic::types::MatrixArray<double> ngrads;
+	for (auto& i: keys) {
+		mic::types::MatrixPtr<double> ngrad = layer.calculateNumericalGradient<mic::neural_nets::loss::SquaredErrorLoss<double> >(x, target_y, layer.p[i.first], loss, delta);
+		// Store gradient - make a copy as well.
+		ngrads.add(i.first, MAKE_MATRIX_PTR(double, *ngrad));
+		//std::cout << "** n" << i.first << " = \n" << *(ngrads[i.first]) << std::endl;
+	}//: for
+
+
+	// Compare gradients.
+	double eps = 1e-8;
+	for (auto& i: keys) {
+		// Get gradient and numerical gradient.
+		mic::types::MatrixPtr<double> grad = grads[i.first];
+		mic::types::MatrixPtr<double> ngrad = ngrads[i.first];
+		// Iterate through params.
+		for (size_t j=0; j<(size_t)grad->size(); j++){
+			//std::cout << "param " << i.first << " j=" << j << " (*grad)[j]= " << (*grad)[j] << " (*ngrad)[j]= " << (*ngrad)[j] << std::endl;
+			EXPECT_LE( fabs((*grad)[j] - (*ngrad)[j]), eps) << "Too big difference between grad and numerical grad of " << i.first << " at position j=" << j;
+		}//: for
+
+	}//: for
+
+}
+
+
+
+/*!
+ * Checks convergence of layer of input size 28x28x1 and with filter bank of 2 filters of size 28x28 with stride 1, double.
+ * \author tkornuta
+ */
+TEST_F(Conv28x28x1Filter2x28x28s1Double, Convergence) {
+	double eps = 1e-6;
+	double loss_value;
 	size_t iteration = 0;
-	while (iteration < 10) {
-		std::cout<<"[" << iteration << "]" << std::endl;
 
-		// Calculate gradients.
+	// Train for a number of iterations.
+	while (iteration < 1000) {
+		// Perform single learning step.
 		mic::types::MatrixPtr<double> predicted_y = layer.forward(x);
-		std::cout<< " ***  Loss = " << loss.calculateMeanLoss(target_y, predicted_y) <<std::endl;
 		mic::types::MatrixPtr<double> dy = loss.calculateGradient(target_y, predicted_y);
-		mic::types::MatrixPtr<double> dx = layer.backward(dy);
+		loss_value = loss.calculateMeanLoss(target_y, predicted_y);
+
+		//std::cout<<"[" << iteration << "]\t Loss = " << loss_value <<std::endl;
+		//std::cout << (*target_y).transpose() << " vs " << (*predicted_y).transpose() << std::endl;
+		if (loss_value < eps)
+			break;
 
 		// Apply the changes - according to the optimization function.
-		layer.update(0.001, 0.0);
-
-		std::cout<<" W00 = " << (*layer.p["W00"]) <<std::endl;
-		std::cout<<" W01 = " << (*layer.p["W01"]) <<std::endl;
-		std::cout<<" W10 = " << (*layer.p["W10"]) <<std::endl;
-		std::cout<<" W11 = " << (*layer.p["W11"]) <<std::endl;
-		for (size_t i=0; i<2; i++)
-			std::cout<<" b"<<i<< " = "<< (*layer.p["b"])[i] << std::endl;
-
+		layer.backward(dy);
+		layer.update(0.01, 0.0);
+		// Next iteration.
 		iteration++;
 	}//: while
+	// Check loss.
+	EXPECT_LE(loss_value, eps);
 }
 
 

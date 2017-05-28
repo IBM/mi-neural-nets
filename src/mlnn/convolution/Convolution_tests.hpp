@@ -16,7 +16,7 @@
 #define private public
 #define protected public
 #include <mlnn/convolution/Convolution.hpp>
-#include <loss/SquaredErrorLoss.hpp>
+#include <loss/LossTypes.hpp>
 
 namespace mic { namespace neural_nets { namespace unit_tests {
 
@@ -408,6 +408,49 @@ private:
 	mic::types::MatrixPtr<float> desired_dx;
 
 };
+
+
+/*!
+ * \brief Test Fixture - layer of input size 28x28x1 and with filter bank of 2 filters of size 28x28 with stride 1, double.
+ * \author tkornuta
+ */
+class Conv28x28x1Filter2x28x28s1Double : public ::testing::Test {
+public:
+	// Constructor. Sets layer size.
+	Conv28x28x1Filter2x28x28s1Double () : layer(8,8,1,2,8,1) {
+
+		x = MAKE_MATRIX_PTR(double, 8*8, 1);
+
+		target_y = MAKE_MATRIX_PTR(double, 2, 1);
+
+	}
+
+protected:
+	// Sets values
+	virtual void SetUp() {
+
+		// Random input
+		(*x).randn(0, 6.0/(8*8));
+		// We want output to be 1 and 0.
+		(*target_y) << 1,0;
+
+	}
+
+private:
+	/// Object to be tested.
+	mic::mlnn::convolution::Convolution<double> layer;
+
+	// Loss function - cross entropy.
+	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
+
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<double> x;
+
+	/// Target y values.
+	mic::types::MatrixPtr<double> target_y;
+
+};
+
 
 
 } } } //: namespaces
