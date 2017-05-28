@@ -522,6 +522,7 @@ public:
 		std::map<std::string, size_t> keys = p.keys();
 
 		for (auto& i: keys) {
+			//std::cout << "** d" << i.first << " = " << (*p[i.first]) << "\n   gradient =" << (*g[i.first])(0)*alpha_ <<std::endl;
 			opt[i.first]->update(p[i.first], g[i.first], alpha_, decay_);
 		}//: for
 	}

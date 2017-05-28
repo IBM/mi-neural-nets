@@ -38,7 +38,7 @@ TEST(Convolutions, NumberOfReceptiveFields) {
  * Checks whether the forward is working for layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1.
  * \author tkornuta
  */
-TEST_F(Conv2x2x2Filter2x1x1s1Float, Forward) {
+TEST_F(Conv2x2x2Filter2x1x1s1Double, Forward) {
 
 	/*std::cout<<"W00 = \n" << (*layer.p["W00"]) <<std::endl;
 	std::cout<<"W01 = \n" << (*layer.p["W01"]) <<std::endl;
@@ -48,7 +48,7 @@ TEST_F(Conv2x2x2Filter2x1x1s1Float, Forward) {
 	std::cout<<"desired_y = \n" << (*desired_y) <<std::endl;*/
 
 	// Forward pass.
-	mic::types::MatrixPtr<float> y = layer.forward(x);
+	mic::types::MatrixPtr<double> y = layer.forward(x);
 	//std::cout<<"y = \n" << (*y) <<std::endl;
 
 	// Check output.
@@ -62,18 +62,18 @@ TEST_F(Conv2x2x2Filter2x1x1s1Float, Forward) {
  * Checks whether the backward pass is working for layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1.
  * \author tkornuta
  */
-TEST_F(Conv2x2x2Filter2x1x1s1Float, Backward) {
+TEST_F(Conv2x2x2Filter2x1x1s1Double, Backward) {
 
 	// Backward pass - need to set x.
 	layer.forward(x);
-	mic::types::MatrixPtr<float> dx = layer.backward(dy);
+	mic::types::MatrixPtr<double> dx = layer.backward(dy);
 	//std::cout<<"dx = \n" << (*dx).transpose() <<std::endl;
 
 	// Check resulting dx gradient.
 	for (size_t i=0; i<8; i++)
 		ASSERT_EQ((*desired_dx)[i], (*dx)[i]) << "at position " << i;
 
-	mic::types::MatrixPtr<float> db = layer.g["b"];
+	mic::types::MatrixPtr<double> db = layer.g["b"];
 	// Check resulting db gradient.
 	for (size_t i=0; i<2; i++)
 		ASSERT_EQ((*desired_db)[i], (*db)[i]) << "at position " << i;
@@ -87,6 +87,7 @@ TEST_F(Conv2x2x2Filter2x1x1s1Float, Backward) {
 	// Second backward - just to assure that all the "internal dimensions" are ok after the first pass.
 	layer.backward(dy);
 }
+
 
 
 /*!
@@ -225,8 +226,6 @@ TEST_F(Conv7x7x3Filter3x3x3s2Float, Forward) {
 		ASSERT_EQ((*output)[i], (*desired_y)[i]) << "at position " << i;
 
 }
-
-
 
 
 } } } //: namespaces

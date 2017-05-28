@@ -208,11 +208,11 @@ public:
 	virtual void resetGrads() {};
 
 	/*!
-	 * Performs the update according to the calculated gradients and injected optimization method.
+	 * Performs the update according to the calculated gradients and injected optimization method. Abstract.
 	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
-	virtual void update(eT alpha_, eT decay_  = 0.0f) { };
+	virtual void update(eT alpha_, eT decay_  = 0.0f) = 0;
 
 	/// Returns size (length) of inputs.
 	size_t inputSize() {

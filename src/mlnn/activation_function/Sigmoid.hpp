@@ -50,6 +50,13 @@ public:
 		}//: for
 	}
 
+	/*!
+	 * Performs the update according to the calculated gradients and injected optimization method. Empty as this is a "const" layer.
+	 * @param alpha_ Learning rate - passed to the optimization functions of all layers.
+	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
+	 */
+	virtual void update(eT alpha_, eT decay_  = 0.0f) { };
+
 protected:
 	// Unhiding the template inherited fields via "using" statement.
     using Layer<eT>::g;

@@ -22,26 +22,28 @@ namespace mic { namespace neural_nets { namespace unit_tests {
 
 
 /*!
- * \brief Test Fixture - layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1, floats.
+ * \brief Test Fixture - layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1, double.
  * Math example taken from my own calculations;)
  * \author tkornuta
  */
-class Conv2x2x2Filter2x1x1s1Float : public ::testing::Test {
+class Conv2x2x2Filter2x1x1s1Double : public ::testing::Test {
 public:
 	// Constructor. Sets layer size.
-	Conv2x2x2Filter2x1x1s1Float () : layer(2,2,2,2,1,1) {
+	Conv2x2x2Filter2x1x1s1Double () : layer(2,2,2,2,1,1) {
 
-		x = MAKE_MATRIX_PTR(float, 8, 1);
+		x = MAKE_MATRIX_PTR(double, 8, 1);
 
-		desired_y = MAKE_MATRIX_PTR(float, 8, 1);
+		desired_y = MAKE_MATRIX_PTR(double, 8, 1);
 
-		dy = MAKE_MATRIX_PTR(float, 8, 1);
+		dy = MAKE_MATRIX_PTR(double, 8, 1);
 
-		desired_dx = MAKE_MATRIX_PTR(float, 8, 1);
+		target_y = MAKE_MATRIX_PTR(double, 8, 1);
+
+		desired_dx = MAKE_MATRIX_PTR(double, 8, 1);
 		// Number of filters * input channels.
-		desired_dW = MAKE_MATRIX_PTR(float, 4, 1);
+		desired_dW = MAKE_MATRIX_PTR(double, 4, 1);
 		// Number of "real neurons".
-		desired_db = MAKE_MATRIX_PTR(float, 2, 1);
+		desired_db = MAKE_MATRIX_PTR(double, 2, 1);
 	}
 
 protected:
@@ -61,6 +63,7 @@ protected:
 
 		(*dy) << 0, 1, 2, 3, 4, 5, 6, 7;
 		(*desired_dx) << 12, 15, 18, 21, 4, 7, 10, 13;
+		(*target_y) << 13, 13, 20, 10, 3, 2, 12, 15;
 
 		(*desired_dW) <<  14, 126, 38, 38;
 		(*desired_db) <<  6, 22;
@@ -68,25 +71,31 @@ protected:
 
 private:
 	/// Object to be tested.
-	mic::mlnn::convolution::Convolution<float> layer;
+	mic::mlnn::convolution::Convolution<double> layer;
+
+	// Loss function.
+	mic::neural_nets::loss::SquaredErrorLoss<double> loss;
 
 	/// Test x - used in forward pass.
-	mic::types::MatrixPtr<float> x;
+	mic::types::MatrixPtr<double> x;
 
 	/// Desired output for a given x.
-	mic::types::MatrixPtr<float> desired_y;
+	mic::types::MatrixPtr<double> desired_y;
 
 	/// Gradient passed to backpropagation.
-	mic::types::MatrixPtr<float> dy;
+	mic::types::MatrixPtr<double> dy;
+
+	/// Target y values.
+	mic::types::MatrixPtr<double> target_y;
 
 	/// Desired gradient dx from backpropagation.
-	mic::types::MatrixPtr<float> desired_dx;
+	mic::types::MatrixPtr<double> desired_dx;
 
 	/// Desired gradient dW from backpropagation.
-	mic::types::MatrixPtr<float> desired_dW;
+	mic::types::MatrixPtr<double> desired_dW;
 
 	/// Desired gradient db from backpropagation.
-	mic::types::MatrixPtr<float> desired_db;
+	mic::types::MatrixPtr<double> desired_db;
 
 };
 
