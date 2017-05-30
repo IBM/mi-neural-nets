@@ -74,12 +74,11 @@ public:
 		// Connect layers by setting the input matrices pointers to point the output matrices.
 		// There will not need to be copy data between layers anymore.
 		if (!connected) {
+			// Verify structure of the network.
+			verify();
 			// Set pointers - pass result to the next layer: x(next layer) = y(current layer).
 			if (layers.size() > 1)
 				for (size_t i = 0; i < layers.size()-1; i++) {
-					// Assert sizes.
-					assert(layers[i+1]->s['x']->rows() == layers[i]->s['y']->rows());
-					assert(layers[i]->g['y']->rows() == layers[i+1]->g['x']->rows());
 					// Connect pointers.
 					layers[i+1]->s['x'] = layers[i]->s['y'];
 					layers[i]->g['y'] = layers[i+1]->g['x'];
@@ -105,6 +104,31 @@ public:
 
 		}
 		//LOG(LDEBUG) <<" predictions: " << getPredictions()->transpose();
+	}
+
+
+	/*!
+	 * Function verifies the network by checking whether all inputs and outputs fit to each other.
+	 */
+	void verify() {
+		bool ok = true;
+		// Set pointers - pass result to the next layer: x(next layer) = y(current layer).
+		if (layers.size() > 1)
+			for (size_t i = 0; i < layers.size()-1; i++) {
+				// Check inputs.
+				if (layers[i]->s['y']->rows() != layers[i+1]->s['x']->rows()) {
+					LOG(LERROR) << "Layer["<<i<<"].y=" <<  layers[i]->s['y']->rows() << " differs from " << "Layer["<<i+1<<"].x=" <<  layers[i+1]->s['x']->rows();
+					ok = false;
+				}
+
+				// Check gradients.
+				if (layers[i]->g['y']->rows() != layers[i+1]->g['x']->rows()) {
+					LOG(LERROR) << "Layer["<<i<<"].dy=" <<  layers[i]->g['y']->rows() << " differs from " << "Layer["<<i+1<<"].dx=" <<  layers[i+1]->g['x']->rows();
+					ok = false;
+				}
+			}//: for
+		if (!ok)
+			exit(-1);
 	}
 
 

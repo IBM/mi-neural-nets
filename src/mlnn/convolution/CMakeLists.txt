@@ -12,7 +12,7 @@ if(GTEST_FOUND AND BUILD_UNIT_TESTS)
 		Convolution_tests.cpp
 		Convolution_convergence_tests.cpp
 		)
-	target_link_libraries(convolutionTestsRunner ${GTEST_LIBRARIES})
+	target_link_libraries(convolutionTestsRunner logger ${Boost_LIBRARIES} ${GTEST_LIBRARIES})
 	if(OpenBLAS_FOUND)
 		target_link_libraries(convolutionTestsRunner  ${OpenBLAS_LIB} )
 	endif(OpenBLAS_FOUND)

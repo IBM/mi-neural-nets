@@ -23,6 +23,8 @@
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/version.hpp>
 
+#include <logger/Log.hpp>
+
 // Forward declaration of class boost::serialization::access
 namespace boost {
 namespace serialization {

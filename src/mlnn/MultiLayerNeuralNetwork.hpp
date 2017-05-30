@@ -17,8 +17,6 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
-#include <logger/Log.hpp>
-
 // Forward declaration of class boost::serialization::access
 namespace boost {
 namespace serialization {

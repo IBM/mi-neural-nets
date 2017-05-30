@@ -9,7 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if(GTEST_FOUND AND BUILD_UNIT_TESTS)
 
 	add_executable(softmaxTestsRunner SoftmaxTests.cpp)
-	target_link_libraries(softmaxTestsRunner ${GTEST_LIBRARIES})
+	target_link_libraries(softmaxTestsRunner logger ${Boost_LIBRARIES} ${GTEST_LIBRARIES})
 	if(OpenBLAS_FOUND)
 		target_link_libraries(softmaxTestsRunner  ${OpenBLAS_LIB} )
 	endif(OpenBLAS_FOUND)
