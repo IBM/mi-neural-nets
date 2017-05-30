@@ -45,12 +45,12 @@ public:
 		stride(stride_),
 		number_of_filters(number_of_filters_)
 	{
-		std::cout<<"====================\n";
+/*		std::cout<<"====================\n";
 		std::cout<<"input_height = " << input_height <<std::endl;
 		std::cout<<"input_width = " << input_width <<std::endl;
 		std::cout<<"number_of_filters = " << number_of_filters <<std::endl;
 		std::cout<<"filter_size = " << filter_size <<std::endl;
-		std::cout<<"stride = " << stride <<std::endl;
+		std::cout<<"stride = " << stride <<std::endl;*/
 
 		// Calculate number of receptive fields within a "single input channel".
 		assert(input_height >= filter_size);
@@ -74,9 +74,9 @@ public:
 		assert(width_rest == 0);
 
 
-		std::cout<<"output_height = " << output_height <<std::endl;
+/*		std::cout<<"output_height = " << output_height <<std::endl;
 		std::cout<<"output_width = " << output_width <<std::endl;
-		std::cout<<"====================\n";
+		std::cout<<"====================\n";*/
 
 		// Calculate "range" - for initialization.
 		eT range_init = (eT) (input_width * input_height * input_channels) +
