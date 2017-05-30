@@ -16,7 +16,7 @@ namespace mic { namespace neural_nets { namespace unit_tests {
  * \brief Numerical gradient test of all parameters for layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1.
  * \author tkornuta
  */
-TEST_F(Conv2x2x2Filter2x1x1s1Double, DISABLED_NumericalGradientCheck) {
+TEST_F(Conv2x2x2Filter2x1x1s1Double, NumericalGradientCheck) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(x);
@@ -66,7 +66,7 @@ TEST_F(Conv2x2x2Filter2x1x1s1Double, DISABLED_NumericalGradientCheck) {
  * \brief Numerical gradient test of all parameters for layer of input size 28x28x1 and with filter bank of 2 filters of size 28x28 with stride 1, double.
  * \author tkornuta
  */
-TEST_F(Conv28x28x1Filter2x28x28s1Double, DISABLED_NumericalGradientCheck) {
+TEST_F(Conv28x28x1Filter2x28x28s1Double, NumericalGradientCheck) {
 
 	// Calculate gradients.
 	mic::types::MatrixPtr<double> predicted_y = layer.forward(x);
@@ -116,7 +116,7 @@ TEST_F(Conv28x28x1Filter2x28x28s1Double, DISABLED_NumericalGradientCheck) {
  * Checks convergence of layer of input size 28x28x1 and with filter bank of 2 filters of size 28x28 with stride 1, double.
  * \author tkornuta
  */
-TEST_F(Conv28x28x1Filter2x28x28s1Double, DISABLED_Convergence) {
+TEST_F(Conv28x28x1Filter2x28x28s1Double, Convergence) {
 	double eps = 1e-6;
 	double loss_value;
 	size_t iteration = 0;

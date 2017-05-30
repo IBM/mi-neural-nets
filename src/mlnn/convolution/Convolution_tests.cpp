@@ -84,7 +84,7 @@ TEST_F(Conv2x2x2Filter2x1x1s1Double, DISABLED_Forward) {
  * Checks whether the backward pass is working for layer of input size 2x2x2 and with filter bank of 2 filters of size 1x1 with stride 1.
  * \author tkornuta
  */
-TEST_F(Conv2x2x2Filter2x1x1s1Double, DISABLED_Backward) {
+TEST_F(Conv2x2x2Filter2x1x1s1Double, Backward) {
 
 	// Backward pass - need to set x.
 	layer.forward(x);
@@ -193,7 +193,7 @@ TEST_F(Conv4x4x1Filter3x1x1s3Double, DISABLED_Forward) {
  * Checks whether the backward gradient pass is working for layer of input size 4x4x1 and with filter bank of 3 filters of size 1x1 with stride 3, double.
  * \author tkornuta
  */
-TEST_F(Conv4x4x1Filter3x1x1s3Double, DISABLED_Backward) {
+TEST_F(Conv4x4x1Filter3x1x1s3Double, Backward) {
 
 	// Backward pass - need to set x.
 	layer.forward(x);
@@ -206,7 +206,7 @@ TEST_F(Conv4x4x1Filter3x1x1s3Double, DISABLED_Backward) {
 	// Check resulting db gradient.
 	mic::types::MatrixPtr<double> db = layer.g["b"];
 	for (size_t i=0; i<3; i++)
-		ASSERT_EQ((*desired_db)[2], (*db)[2]);
+		ASSERT_EQ((*desired_db)[i], (*db)[i]);
 
 	// Check resulting dW gradient.
 	ASSERT_EQ((*desired_dW)[0], (*layer.g["W00"])[0]);
@@ -256,6 +256,46 @@ TEST_F(Conv5x5x1Filter1x3x3s1Float, DISABLED_Forward) {
 
 }
 
+
+/*!
+ * Checks whether the forward is working for layer of input size 5x5x1 and with filter bank of 1 filter of size 2x2 with stride 3 (float).
+ * \author tkornuta
+ */
+TEST_F(Conv5x5x1Filter1x2x2s3Float, Forward) {
+
+	// Forward pass.
+	mic::types::MatrixPtr<float> y = layer.forward(x);
+
+	// Check output.
+	for (size_t i=0; i<4; i++)
+		ASSERT_EQ((*y)[i], (*desired_y)[i]) << "at position " << i;
+
+}
+
+
+/*!
+ * Checks whether the backward gradient pass is working for layer of input size 4x4x1 and with filter bank of 3 filters of size 1x1 with stride 3, double.
+ * \author tkornuta
+ */
+TEST_F(Conv5x5x1Filter1x2x2s3Float, Backward) {
+
+	// Backward pass - need to set x.
+	layer.forward(x);
+	mic::types::MatrixPtr<float> dx = layer.backward(dy);
+
+	// Check resulting dx gradient.
+	for (size_t i=0; i<25; i++)
+		ASSERT_EQ((*desired_dx)[i], (*dx)[i]) << "at position " << i;
+
+	// Check resulting db gradient.
+	mic::types::MatrixPtr<float> db = layer.g["b"];
+	for (size_t i=0; i<1; i++)
+		ASSERT_EQ((*desired_db)[i], (*db)[i]);
+
+	// Check resulting dW gradient.
+	for (size_t i=0; i<4; i++)
+	ASSERT_EQ((*desired_dW)[i], (*layer.g["W00"])[i]);
+}
 
 /*!
  * Checks whether the forward is working for layer of input size 5x6x1 and with filter bank of 1 filter of size 4x4 with stride 1.

@@ -129,7 +129,7 @@ public:
 		m.add ("ys", number_of_filters*output_height*output_width, 1);
 
 		// Allocate memory for "full convolution" (180 degree rotated and expanded) filters.
-		full_filter_height = filter_size + 2*(output_height -1);
+/*		full_filter_height = filter_size + 2*(output_height -1);
 		full_filter_width = filter_size + 2*(output_width -1);
 		for (size_t fi=0; fi< number_of_filters; fi++) {
 			// A given filter (neuron layer) has in fact connection to all input channels.
@@ -140,7 +140,7 @@ public:
 		}//: for filters
 
 		// Allocate memory for "reverse" receptive field.
-		m.add ("rerf", output_height, output_width);
+		m.add ("rerf", output_height, output_width);*/
 
 		// Allocate memory for "gradient x channel".
 		m.add ("gxc", input_height, input_width);
@@ -320,10 +320,8 @@ public:
 
 		// Backpropagate gradient from dy to dx.
 
-		std::cout<<"backpropagade_dy_to_db 1\n";
-
 		// 1. Fill the "rotated-expanded" filters.
-		for (size_t ic=0; ic< input_channels; ic++) {
+/*		for (size_t ic=0; ic< input_channels; ic++) {
 			std::cout<< "======  switching input channel = " << ic << std::endl;
 			for (size_t fi=0; fi< number_of_filters; fi++) {
 				std::cout<< "======  switching filter = " << fi << std::endl;
@@ -344,7 +342,7 @@ public:
 				// Resize filter matrix W back to a row vector.
 				W->resize(1, filter_size*filter_size);
 			}//: for filters
-		}//: for channels
+		}//: for channels*/
 
 //		std::cout<<"backpropagade_dy_to_db 2\n";
 
@@ -363,7 +361,7 @@ public:
 
 			// Convolve reWs with sample channel by channel.
 			for (size_t ic=0; ic< input_channels; ic++) {
-				//std::cout<<"Input channel: " << ic <<std::endl;
+				//std::cout<< "======  switching input channel = " << ic << std::endl;
 
 				// Get pointer to x gradient channel "storage".
 				mic::types::MatrixPtr<eT> gxc = m["gxc"];
@@ -375,48 +373,52 @@ public:
 
 				// For each filter.
 				for (size_t fi=0; fi< number_of_filters; fi++) {
+					//std::cout<< "======  switching filter = " << fi << std::endl;
+
+					// Get filter weight matrix.
+					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
+					W->resize(filter_size, filter_size);
 
 					// Get gradient y channel.
 					mic::types::MatrixPtr<eT> gyc = m["gyc"];
 					// Copy block - resizes the input channel matrix.
 					(*gyc) = gys->block(fi*output_height*output_width, 0, output_height*output_width, 1);
-					(*gyc).resize(output_height*output_width,1);
-					std::cout<< "fi = " << fi << "(*gyc) = \n" << (*gyc) << std::endl;
+					(*gyc).resize(output_height, output_width);
+					//std::cout<< "fi = " << fi << "(*gyc) = \n" << (*gyc) << std::endl;
 
-					// Get reW.
+/*					// Get reW.
 					mic::types::MatrixPtr<eT> reW = m["reW"+std::to_string(fi)+std::to_string(ic)];
 					// Get pointer to "reverse receptive field".
-					mic::types::MatrixPtr<eT> rerf = m["rerf"];
-					for (size_t rew_y=0; rew_y< (full_filter_height - output_height)+1; rew_y++){
-						for (size_t rew_x=0; rew_x< (full_filter_width - output_width)+1; rew_x++){
-							std::cout<< "filter = " << fi << " rew_y=" << rew_y<< " rew_x=" << rew_x << std::endl;
-							std::cout<< "resulting addresses: y =" << (full_filter_height - output_height) - rew_y << " x=  " << (full_filter_width - output_width) - rew_x << std::endl;
-							// Get block under "reverse receptive field".
-							(*rerf) = reW->block((full_filter_height - output_height) - rew_y, (full_filter_width - output_width) - rew_x, output_height, output_width);
-							rerf->resize(1, output_height * output_width);
-							std::cout<< "filter = " << fi << " rew_y=" << rew_y<< " rew_x=" << rew_x << std::endl;
-							std::cout<< "     (*rerf) = \n" << (*rerf) << std::endl;
-							std::cout<< "     (*gyc) = \n" << (*gyc) << std::endl;
-							// Convolve.
-							eT conv= ((*rerf)*(*gyc))(0);
-							std::cout<< "     calculated value= " << conv << std::endl;
-							// Iterate and add result to all possible fields.
-							size_t y=rew_y;
-							do {
-								size_t x=rew_x;
-								do {
-									std::cout<< "adding " << conv << " to (*gxc) = \n" << (*gxc) << "\n in: " << " y=" << y<< " x=" << x << std::endl;
+					mic::types::MatrixPtr<eT> rerf = m["rerf"];*/
+
+					// Iterate through "stride blocks" - their number is equal to output size.
+					// Those are also coordinates of the outputs.
+					for(size_t oy=0; oy < output_height; oy++) {
+						for(size_t ox=0; ox < output_width; ox++) {
+							// Get top upper coordinate of input block.
+							size_t isby = oy * stride;
+							size_t isbx = ox * stride;
+							//std::cout<< "block coordinates: isby = " << isby << " isbx=" << isbx << std::endl;
+
+							// Iterate through the elements and add them to gxc.
+							for (size_t iy=0; iy<filter_size; iy++) {
+								for (size_t ix=0; ix<filter_size; ix++) {
+
+									eT conv = (*W)(iy,ix)*(*gyc)(oy,ox);//((*rerf)*(*gyc))(0);//1;
+									size_t y = isby+iy;
+									size_t x = isbx+ix;
+									//std::cout<< "adding to (*gxc) = \n" << (*gxc) << "\n in: " << " y=" << y<< " x=" << x << std::endl;
 									(*gxc)(y,x) += conv;
-									x+=stride;
-								} while((x+filter_size)< input_width);
-								y+=stride;
-							} while((y+filter_size)< input_height);
-							std::cout<< "     tmp (*gxc) = \n" << (*gxc) << std::endl;
-						}//: rew_x
-					}//: rew_y
-					std::cout<< "filter = "<< fi << " resulting (*gxc) = \n" << (*gxc) << std::endl;
+
+								}//: for ix
+							}//: for iy
+
+
+						}//: for stride blocks y
+					}//: for stride blocks x
+					//std::cout<< "filter = "<< fi << " resulting (*gxc) = \n" << (*gxc) << std::endl;
 				}//: for filters
-				std::cout<< "result for input channel = "<< ic << " (*gxc) = \n" << (*gxc) << std::endl;
+				//std::cout<< "result for input channel = "<< ic << " (*gxc) = \n" << (*gxc) << std::endl;
 				// Resize gradient channel to a column vector.
 				gxc->resize(input_height * input_width, 1);
 
@@ -424,7 +426,7 @@ public:
 				gxs->block(ic*input_height*input_width, 0, input_height*input_width, 1)
 						= (*gxc);
 
-				std::cout<< "(*gs) = \n" << (*gxs) << std::endl;
+				//std::cout<< "(*gs) = \n" << (*gxs) << std::endl;
 			}//: for channels
 
 			// Set column in the gradient batch.

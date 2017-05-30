@@ -307,6 +307,7 @@ public:
 		desired_y = MAKE_MATRIX_PTR(float, 9, 1);
 
 		dy = MAKE_MATRIX_PTR(float, 9, 1);
+
 	}
 
 protected:
@@ -333,8 +334,71 @@ private:
 	/// Gradient passed to backpropagation.
 	mic::types::MatrixPtr<float> dy;
 
+};
+
+
+
+/*!
+ * \brief Test Fixture - layer of input size 5x5x1 and with filter bank of 1 filter of size 2x2 with stride 3 (float).
+ * Math example taken from: https://ujjwalkarn.me/2016/08/11/intuitive-explanation-convnets/
+ * \author tkornuta
+ */
+class Conv5x5x1Filter1x2x2s3Float : public ::testing::Test {
+public:
+	// Constructor. Sets layer size.
+	Conv5x5x1Filter1x2x2s3Float () : layer(5,5,1,1,2,3) {
+
+		x = MAKE_MATRIX_PTR(float, 25, 1);
+
+		desired_y = MAKE_MATRIX_PTR(float, 4, 1);
+
+		dy = MAKE_MATRIX_PTR(float, 4, 1);
+
+		desired_dx = MAKE_MATRIX_PTR(float, 25, 1);
+		// Number of filters * input channels.
+		desired_dW = MAKE_MATRIX_PTR(float, 4, 1);
+		// Number of "real neurons".
+		desired_db = MAKE_MATRIX_PTR(float, 1, 1);
+	}
+
+protected:
+	// Sets values
+	virtual void SetUp() {
+		(*layer.p["W00"]).enumerate();
+		(*layer.p["b"]) << 0;
+
+		(*x).enumerate();
+		(*desired_y) << 29, 47, 119, 137;
+
+		(*dy).enumerate();
+		(*desired_dx) << 0,0,0,0, 1, 0,0,0, 2, 3, 0,0,0,0,0,0, 2, 0,0, 3, 4, 6, 0, 6, 9;
+
+		(*desired_dW) <<  87, 93, 117, 123;
+		(*desired_db) <<  6;
+
+	}
+
+private:
+	/// Object to be tested.
+	mic::mlnn::convolution::Convolution<float> layer;
+
+	/// Test x - used in forward pass.
+	mic::types::MatrixPtr<float> x;
+
+	/// Desired output for a given x.
+	mic::types::MatrixPtr<float> desired_y;
+
+	/// Gradient passed to backpropagation.
+	mic::types::MatrixPtr<float> dy;
+
 	/// Desired gradient dy from backpropagation.
 	mic::types::MatrixPtr<float> desired_dx;
+
+	/// Desired gradient dW from backpropagation.
+	mic::types::MatrixPtr<float> desired_dW;
+
+	/// Desired gradient db from backpropagation.
+	mic::types::MatrixPtr<float> desired_db;
 };
 
 
