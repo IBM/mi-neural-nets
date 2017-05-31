@@ -49,11 +49,11 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		(*layer.p["W00"]) << 0;
-		(*layer.p["W01"]) << 2;
+		(*layer.p["W0x0"]) << 0;
+		(*layer.p["W0x1"]) << 2;
 
-		(*layer.p["W10"]) << 3;
-		(*layer.p["W11"]) << 1;
+		(*layer.p["W1x0"]) << 3;
+		(*layer.p["W1x1"]) << 1;
 
 		// Set biases of both neurons.
 		(*layer.p["b"]) << 0, 1;
@@ -120,14 +120,14 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		(*layer.p["W00"]) << 0, 1, 1, 0;
-		(*layer.p["W01"]) << 0, -1, -1, 0;
+		(*layer.p["W0x0"]) << 0, 1, 1, 0;
+		(*layer.p["W0x1"]) << 0, -1, -1, 0;
 
-		(*layer.p["W10"]) << -1, 0, 0, 1;
-		(*layer.p["W11"]) << 1, 0, 0, -1;
+		(*layer.p["W1x0"]) << -1, 0, 0, 1;
+		(*layer.p["W1x1"]) << 1, 0, 0, -1;
 
-		(*layer.p["W20"]) << 0, 0, 1, 1;
-		(*layer.p["W21"]) << 0, 0, -1, -1;
+		(*layer.p["W2x0"]) << 0, 0, 1, 1;
+		(*layer.p["W2x1"]) << 0, 0, -1, -1;
 
 		// Set biases of all three neurons.
 		(*layer.p["b"]) << 1, 0, -1;
@@ -176,7 +176,7 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		(*layer.p["W00"]) << 0, 1, 2, 3;
+		(*layer.p["W0x0"]) << 0, 1, 2, 3;
 
 		// Set biases of both neurons.
 		(*layer.p["b"]) << 0;
@@ -244,9 +244,9 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		(*layer.p["W00"]) << 0;
-		(*layer.p["W10"]) << 1;
-		(*layer.p["W20"]) << 2;
+		(*layer.p["W0x0"]) << 0;
+		(*layer.p["W1x0"]) << 1;
+		(*layer.p["W2x0"]) << 2;
 
 		// Set biases of neurons.
 		(*layer.p["b"]) << -1, 0, 1;
@@ -313,7 +313,7 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		(*layer.p["W00"]) << 1, 0, 1, 0, 1, 0, 1, 0, 1;
+		(*layer.p["W0x0"]) << 1, 0, 1, 0, 1, 0, 1, 0, 1;
 		(*layer.p["b"]) << 0;
 
 		(*x) << 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0;
@@ -364,7 +364,7 @@ public:
 protected:
 	// Sets values
 	virtual void SetUp() {
-		(*layer.p["W00"]).enumerate();
+		(*layer.p["W0x0"]).enumerate();
 		(*layer.p["b"]) << 0;
 
 		(*x).enumerate();
@@ -423,14 +423,14 @@ protected:
 	virtual void SetUp() {
 
 		// Set weights of first neuron.
-		(*layer.p["W00"]) << 0, -1, 0, 0, 1, -1, 1, 1, -1;
-		(*layer.p["W01"]) << 1, 0, 1, 0, -1, -1, 1, 1, -1;
-		(*layer.p["W02"]) << 1, 1, 0, -1, 1, -1, 1, 0, 1;
+		(*layer.p["W0x0"]) << 0, -1, 0, 0, 1, -1, 1, 1, -1;
+		(*layer.p["W0x1"]) << 1, 0, 1, 0, -1, -1, 1, 1, -1;
+		(*layer.p["W0x2"]) << 1, 1, 0, -1, 1, -1, 1, 0, 1;
 
 		// Set weights of second neuron.
-		(*layer.p["W10"]) << 1, 1, -1, -1, -1, 1, 0, -1, -1;
-		(*layer.p["W11"]) << 0, 1, 1, -1, 1, -1, 0, -1, -1;
-		(*layer.p["W12"]) << 0, 0, 0, 1, 1, -1, -1, 0, 1;
+		(*layer.p["W1x0"]) << 1, 1, -1, -1, -1, 1, 0, -1, -1;
+		(*layer.p["W1x1"]) << 0, 1, 1, -1, 1, -1, 0, -1, -1;
+		(*layer.p["W1x2"]) << 0, 0, 0, 1, 1, -1, -1, 0, 1;
 
 		// Set biases of both neurons.
 		(*layer.p["b"]) << 1, 0;
@@ -505,11 +505,11 @@ protected:
 	// Sets values
 	virtual void SetUp() {
 		for (size_t i=0; i<16; i++)
-			(*layer.p["W00"])(i) = i+1;
-		(*layer.p["W00"]).resize(4,4);
-		(*layer.p["W00"]).transposeInPlace();
+			(*layer.p["W0x0"])(i) = i+1;
+		(*layer.p["W0x0"]).resize(4,4);
+		(*layer.p["W0x0"]).transposeInPlace();
 		//std::cout<<"*layer.p[W00] = \n" << (*layer.p["W00"]) << std::endl;
-		(*layer.p["W00"]).resize(1, 4*4);
+		(*layer.p["W0x0"]).resize(1, 4*4);
 
 		// Set neuron bias.
 		(*layer.p["b"]) << 0;

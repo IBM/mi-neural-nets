@@ -300,7 +300,7 @@ public:
 	void backward() {
 		//std::cout<<"backpropagade_dy_to_dx!\n";
 		// To dx.
-		//backpropagade_dy_to_dx();
+		backpropagade_dy_to_dx();
 
 		//std::cout<<"backpropagade_dy_to_dW!\n";
 		// To dW.
@@ -308,7 +308,7 @@ public:
 
 		//std::cout<<"backpropagade_dy_to_db!\n";
 		// To db.
-		//backpropagade_dy_to_db();
+		backpropagade_dy_to_db();
 
 		//std::cout<<"After Backward!\n";
 	}//: backward

@@ -101,10 +101,10 @@ TEST_F(Conv2x2x2Filter2x1x1s1Double, Backward) {
 		ASSERT_EQ((*desired_db)[i], (*db)[i]) << "at position " << i;
 
 	// Check resulting dW gradient.
-	ASSERT_EQ((*desired_dW)[0], (*layer.g["W00"])[0]);
-	ASSERT_EQ((*desired_dW)[1], (*layer.g["W11"])[0]);
-	ASSERT_EQ((*desired_dW)[2], (*layer.g["W01"])[0]);
-	ASSERT_EQ((*desired_dW)[3], (*layer.g["W10"])[0]);
+	ASSERT_EQ((*desired_dW)[0], (*layer.g["W0x0"])[0]);
+	ASSERT_EQ((*desired_dW)[1], (*layer.g["W1x1"])[0]);
+	ASSERT_EQ((*desired_dW)[2], (*layer.g["W0x1"])[0]);
+	ASSERT_EQ((*desired_dW)[3], (*layer.g["W1x0"])[0]);
 
 	// Second backward - just to assure that all the "internal dimensions" are ok after the first pass.
 //	layer.backward(dy);
@@ -166,7 +166,7 @@ TEST_F(Conv4x4x1Filter1x2x2s2Float, Backward) {
 	ASSERT_EQ((*desired_db)[0], (*db)[0]);
 
 	// Check resulting dW gradient.
-	mic::types::MatrixPtr<float> dW = layer.g["W00"];
+	mic::types::MatrixPtr<float> dW = layer.g["W0x0"];
 	for (size_t i=0; i<4; i++)
 		ASSERT_EQ((*desired_dW)[i], (*dW)[i]) << "at position " << i;
 }
@@ -209,9 +209,9 @@ TEST_F(Conv4x4x1Filter3x1x1s3Double, Backward) {
 		ASSERT_EQ((*desired_db)[i], (*db)[i]);
 
 	// Check resulting dW gradient.
-	ASSERT_EQ((*desired_dW)[0], (*layer.g["W00"])[0]);
-	ASSERT_EQ((*desired_dW)[1], (*layer.g["W10"])[0]);
-	ASSERT_EQ((*desired_dW)[2], (*layer.g["W20"])[0]);
+	ASSERT_EQ((*desired_dW)[0], (*layer.g["W0x0"])[0]);
+	ASSERT_EQ((*desired_dW)[1], (*layer.g["W1x0"])[0]);
+	ASSERT_EQ((*desired_dW)[2], (*layer.g["W2x0"])[0]);
 }
 
 /*!
@@ -223,8 +223,8 @@ TEST_F(Conv4x4x1Filter3x1x1s3Double, Backward) {
 TEST_F(Conv5x5x1Filter1x3x3s1Float, Dimensions) {
 
 	// Check filter size - W.
-	ASSERT_EQ((*layer.p["W00"]).rows(), 1);
-	ASSERT_EQ((*layer.p["W00"]).cols(), 9);
+	ASSERT_EQ((*layer.p["W0x0"]).rows(), 1);
+	ASSERT_EQ((*layer.p["W0x0"]).cols(), 9);
 
 	// Check filter size - b.
 	ASSERT_EQ((*layer.p["b"]).rows(), 1);
@@ -294,7 +294,7 @@ TEST_F(Conv5x5x1Filter1x2x2s3Float, Backward) {
 
 	// Check resulting dW gradient.
 	for (size_t i=0; i<4; i++)
-	ASSERT_EQ((*desired_dW)[i], (*layer.g["W00"])[i]);
+	ASSERT_EQ((*desired_dW)[i], (*layer.g["W0x0"])[i]);
 }
 
 /*!
