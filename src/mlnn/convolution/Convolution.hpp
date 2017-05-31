@@ -45,12 +45,12 @@ public:
 		stride(stride_),
 		number_of_filters(number_of_filters_)
 	{
-		std::cout<<"====================\n";
-		std::cout<<"input_height = " << input_height <<std::endl;
-		std::cout<<"input_width = " << input_width <<std::endl;
-		std::cout<<"number_of_filters = " << number_of_filters <<std::endl;
-		std::cout<<"filter_size = " << filter_size <<std::endl;
-		std::cout<<"stride = " << stride <<std::endl;
+		LOG(LDEBUG)<<"====================\n";
+		LOG(LDEBUG)<<"input_height = " << input_height <<std::endl;
+		LOG(LDEBUG)<<"input_width = " << input_width <<std::endl;
+		LOG(LDEBUG)<<"number_of_filters = " << number_of_filters <<std::endl;
+		LOG(LDEBUG)<<"filter_size = " << filter_size <<std::endl;
+		LOG(LDEBUG)<<"stride = " << stride <<std::endl;
 
 		// Calculate number of receptive fields within a "single input channel".
 		assert(input_height >= filter_size);
@@ -73,9 +73,9 @@ public:
 		// Filters must "exactly" fit!
 		assert(width_rest == 0);
 
-		std::cout<<"output_height = " << output_height <<std::endl;
-		std::cout<<"output_width = " << output_width <<std::endl;
-		std::cout<<"====================\n";
+		LOG(LDEBUG)<<"output_height = " << output_height <<std::endl;
+		LOG(LDEBUG)<<"output_width = " << output_width <<std::endl;
+		LOG(LDEBUG)<<"====================\n";
 
 		// Set output height and resize matrices!
 		Layer<eT>::output_size = number_of_filters*output_height*output_width;
@@ -176,6 +176,27 @@ public:
 	 */
 	virtual ~Convolution() {};
 
+	/*!
+	 * Stream layer parameters.
+	 * @return Ostream object.
+	 */
+	virtual std::string streamLayerParameters() {
+		std::ostringstream os_;
+		// Display id/type.
+		os_ << "  [" << Layer<eT>::type() << "]: " << Layer<eT>::layer_name << ": "
+				<< Layer<eT>::input_size << "x" << batch_size << " -> " << Layer<eT>::output_size << "x" << batch_size << "\n";
+		// Display dimensions.
+		os_<<"    * input_height = " << input_height <<std::endl;
+		os_<<"    * input_width = " << input_width <<std::endl;
+		os_<<"    * input_channels = " << input_channels <<std::endl;
+		os_<<"    * filter_size = " << filter_size <<std::endl;
+		os_<<"    * stride = " << stride <<std::endl;
+		os_<<"    * output_height = " << output_height <<std::endl;
+		os_<<"    * output_width = " << output_width <<std::endl;
+		os_<<"    * output_channels = " << number_of_filters <<std::endl;
+
+		return os_.str();
+	}
 	/*!
 	 * Performs forward pass through the filters. Can process batches.
 	 */
@@ -317,33 +338,8 @@ public:
 
 		// Backpropagate gradient from dy to dx.
 
-		// 1. Fill the "rotated-expanded" filters.
-/*		for (size_t ic=0; ic< input_channels; ic++) {
-			std::cout<< "======  switching input channel = " << ic << std::endl;
-			for (size_t fi=0; fi< number_of_filters; fi++) {
-				std::cout<< "======  switching filter = " << fi << std::endl;
-				mic::types::MatrixPtr<eT> reW = m["reW"+std::to_string(fi)+std::to_string(ic)];
-				reW->setZero();
-				// Get filter.
-				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
-				W->resize(filter_size, filter_size);
-				// "Rotate" and insert filter values into right positions of "rotated-expanded" filter.
-				for(size_t y=0; y < filter_size; y++)
-					for(size_t x=0; x < filter_size; x++){
-						std::cout<<"y =" << y <<" x =" << x << std::endl;
-						std::cout<<"rew_y =" << stride*y + (output_height-1) <<" rew_x =" << stride*x + (output_width -1) << std::endl;
 
-						(*reW)(y + (output_height-1), x + (output_width -1)) = (*W)(filter_size-y-1,filter_size-x-1);
-					}//: for for
-				std::cout<<"reW=\n"<<(*reW)<<std::endl;
-				// Resize filter matrix W back to a row vector.
-				W->resize(1, filter_size*filter_size);
-			}//: for filters
-		}//: for channels*/
-
-//		std::cout<<"backpropagade_dy_to_db 2\n";
-
-		// 2. Calculate dx for a given gradient batch.
+		// Calculate dx for a given batch of dy gradients.
 		// Iterate through samples in the input batch.
 //#pragma omp parallel for
 		for (size_t ib=0; ib< batch_size; ib++) {
@@ -351,6 +347,16 @@ public:
 			// Get y gradient sample from batch.
 			mic::types::MatrixPtr<eT> gys = m["gys"];
 			(*gys) = batch_dy->col(ib);
+
+			/*///////////////////////
+			// Get gradient y channel.
+			mic::types::MatrixPtr<eT> gyc = m["gyc"];
+			for (size_t fi=0; fi< number_of_filters; fi++) {
+				(*gyc) = gys->block(fi*output_height*output_width, 0, output_height*output_width, 1);
+				(*gyc).resize(output_height, output_width);
+				std::cout<< "============  dy channel = " << fi << "(*gyc) = \n" << (*gyc) << std::endl;
+			}// to remove*/
+
 
 			// Get pointer to x gradient sample matrix.
 			mic::types::MatrixPtr<eT> gxs = m["gxs"];

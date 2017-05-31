@@ -320,13 +320,24 @@ public:
 	}
 
 	/*!
+	 * Stream layer parameters.
+	 * @return Ostream object.
+	 */
+	virtual std::string streamLayerParameters() {
+		std::ostringstream os_;
+		os_ << "  [" << type() << "]: " << layer_name << ": " << input_size << "x" << batch_size << " -> " << output_size << "x" << batch_size << "\n";
+		return os_.str();
+	}
+
+	/*!
 	 * Stream operator enabling to print neural network.
 	 * @param os_ Ostream object.
 	 * @param obj_ Tensor object.
 	 */
 	friend std::ostream& operator<<(std::ostream& os_, Layer& obj_) {
 		// Display dimensions.
-		os_ << "  [" << obj_.type() << "]: " << obj_.layer_name << ": " << obj_.input_size << "x" << obj_.batch_size << " -> " << obj_.output_size << "x" << obj_.batch_size << "\n";
+		os_ << obj_.streamLayerParameters();
+
 		// Display inputs.
 		os_ << "    [" << obj_.s.name() << "]:\n";
 		for (auto& i: obj_.s.keys()) {

@@ -54,8 +54,8 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
-const size_t batch_size = 4;
-const size_t output_size = 4608;
+const size_t batch_size = 1;
+const size_t output_size = 3872;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
 
@@ -75,23 +75,34 @@ void batch_function (void) {
 		//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 		//neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 8, 5, 1));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 8, 7, 1));
 			neural_net.pushLayer(new ReLU<float>(output_size));
-			neural_net.pushLayer(new Linear<float>(output_size, 100));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(22, 22, 8, 20, 5, 1));
+			neural_net.pushLayer(new ReLU<float>(6480));
+			neural_net.pushLayer(new Linear<float>(6480, 100));
 			neural_net.pushLayer(new ReLU<float>(100));
 			neural_net.pushLayer(new Linear<float>(100, 10));
 			neural_net.pushLayer(new Softmax<float>(10));
-			neural_net.verify();
+			if (!neural_net.verify())
+				exit(-1);
+
+
 			//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 			neural_net.setOptimization<  mic::neural_nets::optimization::Momentum<float> >();
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
 
+	// Import data from datasets.
+	if (!importer->importData())
+		exit(-1);
+
+
 	size_t iteration = 0;
 
 	// Retrieve the next minibatch.
 	//mic::types::MNISTBatch bt = importer->getNextBatch();
+	//importer->setNextSampleIndex(7);
 
 	// Main application loop.
 	while (!APP_STATE->Quit()) {
@@ -110,7 +121,7 @@ void batch_function (void) {
 				mic::types::MNISTBatch bt = importer->getNextBatch();
 
 				// Set batch to be displayed.
-				w_input->setBatchDataUnsynchronized(bt.data());
+				//w_input->setBatchDataUnsynchronized(bt.data());
 
 				// Encode data.
 				mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
@@ -127,16 +138,18 @@ void batch_function (void) {
 				(*encoded_labels)[15]= 1.0;*/
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_labels, 0.01, 0.001);
+				float loss = neural_net.train (encoded_batch, encoded_labels, 0.1, 0.001);
 
 				// Get reconstruction.
 				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
 				std::vector<mic::types::MatrixXfPtr> decoded_reconstruction = mnist_encoder->decodeBatch(encoded_reconstruction);
 				w_reconstruction->setBatchDataUnsynchronized(decoded_reconstruction);*/
 
-				if (iteration%10 == 0) {
+				{//if (iteration%10 == 0) {
 					// Visualize the weights.
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > layer1 = neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(0);
+					w_input->setBatchDataUnsynchronized(layer1->getInputActivations(false));
+
 					w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
 
 					w_weights2->setBatchDataUnsynchronized(layer1->getWeightGradientActivations());
@@ -192,10 +205,6 @@ int main(int argc, char* argv[]) {
 
 	// Initialize property-dependent variables of all registered property-tree objects - USER dependent part.
 	PARAM_SERVER->initializePropertyDependentVariables();
-
-	// Import data from datasets.
-	if (!importer->importData())
-		return -1;
 
 	// Initialize GLUT! :]
 	VGL_MANAGER->initializeGLUT(argc, argv);

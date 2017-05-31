@@ -110,25 +110,28 @@ public:
 	/*!
 	 * Function verifies the network by checking whether all inputs and outputs fit to each other.
 	 */
-	void verify() {
+	bool verify() {
 		bool ok = true;
 		// Set pointers - pass result to the next layer: x(next layer) = y(current layer).
 		if (layers.size() > 1)
 			for (size_t i = 0; i < layers.size()-1; i++) {
 				// Check inputs.
 				if (layers[i]->s['y']->rows() != layers[i+1]->s['x']->rows()) {
-					LOG(LERROR) << "Layer["<<i<<"].y=" <<  layers[i]->s['y']->rows() << " differs from " << "Layer["<<i+1<<"].x=" <<  layers[i+1]->s['x']->rows();
+					LOG(LERROR) << "Layer["<<i<<"].y differs from " << "Layer["<<i+1<<"].x";
 					ok = false;
+					LOG(LINFO) << "Layer["<<i<<"]: " <<  (*layers[i]).streamLayerParameters();
+					LOG(LINFO) << "Layer["<<i+1<<"]: " <<  (*layers[i+1]).streamLayerParameters();
 				}
 
 				// Check gradients.
 				if (layers[i]->g['y']->rows() != layers[i+1]->g['x']->rows()) {
-					LOG(LERROR) << "Layer["<<i<<"].dy=" <<  layers[i]->g['y']->rows() << " differs from " << "Layer["<<i+1<<"].dx=" <<  layers[i+1]->g['x']->rows();
+					LOG(LERROR) << "Layer["<<i<<"].dy differs from " << "Layer["<<i+1<<"].dx";
 					ok = false;
+					LOG(LINFO) << "Layer["<<i<<"]: " <<  (*layers[i]).streamLayerParameters();
+					LOG(LINFO) << "Layer["<<i+1<<"]: " <<  (*layers[i+1]).streamLayerParameters();
 				}
 			}//: for
-		if (!ok)
-			exit(-1);
+		return ok;
 	}
 
 
