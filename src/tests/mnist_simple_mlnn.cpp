@@ -71,7 +71,7 @@ int main() {
 
 
 	LOG(LSTATUS) << "Starting the training of neural network...";
-	float learning_rate = 0.01;
+	float learning_rate = 0.001;
 	MatrixXfPtr encoded_batch, encoded_targets;
 
 	// Perform the training.

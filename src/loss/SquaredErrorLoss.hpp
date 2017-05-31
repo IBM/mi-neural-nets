@@ -54,6 +54,11 @@ public:
 		for (size_t i=0; i <(size_t)predicted_y_->size(); i++) {
 			(*dy)[i] = -((*target_y_)[i] - (*predicted_y_)[i]);
 		}
+
+		/*std::cout << " predicted_y_ = " << (*predicted_y_) << std::endl;
+		std::cout << " target_y_ = " << (*target_y_) << std::endl;
+		std::cout << " dy = (p-t) = " << (*dy) << std::endl;*/
+
 		return dy;
 	}
 

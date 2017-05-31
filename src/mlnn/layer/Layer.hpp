@@ -251,7 +251,14 @@ public:
 	}
 
 	/*!
-	 * Returns the pointer to state (matrix) (or throws an exception!)
+	 * Returns the pointer to gradient (matrix) (or throws an exception!)
+	 */
+	mic::types::MatrixPtr<eT> getGradient(std::string name_) {
+		return g[name_];
+	}
+
+	/*!
+	 * Sets state (matrix) (or throws an exception!)
 	 */
 	void setState(std::string name_, mic::types::MatrixPtr<eT> mat_ptr_) {
 		(*s[name_]) = (*mat_ptr_);

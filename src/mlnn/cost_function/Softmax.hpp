@@ -41,7 +41,7 @@ public:
 		mic::types::MatrixPtr<eT> max = m["max"];
 		mic::types::MatrixPtr<eT> sum = m["sum"];
 
-//		std::cout << "Softmax forward: s['x'] = \n" << (*s['x']) << std::endl;
+		//std::cout << "Softmax forward: s['x'] = \n" << (*s['x']) << std::endl;
 
 		// Prevent overflow according to: http://eric-yuan.me/softmax/
 		(*max) = x->colwise().maxCoeff();
@@ -80,7 +80,7 @@ public:
 			// dx = dy *  derivative of softmax, i.e. y * (1 - y);
 			(*dx)[i] = (*dy)[i] * (*y)[i] * (1 - (*y)[i]);
 
-/*		std::cout << "Softmax backward: g['y'] = \n" << (*g['y']) << std::endl;
+		/*std::cout << "Softmax backward: g['y'] = \n" << (*g['y']) << std::endl;
 		std::cout << "Softmax backward: g['x'] = \n" << (*g['x']) << std::endl;*/
 	}
 
