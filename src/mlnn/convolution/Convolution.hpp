@@ -481,7 +481,7 @@ public:
 				// 3.1. Get input channel from image.
 				mic::types::MatrixPtr<eT> x_channel = m["xc"];
 				// Copy block - resizes the input channel matrix.
-				(*x_channel) = (*xs);//->block(ic*input_height*input_width, 0, input_height*input_width, 1);
+				(*x_channel) = xs->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				// Resize channel using the given dimensions.
 				x_channel->resize(input_height, input_width);
 				//std::cout<< "======  switching input channel = " << ic << " x_channel=\n" << (*x_channel) << std::endl;
