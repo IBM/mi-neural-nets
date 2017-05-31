@@ -89,7 +89,7 @@ TEST_F(Conv2x2x2Filter2x1x1s1Double, Backward) {
 	// Backward pass - need to set x.
 	layer.forward(x);
 	mic::types::MatrixPtr<double> dx = layer.backward(dy);
-	//std::cout<<"dx = \n" << (*dx).transpose() <<std::endl;
+	std::cout<<"dx = \n" << (*dx).transpose() <<std::endl;
 
 	// Check resulting dx gradient.
 	for (size_t i=0; i<8; i++)
