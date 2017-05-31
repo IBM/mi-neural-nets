@@ -185,9 +185,16 @@ public:
 		mic::types::MatrixPtr<eT> batch = s['x'];
 		//std::cout<< "forward batch_x=\n" << (*batch) << std::endl;
 
+		// Get output pointer - so the results will be stored!
+		mic::types::MatrixPtr<eT> y = s['y'];
+		y->setZero();
+
 		// Iterate through samples in the input batch.
 //#pragma omp parallel for
 		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// The "output sample" that will "concatenate" the output channels into one "column vector".
+			mic::types::MatrixPtr<eT> y_sample = m["ys"];
 
 			// 1. "Reset" output "channels".
 			for (size_t fi=0; fi< number_of_filters; fi++) {
@@ -233,11 +240,14 @@ public:
 				}//: for ry
 
 				// 3.3. Convolve receptive fields with filters.
+
 				// Iterate through filters and calculate the result of the convolution.
 				for (size_t fi=0; fi< number_of_filters; fi++) {
 					// Get output channel for a given filter.
 					mic::types::MatrixPtr<eT> y_channel = m["yc"+std::to_string(fi)];
-					//std::cout << "====  switching to oc = \n" << (*y_channel)<<std::endl;
+					// Resize to matrix.
+					y_channel->resize(output_height, output_width);
+					//std::cout << "====  switching to oc " << fi << " = \n" << (*y_channel)<<std::endl;
 					// Get "part of a given neuron" responding to a given input channel.
 					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 					// Not required - just in case. :]
@@ -256,43 +266,23 @@ public:
 						}//: for rx
 					}//: for ry
 					//std::cout << "====  ic = " << ic << " filter= " << fi << " oc = \n" << (*y_channel)<<std::endl;
+
+					// Resize output channel to a column vector.
+					y_channel->resize(output_height*output_width, 1);
+					// Concatenate.
+					y_sample->block(fi*output_height*output_width, 0, output_height*output_width, 1)
+							= (*y_channel);
 				}//: for filters
+
 			}//: for channels
-		}//: for batch
-
-		// 4. Produce output.
-		// Create output batch from samples one by one.
-
-		// Get output pointer - so the results will be stored!
-		mic::types::MatrixPtr<eT> y = s['y'];
-		y->setZero();
-
-		// Iterate through samples in the input batch.
-		for (size_t ib=0; ib< batch_size; ib++) {
-			// "Concatenate" output channels into one vector - "output sample".
-			mic::types::MatrixPtr<eT> y_sample = m["ys"];
-			y_sample->setZero();
-			for (size_t fi=0; fi< number_of_filters; fi++) {
-				// Get output channel for a given filter.
-				mic::types::MatrixPtr<eT> y_channel = m["yc"+std::to_string(fi)];
-				// Resize output channel to a column vector.
-				y_channel->resize(output_height*output_width, 1);
-				//std::cout << "filter= " << fi << " oc = " << (*y_channel)<<std::endl;
-
-				// Concatenate.
-				y_sample->block(fi*output_height*output_width, 0, output_height*output_width, 1)
-						= (*y_channel);
-				//std::cout <<"os =" << (*y_sample)<<std::endl;
-			}//: for filters
-			/*std::cout<<"os.dims = " << y_sample->rows() << "," << y_sample->cols() << "\n";
-			std::cout<<"y.dims = " << y->rows() << "," << y->cols() << "\n";*/
+			//std::cout <<"output before adding y =" << (*y) <<std::endl;
 			// Set column in the output batch.
 			y->col(ib) = (*y_sample);
 
 		}//: for batch
 
 		//std::cout <<"output y =" << (*y).transpose() <<std::endl;
-}//: forward
+	}//: forward
 
 	/*!
 	 * Back-propagates the gradients through the layer.
@@ -621,7 +611,7 @@ public:
 
 
 	/*!
-	 * Returns activations of neurons of a given layer (simple visualization).
+	 * Returns activations of weights.
 	 */
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
 
@@ -650,6 +640,78 @@ public:
 
 		// Return activations.
 		return w_activations;
+	}
+
+
+
+	/*!
+	 * Returns activations of weight gradients (dx).
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(dw_activations, number_of_filters * input_channels, filter_size*filter_size, 1);
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t fi=0; fi< number_of_filters; fi++) {
+
+			// Iterate through input channels.
+			for (size_t ic=0; ic< input_channels; ic++) {
+
+				// Get matrix of a given "part of a given neuron dW".
+				mic::types::MatrixPtr<eT> W = g["W"+std::to_string(fi)+"x"+std::to_string(ic)];
+
+				// Get row.
+				mic::types::MatrixPtr<eT> row = dw_activations[fi*input_channels + ic];
+				// Copy data.
+				(*row) = (*W);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for filter
+
+		// Return activations.
+		return dw_activations;
+	}
+
+
+	/*!
+	 * Returns activations of input neurons.
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations(bool normalize_ = true) {
+
+ 		// Allocate memory.
+		lazyAllocateMatrixVector(x_activations, input_channels * batch_size, input_height*input_width, 1);
+
+		// Get y batch.
+		mic::types::MatrixPtr<eT> batch_x = s['x'];
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_x = m["xs"];
+			(*sample_x) = batch_x->col(ib);
+
+			// Iterate through output channels.
+			for (size_t oc=0; oc< input_channels; oc++) {
+				// Get activation "row".
+				mic::types::MatrixPtr<eT> row = x_activations[ib*input_channels + oc];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = sample_x->block(oc*input_height*input_width, 0, input_height*input_width, 1);
+				row->resize(input_height, input_width);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for batch
+
+		// Return output activations.
+		return x_activations;
 	}
 
 
@@ -692,76 +754,6 @@ public:
 
 
 	/*!
-	 * Returns activations of weight gradients (dx).
-	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(bool normalize_ = true) {
-
-		// Allocate memory.
-		lazyAllocateMatrixVector(dw_activations, number_of_filters * input_channels, filter_size*filter_size, 1);
-
-		// Iterate through filters and generate "activation image" for each one.
-		for (size_t fi=0; fi< number_of_filters; fi++) {
-
-			// Iterate through input channels.
-			for (size_t ic=0; ic< input_channels; ic++) {
-
-				// Get matrix of a given "part of a given neuron dW".
-				mic::types::MatrixPtr<eT> W = g["W"+std::to_string(fi)+"x"+std::to_string(ic)];
-
-				// Get row.
-				mic::types::MatrixPtr<eT> row = dw_activations[fi*input_channels + ic];
-				// Copy data.
-				(*row) = (*W);
-
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
-			}//: for channel
-		}//: for filter
-
-		// Return activations.
-		return dw_activations;
-	}
-
-
-	/*!
-	 * Returns activations of neurons of a given layer (simple visualization).
-	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations(bool normalize_ = true) {
-
- 		// Allocate memory.
-		lazyAllocateMatrixVector(x_activations, input_channels * batch_size, input_height*input_width, 1);
-
-		// Get y batch.
-		mic::types::MatrixPtr<eT> batch_x = s['x'];
-
-		// Iterate through filters and generate "activation image" for each one.
-		for (size_t ib=0; ib< batch_size; ib++) {
-
-			// Get input sample from batch!
-			mic::types::MatrixPtr<eT> sample_x = m["xs"];
-			(*sample_x) = batch_x->col(ib);
-
-			// Iterate through output channels.
-			for (size_t oc=0; oc< input_channels; oc++) {
-				// Get activation "row".
-				mic::types::MatrixPtr<eT> row = x_activations[ib*input_channels + oc];
-
-				// Copy "channel block" from given dx sample.
-				(*row) = sample_x->block(oc*input_height*input_width, 0, input_height*input_width, 1);
-				row->resize(input_height, input_width);
-
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
-			}//: for channel
-		}//: for batch
-
-		// Return output activations.
-		return x_activations;
-	}
-
-	/*!
 	 * Returns activations of receptive fields.
 	 * Limitation: displays receptive fields of the last sample from batch!
 	 */
@@ -797,7 +789,7 @@ public:
 	}
 
 	/*!
-	 * Returns activations of neurons of a given layer (simple visualization).
+	 * Returns activations of inverse receptive fields.
 	 * Limitation: displays receptive fields of the last sample from batch!
 	 */
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseReceptiveFields(bool normalize_ = true) {
@@ -832,12 +824,12 @@ public:
 
 
 	/*!
-	 * Returns activations of neurons of a given layer (simple visualization).
+	 * Returns activations of output neurons.
 	 */
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(bool normalize_ = true) {
 
 		// Allocate memory.
-		lazyAllocateMatrixVector(y_activations, number_of_filters, output_height*output_width, 1);
+		lazyAllocateMatrixVector(y_activations, number_of_filters*batch_size, output_height*output_width, 1);
 
 		// Get y batch.
 		mic::types::MatrixPtr<eT> batch_y = s['y'];
@@ -865,6 +857,43 @@ public:
 
 		// Return output activations.
 		return y_activations;
+	}
+
+
+	/*!
+	 * Returns activations of gradients of output neurons.
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputGradientActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(dy_activations, number_of_filters*batch_size, output_height*output_width, 1);
+
+		// Get y batch.
+		mic::types::MatrixPtr<eT> batch_dy = g['y'];
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_dy = m["ys"];
+			(*sample_dy) = batch_dy->col(ib);
+
+			// Iterate through output channels.
+			for (size_t oc=0; oc< number_of_filters; oc++) {
+				// Get y "row".
+				mic::types::MatrixPtr<eT> row = dy_activations[ib*number_of_filters + oc];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = sample_dy->block(oc*output_height*output_width, 0, output_height*output_width, 1);
+				row->resize(output_height, output_width);
+
+				// Normalize.
+				normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for batch
+
+		// Return output activations.
+		return dy_activations;
 	}
 
 
@@ -918,17 +947,20 @@ private:
 	// Friend class - required for using boost serialization.
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
-	/// Vector containing activations of weights/filters.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
-
 	/// Vector containing activations of input neurons.
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > x_activations;
+
+	/// Vector containing activations of gradients of inputs (dx).
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > dx_activations;
 
 	/// Vector containing activations of output neurons.
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > y_activations;
 
-	/// Vector containing activations of gradients of inputs (dx).
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > dx_activations;
+	/// Vector containing activations of gradients of outputs (dy).
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > dy_activations;
+
+	/// Vector containing activations of weights/filters.
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
 
 	/// Vector containing activations of gradients of weights (dW).
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > dw_activations;

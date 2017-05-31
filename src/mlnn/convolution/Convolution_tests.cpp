@@ -62,10 +62,10 @@ TEST(Convolutions, LayerDimensions) {
  */
 TEST_F(Conv2x2x2Filter2x1x1s1Double, Forward) {
 
-	/*std::cout<<"W00 = \n" << (*layer.p["W00"]) <<std::endl;
-	std::cout<<"W01 = \n" << (*layer.p["W01"]) <<std::endl;
-	std::cout<<"W10 = \n" << (*layer.p["W10"]) <<std::endl;
-	std::cout<<"W11 = \n" << (*layer.p["W11"]) <<std::endl;
+	/*std::cout<<"W00 = \n" << (*layer.p["W0x0"]) <<std::endl;
+	std::cout<<"W01 = \n" << (*layer.p["W0x1"]) <<std::endl;
+	std::cout<<"W10 = \n" << (*layer.p["W1x0"]) <<std::endl;
+	std::cout<<"W11 = \n" << (*layer.p["W1x1"]) <<std::endl;
 	std::cout<<"x = \n" << (*x) <<std::endl;
 	std::cout<<"desired_y = \n" << (*desired_y) <<std::endl;*/
 
