@@ -134,7 +134,9 @@ script:
   - make install VERBOSE=1
   - src/loss/lossTestsRunner
   - src/mlnn/cost_function/softmaxTestsRunner
+  - src/mlnn/convolution/convolutionTestsRunner
   - src/mlnn/fully_connected/linearTestsRunner
   - src/mlnn/mlnnTestsRunner
   - src/optimization/artificialLandscapesTestsRunner
   - src/optimization/optimizationFunctionsTestsRunner
+  - src/optimization/hebbianLearningTestsRunner
