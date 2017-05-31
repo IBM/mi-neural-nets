@@ -18,7 +18,7 @@ namespace mlnn {
 namespace convolution {
 
 /*!
- * \brief Class representing a convolution layer.
+ * \brief Class representing a convolution layer, with "valid padding" and variable stride.
  * \author tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
@@ -93,13 +93,13 @@ public:
 			// A given filter (neuron layer) has in fact connection to all input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
 				// Create the weights matrix - a row vector.
-				p.add ("W"+std::to_string(fi)+std::to_string(ic), 1, filter_size*filter_size);
+				p.add ("W"+std::to_string(fi)+"x"+std::to_string(ic), 1, filter_size*filter_size);
 				// Initialize weights of the W matrix.
-				p["W"+std::to_string(fi)+std::to_string(ic)]->rand(-range, range);
+				p["W"+std::to_string(fi)+"x"+std::to_string(ic)]->rand(-range, range);
 				//std::cout<<"W.dims = " << p["W"+std::to_string(fi)+std::to_string(ic)]->rows() << "," << p["W"+std::to_string(fi)+std::to_string(ic)]->cols() << "\n";
 
 				// Create the weights matrix for updates/gradients.
-				g.add ("W"+std::to_string(fi)+std::to_string(ic), 1, filter_size*filter_size);
+				g.add ("W"+std::to_string(fi)+"x"+std::to_string(ic), 1, filter_size*filter_size);
 			}//: for input channels.
 
 		}//: for filter
@@ -114,7 +114,7 @@ public:
 		for (size_t ry=0; ry< output_height; ry++) {
 			for (size_t rx=0; rx< output_width; rx++) {
 				// Create receptive field matrix.
-				m.add ("xrf"+std::to_string(ry)+std::to_string(rx), filter_size, filter_size);
+				m.add ("xrf"+std::to_string(ry)+"x"+std::to_string(rx), filter_size, filter_size);
 			}//: for
 		}//: for
 
@@ -163,7 +163,7 @@ public:
 		for (size_t ry=0; ry< filter_size; ry++) {
 			for (size_t rx=0; rx< filter_size; rx++) {
 				// Create receptive field matrix.
-				m.add ("ixrf"+std::to_string(ry)+std::to_string(rx), output_height, output_width);
+				m.add ("ixrf"+std::to_string(ry)+"x"+std::to_string(rx), output_height, output_width);
 			}//: for
 		}//: for
 
@@ -223,7 +223,7 @@ public:
 					for (size_t rx=0, ix = 0; rx< output_width; rx++, ix+=stride) {
 						//std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
 						// Get receptive field matrix...
-						mic::types::MatrixPtr<eT> field = m["xrf"+std::to_string(ry)+std::to_string(rx)];
+						mic::types::MatrixPtr<eT> field = m["xrf"+std::to_string(ry)+"x"+std::to_string(rx)];
 						// Copy block from channel - resizes the field matrix.
 						(*field) = ichannel->block(iy,ix,filter_size, filter_size);
 						//std::cout<< "field=\n" << (*field) << std::endl;
@@ -239,14 +239,14 @@ public:
 					mic::types::MatrixPtr<eT> y_channel = m["yc"+std::to_string(fi)];
 					//std::cout << "====  switching to oc = \n" << (*y_channel)<<std::endl;
 					// Get "part of a given neuron" responding to a given input channel.
-					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
+					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 					// Not required - just in case. :]
 					W->resize(1,filter_size*filter_size);
 					// Iterate through receptive fields.
 					for (size_t ry=0; ry< output_height; ry++) {
 						for (size_t rx=0; rx< output_width; rx++) {
 							// Get receptive field matrix of size (1, filter_size^2)...
-							mic::types::MatrixPtr<eT> xrf = m["xrf"+std::to_string(ry)+std::to_string(rx)];
+							mic::types::MatrixPtr<eT> xrf = m["xrf"+std::to_string(ry)+"x"+std::to_string(rx)];
 							// ... and result of "convolution" of that filter with the part of the input "below" the receptive field.
 							/*std::cout<<"ic = " << ic  << " filter = " << fi << " ry =" << ry <<" rx =" << rx <<std::endl;
 							std::cout<< "W=\n" << (*W) << std::endl;
@@ -255,7 +255,7 @@ public:
 							(*y_channel)(ry, rx) += ((*W)*(*xrf))(0);
 						}//: for rx
 					}//: for ry
-					//std::cout << "====  ic = " << ic << "filter= " << fi << " oc = \n" << (*y_channel)<<std::endl;
+					//std::cout << "====  ic = " << ic << " filter= " << fi << " oc = \n" << (*y_channel)<<std::endl;
 				}//: for filters
 			}//: for channels
 		}//: for batch
@@ -291,7 +291,7 @@ public:
 
 		}//: for batch
 
-		std::cout <<"output y =" << (*y).transpose() <<std::endl;
+		//std::cout <<"output y =" << (*y).transpose() <<std::endl;
 }//: forward
 
 	/*!
@@ -335,7 +335,7 @@ public:
 				mic::types::MatrixPtr<eT> reW = m["reW"+std::to_string(fi)+std::to_string(ic)];
 				reW->setZero();
 				// Get filter.
-				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
+				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 				W->resize(filter_size, filter_size);
 				// "Rotate" and insert filter values into right positions of "rotated-expanded" filter.
 				for(size_t y=0; y < filter_size; y++)
@@ -383,7 +383,7 @@ public:
 					//std::cout<< "======  switching filter = " << fi << std::endl;
 
 					// Get filter weight matrix.
-					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
+					mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 					W->resize(filter_size, filter_size);
 
 					// Get gradient y channel.
@@ -459,7 +459,7 @@ public:
 		for (size_t fi=0; fi< number_of_filters; fi++) {
 			// A given filter (neuron layer) has in fact connection to all input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
-				g["W"+std::to_string(fi)+std::to_string(ic)]->setZero();
+				g["W"+std::to_string(fi)+"x"+std::to_string(ic)]->setZero();
 			}//: for ic
 		}//: for fi
 
@@ -481,7 +481,7 @@ public:
 				// 3.1. Get input channel from image.
 				mic::types::MatrixPtr<eT> x_channel = m["xc"];
 				// Copy block - resizes the input channel matrix.
-				(*x_channel) = xs->block(ic*input_height*input_width, 0, input_height*input_width, 1);
+				(*x_channel) = (*xs);//->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				// Resize channel using the given dimensions.
 				x_channel->resize(input_height, input_width);
 				//std::cout<< "======  switching input channel = " << ic << " x_channel=\n" << (*x_channel) << std::endl;
@@ -492,19 +492,23 @@ public:
 				for (size_t fy=0; fy< filter_size; fy++) {
 					for (size_t fx=0; fx< filter_size; fx++) {
 						// Get inverse receptive field matrix.
-						mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(fy)+std::to_string(fx)];
+						mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(fy)+"x"+std::to_string(fx)];
+						ixrf->setZero();
 						//std::cout << (*x_field).rows() << "x" << (*x_field).cols() <<std::endl;
 						//std::cout<< "x_field=\n" << (*x_field) << std::endl;
 						ixrf->resize(output_height, output_width);
+						ixrf->setZero();
 						// Iterate through the input channel using stride.
 						for (size_t iy=0; iy< output_height; iy++) {
 							for (size_t ix=0; ix< output_width; ix++) {
-								//std::cout<<"ry =" << ry <<" rx =" << rx <<" iy =" << iy <<" ix =" << ix << std::endl;
+								/*std::cout<<"fy =" << fy <<" fx =" << fx <<" iy =" << iy <<" ix =" << ix << std::endl;
+								std::cout<<"fy*iy*stride =" << fy*iy*stride <<" fx+ix*stride =" << fx+ix*stride <<std::endl;*/
 								// Copy cell - one by one :]
 								(*ixrf)(iy, ix) = (*x_channel)(fy+iy*stride,fx+ix*stride);
 
 							}//: for ix
 						}//: for iy
+						//(*ixrf) = (*x_channel).block(fy, fx, output_height, output_width);
 						// Resize the field to a column vector.
 						ixrf->resize(1, output_height*output_width);
 						//std::cout<< "x_field=\n" << (*x_field) << std::endl;
@@ -519,7 +523,7 @@ public:
 					//std::cout<< "gyc=\n" << (*gyc) << std::endl;
 
 					// Get matrix of a given "part of a given neuron".
-					mic::types::MatrixPtr<eT> dW = g["W"+std::to_string(fi)+std::to_string(ic)];
+					mic::types::MatrixPtr<eT> dW = g["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 					// Not required - just in case. :]
 					dW->resize(filter_size, filter_size);
 					// Iterate through inverse receptive fields and CONVOLVE.
@@ -527,7 +531,7 @@ public:
 						for (size_t rx=0; rx< filter_size; rx++) {
 							//std::cout<<"filter = " << fi << " ry =" << ry <<" rx =" << rx <<std::endl;
 							// Get inverse receptive field matrix of size (filter_size^2, 1)...
-							mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(ry)+std::to_string(rx)];
+							mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(ry)+"x"+std::to_string(rx)];
 							ixrf->resize(1, output_height*output_width);
 							/*std::cout<< "x_field=\n" << (*ixrf) << std::endl;
 							std::cout<< "gyc=\n" << (*gyc) << std::endl;
@@ -619,7 +623,7 @@ public:
 	/*!
 	 * Returns activations of neurons of a given layer (simple visualization).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(w_activations, number_of_filters, filter_size*filter_size, 1);
@@ -630,7 +634,7 @@ public:
 			// Iterate through input channels.
 			for (size_t ic=0; ic< input_channels; ic++) {
 				// Get matrix of a given "part of a given neuron".
-				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+std::to_string(ic)];
+				mic::types::MatrixPtr<eT> W = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 
 				// Get row.
 				mic::types::MatrixPtr<eT> row = w_activations[fi*input_channels + ic];
@@ -639,7 +643,8 @@ public:
 				row->resize(filter_size, filter_size);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for channels
 		}//: for filters
 
@@ -651,7 +656,7 @@ public:
 	/*!
 	 * Returns activations of input gradients (dx).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputGradientActivations(size_t height_, size_t width_) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputGradientActivations(bool normalize_ = true) {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dx_activations, batch_size * input_channels, filter_size*filter_size, 1);
@@ -676,7 +681,8 @@ public:
 				row->resize(filter_size, filter_size);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
@@ -688,7 +694,7 @@ public:
 	/*!
 	 * Returns activations of weight gradients (dx).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(size_t height_, size_t width_) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(bool normalize_ = true) {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dw_activations, number_of_filters * input_channels, filter_size*filter_size, 1);
@@ -700,7 +706,7 @@ public:
 			for (size_t ic=0; ic< input_channels; ic++) {
 
 				// Get matrix of a given "part of a given neuron dW".
-				mic::types::MatrixPtr<eT> W = g["W"+std::to_string(fi)+std::to_string(ic)];
+				mic::types::MatrixPtr<eT> W = g["W"+std::to_string(fi)+"x"+std::to_string(ic)];
 
 				// Get row.
 				mic::types::MatrixPtr<eT> row = dw_activations[fi*input_channels + ic];
@@ -708,7 +714,8 @@ public:
 				(*row) = (*W);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for filter
 
@@ -720,8 +727,8 @@ public:
 	/*!
 	 * Returns activations of neurons of a given layer (simple visualization).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations(size_t height_, size_t width_) {
-/*
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations(bool normalize_ = true) {
+
  		// Allocate memory.
 		lazyAllocateMatrixVector(x_activations, input_channels * batch_size, input_height*input_width, 1);
 
@@ -745,56 +752,92 @@ public:
 				row->resize(input_height, input_width);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
 		// Return output activations.
-		return x_activations;*/
+		return x_activations;
+	}
 
- 		// Allocate memory.
-		lazyAllocateMatrixVector(x_activations, output_height * output_width, filter_size, filter_size);
+	/*!
+	 * Returns activations of receptive fields.
+	 * Limitation: displays receptive fields of the last sample from batch!
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getReceptiveFields(bool normalize_ = true) {
+
+		// TODO: batch!
+		//assert(batch_size==1);
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(xrf_activations, output_height * output_width, filter_size, filter_size);
 
 		// Receptive field "id" coordinates: rx, ry.
 		for (size_t ry=0; ry< output_height; ry++) {
 			for (size_t rx=0; rx< output_width; rx++) {
 				// Get receptive field matrix...
-				mic::types::MatrixPtr<eT> field = m["xrf"+std::to_string(ry)+std::to_string(rx)];
+				mic::types::MatrixPtr<eT> xrf = m["xrf"+std::to_string(ry)+"x"+std::to_string(rx)];
 
 				// Get activation "row".
-				mic::types::MatrixPtr<eT> row = x_activations[ry*output_width + rx];
+				mic::types::MatrixPtr<eT> row = xrf_activations[ry*output_width + rx];
 
 				// Copy field.
-				(*row) = *(field);
+				(*row) = *(xrf);
 				row->resize(filter_size, filter_size);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for ry
 		}//: for rx
 
 		// Return activations.
-		return x_activations;
+		return xrf_activations;
 	}
 
+	/*!
+	 * Returns activations of neurons of a given layer (simple visualization).
+	 * Limitation: displays receptive fields of the last sample from batch!
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseReceptiveFields(bool normalize_ = true) {
 
+		// TODO: batch!
+		//assert(batch_size==1);
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(irf_activations, filter_size*filter_size, output_height, output_width);
+
+		for (size_t fy=0; fy< filter_size; fy++) {
+			for (size_t fx=0; fx< filter_size; fx++) {
+				// Get inverse receptive field matrix.
+				mic::types::MatrixPtr<eT> ixrf = m["ixrf"+std::to_string(fy)+"x"+std::to_string(fx)];
+
+				// Get activation "row".
+				mic::types::MatrixPtr<eT> row = irf_activations[fy*filter_size + fx];
+
+				// Copy field.
+				(*row) = *(ixrf);
+				row->resize(output_height, output_width);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+				}//: for rx
+			}//: for ry
+
+		// Return activations.
+		return irf_activations;
+	}
 
 
 	/*!
 	 * Returns activations of neurons of a given layer (simple visualization).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(size_t height_, size_t width_) {
-		// Check if memory for the activations was allocated.
-		if (y_activations.size() == 0) {
-			for (size_t i=0; i < number_of_filters; i++) {
-				// Allocate memory for activation of every neuron.
-				mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, output_height*output_width, 1);
-				y_activations.push_back(row);
-			}//: for
-		}//: if
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(bool normalize_ = true) {
 
-		// Epsilon added for numerical stability.
-		eT eps = 1e-10;
+		// Allocate memory.
+		lazyAllocateMatrixVector(y_activations, number_of_filters, output_height*output_width, 1);
 
 		// Get y batch.
 		mic::types::MatrixPtr<eT> batch_y = s['y'];
@@ -814,10 +857,9 @@ public:
 				// Copy "channel block" from given dx sample.
 				(*row) = sample_y->block(oc*output_height*output_width, 0, output_height*output_width, 1);
 				row->resize(output_height, output_width);
-				// Calculate l2 norm.
-				eT l2 = row->norm() + eps;
-				// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-				(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
+
+				// Normalize.
+				normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
@@ -890,6 +932,12 @@ private:
 
 	/// Vector containing activations of gradients of weights (dW).
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > dw_activations;
+
+	/// Vector containing receptive fields.
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > xrf_activations;
+
+	/// Vector containing inverse receptive fields.
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > irf_activations;
 
 	/*!
 	 * Private constructor, used only during the serialization.

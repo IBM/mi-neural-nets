@@ -54,7 +54,7 @@ mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
 const size_t batch_size = 1;
-const size_t hidden_layer_units = 64;
+const size_t output_size = 13520;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
 
@@ -74,10 +74,10 @@ void batch_function (void) {
 		//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 		//neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 4, 14, 14));
-			//neural_net.pushLayer(new ReLU<float>(90));
-			//neural_net.pushLayer(new Linear<float>(16, 10));
-			neural_net.pushLayer(new Softmax<float>(16));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 10, 28, 1));
+			//neural_net.pushLayer(new ReLU<float>(output_size));
+			//neural_net.pushLayer(new Linear<float>(output_size, 10));
+			neural_net.pushLayer(new Softmax<float>(10));
 			neural_net.verify();
 			//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 			//neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
@@ -88,7 +88,7 @@ void batch_function (void) {
 	size_t iteration = 0;
 
 	// Retrieve the next minibatch.
-	mic::types::MNISTBatch bt = importer->getRandomBatch();
+	mic::types::MNISTBatch bt = importer->getNextBatch();
 
 	// Main application loop.
 	while (!APP_STATE->Quit()) {
@@ -103,23 +103,25 @@ void batch_function (void) {
 			{ // Enter critical section - with the use of scoped lock from AppState!
 				APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
+				// Retrieve the next minibatch.
+				//mic::types::MNISTBatch bt = importer->getNextBatch();
+
 				// Set batch to be displayed.
 				w_input->setBatchDataUnsynchronized(bt.data());
 
 				// Encode data.
 				mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
-				//mic::types::MatrixXfPtr encoded_labels = mnist_encoder->encodeBatch(bt.data());
-//				mic::types::MatrixXfPtr encoded_labels = label_encoder->encodeBatch(bt.labels());
+				mic::types::MatrixXfPtr encoded_labels = label_encoder->encodeBatch(bt.labels());
 
 /*				mic::types::MatrixPtr<float> encoded_batch = MAKE_MATRIX_PTR(float, patch_size*patch_size, 1);
 				for (size_t i=0; i<patch_size*patch_size; i++)
 					(*encoded_batch)[i]= 1.0 -(float)i/(patch_size*patch_size);*/
-				mic::types::MatrixPtr<float> encoded_labels = MAKE_MATRIX_PTR(float, 16, 1);
+				/*mic::types::MatrixPtr<float> encoded_labels = MAKE_MATRIX_PTR(float, output_size, 1);
 				encoded_labels->setZero();
-				(*encoded_labels)[0]= 1.0;
-				(*encoded_labels)[6]= 1.0;
+				(*encoded_labels)[0]= 1.0;*/
+				/*(*encoded_labels)[6]= 1.0;
 				(*encoded_labels)[9]= 1.0;
-				(*encoded_labels)[15]= 1.0;
+				(*encoded_labels)[15]= 1.0;*/
 
 				// Train the autoencoder.
 				float loss = neural_net.train (encoded_batch, encoded_labels, 0.1);
@@ -132,11 +134,11 @@ void batch_function (void) {
 				if (iteration%10 == 0) {
 					// Visualize the weights.
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > layer1 = neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(0);
-					w_weights1->setBatchDataUnsynchronized(layer1->getActivations(patch_size, patch_size));
+					w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
 
-					w_weights2->setBatchDataUnsynchronized(layer1->getInputGradientActivations(patch_size, patch_size));
-					w_weights3->setBatchDataUnsynchronized(layer1->getWeightGradientActivations(patch_size, patch_size));
-					w_weights4->setBatchDataUnsynchronized(layer1->getInputActivations(patch_size, patch_size));
+					w_weights2->setBatchDataUnsynchronized(layer1->getWeightGradientActivations());
+					w_weights3->setBatchDataUnsynchronized(layer1->getReceptiveFields(false));
+					w_weights4->setBatchDataUnsynchronized(layer1->getInverseReceptiveFields(false));
 
 				}//: if
 
@@ -198,8 +200,8 @@ int main(int argc, char* argv[]) {
 //	w_reconstruction = new WindowGrayscaleBatch("Reconstructed batch", 512, 512, 0, 580);
 	w_weights1 = new WindowGrayscaleBatch("L0 weights", 512, 512, 612, 100);
 	w_weights2 = new WindowGrayscaleBatch("L0 dx", 512, 512, 1124, 100);
-	w_weights3 = new WindowGrayscaleBatch("L0 dW", 512, 512, 100, 612);
-	w_weights4 = new WindowGrayscaleBatch("L0 tmp", 512, 512, 612, 612);
+	w_weights3 = new WindowGrayscaleBatch("L0 receptive fields", 512, 512, 100, 612);
+	w_weights4 = new WindowGrayscaleBatch("L0 inverse receptive fields", 512, 512, 612, 612);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 
