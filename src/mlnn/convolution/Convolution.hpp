@@ -595,6 +595,14 @@ public:
 		}//: for
 	}
 
+
+	/*!
+	 * Allocates memory to a matrix vector (lazy).
+	 * @param vector_ Vector that will store the matrices.
+	 * @param vector_size Number of matrices to be added.
+	 * @param matrix_height_ Height of matrices.
+	 * @param matrix_width_ Width of matrices.
+	 */
 	void lazyAllocateMatrixVector(std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & vector_, size_t vector_size_, size_t matrix_height_, size_t matrix_width_) {
 		// Check if memory for the activations was allocated.
 		if (vector_.size() == 0) {
@@ -606,6 +614,11 @@ public:
 		}//: if
 	}
 
+
+	/*!
+	 * Normalizes the matrix. to the range <0.0, 1.0>. - for the visualization purposes.
+	 * @param matrix_ Matrix to be normalized.
+	 */
 	void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
 		// Epsilon added for numerical stability.
 		eT eps = 1e-10;
@@ -622,7 +635,7 @@ public:
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
 
 		// Allocate memory.
-		lazyAllocateMatrixVector(w_activations, number_of_filters, filter_size*filter_size, 1);
+		lazyAllocateMatrixVector(w_activations, number_of_filters*input_channels, filter_size*filter_size, 1);
 
 		// Iterate through filters and generate "activation image" for each one.
 		for (size_t fi=0; fi< number_of_filters; fi++) {
@@ -727,7 +740,7 @@ public:
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputGradientActivations(bool normalize_ = true) {
 
 		// Allocate memory.
-		lazyAllocateMatrixVector(dx_activations, batch_size * input_channels, filter_size*filter_size, 1);
+		lazyAllocateMatrixVector(dx_activations, batch_size * input_channels, input_height*input_width, 1);
 
 		// Get dx batch.
 		mic::types::MatrixPtr<eT> batch_dx = g['x'];
@@ -745,8 +758,8 @@ public:
 				mic::types::MatrixPtr<eT> row = dx_activations[ib*input_channels + ic];
 
 				// Copy "channel block" from given dx sample.
-				(*row) = sample_dx->block(ic*filter_size*filter_size, 0, filter_size*filter_size, 1);
-				row->resize(filter_size, filter_size);
+				(*row) = sample_dx->block(ic*input_height*input_width, 0, input_height*input_width, 1);
+				row->resize(input_height, input_width);
 
 				// Normalize.
 				if (normalize_ )
