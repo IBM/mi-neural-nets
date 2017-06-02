@@ -166,8 +166,8 @@ class Linear50x100Double : public ::testing::Test {
 public:
 	// Constructor. Sets layer size.
 	Linear50x100Double () : layer(50,100) {
-		const_x = MAKE_MATRIX_PTR (double, layer.input_size, 1);
-		target_y = MAKE_MATRIX_PTR (double, layer.output_size, 1);
+		const_x = MAKE_MATRIX_PTR (double, layer.inputSize(), 1);
+		target_y = MAKE_MATRIX_PTR (double, layer.outputSize(), 1);
 	}
 
 protected:
@@ -179,22 +179,22 @@ protected:
 		std::mt19937 mt(rd());
 
 		// Initialize W.
-		double range = sqrt(6.0 / double(layer.output_size + layer.input_size));
+		double range = sqrt(6.0 / double(layer.outputSize() + layer.inputSize()));
 		std::uniform_real_distribution<double> distW(-range, range);
-		for (size_t i = 0; i < layer.output_size * layer.input_size; i++)
+		for (size_t i = 0; i < layer.outputSize() * layer.inputSize(); i++)
 			(*layer.p["W"])[i] = (double)distW(rd);
 
 		// Initialize b.
 		std::uniform_real_distribution<double> distb(-5.0, 5.0);
-		for(size_t row=0; row < layer.output_size; row++)
+		for(size_t row=0; row < layer.outputSize(); row++)
 			(*layer.p["b"])[row] = (double)distb(rd);
 
 		// Initialize x and y.
 		std::uniform_real_distribution<double> distxy(-5.0, 5.0);
-		for (size_t i = 0; i <layer.input_size; i++)
+		for (size_t i = 0; i <layer.inputSize(); i++)
 			(*const_x)[i] = (double)distxy(rd);
 
-		for (size_t i = 0; i < layer.output_size; i++)
+		for (size_t i = 0; i < layer.outputSize(); i++)
 			(*target_y)[i] = (double)distxy(rd);
 
 		// Reset state and gradients.

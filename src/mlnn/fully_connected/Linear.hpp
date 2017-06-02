@@ -28,29 +28,50 @@ class Linear : public mic::mlnn::Layer<eT> {
 public:
 
 	/*!
-	 * Creates the linear (i.e fully connected) layer.
+	 * Creates a linear (i.e fully connected) layer - reduced number of parameters.
 	 * @param inputs_ Length of the input vector.
 	 * @param outputs_ Length of the output vector.
 	 * @param name_ Name of the layer.
 	 */
-	Linear<eT>(size_t inputs_, size_t outputs_, std::string name_ = "Linear") :
-		Layer<eT>(inputs_, outputs_, 1, LayerTypes::Linear, name_) {
+	Linear(size_t inputs_, size_t outputs_, std::string name_ = "Linear") :
+		Linear(inputs_, 1, 1, outputs_, 1, 1, name_)
+	{
+		std::cout<<"constructor Linear 1!\n";
+	}
+
+
+	/*!
+	 * Creates a linear (i.e fully connected) layer.
+	 * @param input_height_ Height of the input sample.
+	 * @param input_width_ Width of the input sample.
+	 * @param input_depth_ Depth of the input sample.
+	 * @param output_height_ Width of the output sample.
+	 * @param output_width_ Height of the output sample.
+	 * @param output_depth_ Depth of the output sample.
+	 * @param name_ Name of the layer.
+	 */
+	Linear(size_t input_height_, size_t input_width_, size_t input_depth_, size_t output_height_, size_t output_width_, size_t output_depth, std::string name_ = "Linear") :
+		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
+				output_height_, output_width_, output_depth,
+				LayerTypes::Convolution, name_)
+	{
+		std::cout<<"constructor Linear 2!\n";
 
 		// Create the weights matrix.
-		p.add ("W", outputs_, inputs_);
+		p.add ("W", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
 		// Create the bias vector.
-		p.add ("b", outputs_, 1);
+		p.add ("b", Layer<eT>::outputSize(), 1);
 
 		// Initialize weights of the W matrix.
-		eT range = sqrt(6.0 / eT(inputs_ + outputs_));
+		eT range = sqrt(6.0 / eT(Layer<eT>::inputSize() + Layer<eT>::outputSize()));
 
 		Layer<eT>::p['W']->rand(-range, range);
 		Layer<eT>::p['b']->setZero();
 
 		// Add W and b gradients.
-		Layer<eT>::g.add ("W", outputs_, inputs_);
-		Layer<eT>::g.add ("b", outputs_, 1 );
+		Layer<eT>::g.add ("W", Layer<eT>::outputSize(), Layer<eT>::inputSize());
+		Layer<eT>::g.add ("b", Layer<eT>::outputSize(), 1 );
 
 		// Set gradient descent as default optimization function.
 		Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
@@ -130,39 +151,91 @@ public:
 		//std::cout << "p['W'] after update= \n" << (*p['W']) << std::endl;
 	}
 
+
+	/*!
+	 * Returns activations of weights.
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(w_activations, 1, Layer<eT>::outputSize()*Layer<eT>::inputSize(), 1);
+
+		// Get matrix of a given "part of a given neuron".
+		mic::types::MatrixPtr<eT> W = p["W"];
+
+		// Get row.
+		mic::types::MatrixPtr<eT> row = w_activations[0];
+		// Copy data.
+		(*row) = (*W);
+		row->resize(Layer<eT>::outputSize(), Layer<eT>::inputSize());
+
+		// Normalize.
+		if (normalize_ )
+			normalizeMatrixForVisualization(row);
+
+		// Return activations.
+		return w_activations;
+	}
+
+
+
+	/*!
+	 * Returns activations of weight gradients (dx).
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(dw_activations, 1, Layer<eT>::outputSize()*Layer<eT>::inputSize(), 1);
+
+		// Get matrix of a given "part of a given neuron".
+		mic::types::MatrixPtr<eT> dW = g["W"];
+
+		// Get row.
+		mic::types::MatrixPtr<eT> row = dw_activations[0];
+		// Copy data.
+		(*row) = (*dW);
+		row->resize(Layer<eT>::outputSize(), Layer<eT>::inputSize());
+
+		// Normalize.
+		if (normalize_ )
+			normalizeMatrixForVisualization(row);
+
+		// Return activations.
+		return dw_activations;
+	}
+
+
+
 	/*!
 	 * Returns activations of neurons of a given layer (simple visualization).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
-		// Check if memory for the activations was allocated.
-		if (neuron_activations.size() == 0) {
-			for (size_t i=0; i < output_size; i++) {
-				// Allocate memory for activation of every neuron.
-				mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, input_size, 1);
-				neuron_activations.push_back(row);
-			}//: for
-		}//: if
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseActivations(bool normalize_ = true) {
 
-		// Epsilon added for numerical stability.
-		eT eps = 1e-10;
+		// Allocate memory.
+		lazyAllocateMatrixVector(inverse_activations, Layer<eT>::outputSize(), input_height*input_width, 1);
+
+		// TODO: check different input-output depths.
 
 		mic::types::MatrixPtr<eT> W =  p["W"];
 		// Iterate through "neurons" and generate "activation image" for each one.
-		for (size_t i=0; i < output_size; i++) {
-			// Get row.
-			mic::types::MatrixPtr<eT> row = neuron_activations[i];
-			// Copy data.
-			(*row) = W->row(i);
-			// Resize row.
-			row->resize( height_, width_);
-			// Calculate l2 norm.
-			eT l2 = row->norm() + eps;
-			// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-			(*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
+		for (size_t i=0; i < output_height*output_width; i++) {
+
+			for (size_t j=0; j < input_depth; j++) {
+				// "Access" activation row.
+				mic::types::MatrixPtr<eT> row = inverse_activations[i*input_depth + j];
+				// Copy data.
+				(*row) = W->row(i).block(input_height*input_width, 1);
+				// Resize row.
+				row->resize( input_height, input_width);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+			}//: for
 		}//: for
 
 		// Return activations.
-		return neuron_activations;
+		return inverse_activations;
 	}
 
 
@@ -176,10 +249,20 @@ protected:
     using Layer<eT>::s;
     using Layer<eT>::p;
     using Layer<eT>::m;
-    using Layer<eT>::input_size;
-    using Layer<eT>::output_size;
-    using Layer<eT>::batch_size;
     using Layer<eT>::opt;
+
+    // Uncover "sizes" for visualization.
+    using Layer<eT>::input_height;
+    using Layer<eT>::input_width;
+    using Layer<eT>::input_depth;
+	using Layer<eT>::output_height;
+	using Layer<eT>::output_width;
+	using Layer<eT>::output_depth;
+    using Layer<eT>::batch_size;
+
+	 // Uncover methods useful in visualization.
+	 using Layer<eT>::lazyAllocateMatrixVector;
+	 using Layer<eT>::normalizeMatrixForVisualization;
 
 private:
 	// Friend class - required for using boost serialization.
@@ -188,8 +271,14 @@ private:
 	// Friend class - required for accessing private constructor.
 	template<typename tmp> friend class SparseLinear;
 
-	/// Vector containing activations of neurons.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > neuron_activations;
+	/// Vector containing activations of weights/filters.
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
+
+	/// Vector containing activations of gradients of weights (dW).
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > dw_activations;
+
+	/// Vector containing activations of neurons (y*W^T).
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > inverse_activations;
 
 	/*!
 	 * Private constructor, used only during the serialization.

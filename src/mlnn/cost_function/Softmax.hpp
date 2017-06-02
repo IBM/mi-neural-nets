@@ -15,7 +15,7 @@ namespace mlnn {
 namespace cost_function {
 
 /*!
- * Softmax cost function.
+ * \brief Softmax activation function.
  * \author tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
@@ -23,16 +23,61 @@ template <typename eT=float>
 class Softmax : public mic::mlnn::Layer<eT> {
 public:
 
-	Softmax<eT>(size_t inputs_, std::string name_ = "Softmax") :
-		Layer<eT>(inputs_, inputs_, 1, LayerTypes::Softmax, name_) {
+	/*!
+	 * Creates a Softmax layer - reduced number of parameters.
+	 * @param size_ Length of the input/output data.
+	 * @param name_ Name of the layer.
+	 */
+	Softmax(size_t size_, std::string name_ = "Softmax") :
+		Softmax(size_, 1, 1, size_, 1, 1, name_)
+	{
+		std::cout<<"constructor Softmax 1!\n";
+	}
 
+
+	/*!
+	 * Creates a Softmax layer.
+	 * @param input_height_ Height of the input sample.
+	 * @param input_width_ Width of the input sample.
+	 * @param input_depth_ Depth of the input sample.
+	 * @param output_height_ Width of the output sample.
+	 * @param output_width_ Height of the output sample.
+	 * @param output_depth_ Depth of the output sample.
+	 * @param name_ Name of the layer.
+	 */
+	Softmax(size_t input_height_, size_t input_width_, size_t input_depth_, size_t output_height_, size_t output_width_, size_t output_depth, std::string name_ = "Softmax") :
+		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
+				output_height_, output_width_, output_depth,
+				LayerTypes::Softmax, name_)
+	{
+		std::cout<<"constructor Softmax!\n";
 		// Add "temporary" parameters.
-		m.add("e", inputs_, 1);
+		m.add("e", Layer<eT>::inputSize(), 1);
 		m.add("sum", 1, 1);
 		m.add("max", 1, 1);
 	}
 
+
+	/*!
+	 * Virtual destructor - empty.
+	 */
 	virtual ~Softmax() {};
+
+	/*!
+	 * Changes the size of the batch - resizes e and sum.
+	 * @param New size of the batch.
+	 */
+	virtual void resizeBatch(size_t batch_size_) {
+		// Call parent resize.
+		Layer<eT>::resizeBatch(batch_size_);
+
+		// Reshape the temporary matrices.
+		m["e"]->resize(m["e"]->rows(), batch_size_);
+		m["sum"]->resize(m["sum"]->rows(), batch_size_);
+		m["max"]->resize(m["max"]->rows(), batch_size_);
+	}
+
+
 
 	void forward(bool test_ = false) {
 		mic::types::MatrixPtr<eT> x = s["x"];
@@ -46,19 +91,13 @@ public:
 		// Prevent overflow according to: http://eric-yuan.me/softmax/
 		(*max) = x->colwise().maxCoeff();
 
-//		std::cout << "Softmax forward: max = \n" << (*max) << std::endl;
-
 		// Calculate the e matrix - with overflow prevention.
 		for (size_t i = 0; i < (size_t)y->rows(); i++)
 			for (size_t j = 0; j < (size_t)y->cols(); j++)
 				(*e)(i, j) = std::exp( (*x)(i, j) - (*max)(j) );
 
-//		std::cout << "Softmax forward: e = \n" << (*e) << std::endl;
-
 		// Sum the values in columns (single batch), one by one.
 		(*sum) = e->colwise().sum();
-
-//		std::cout << "Softmax forward: sum = \n" << (*sum) << std::endl;
 
 		// Iterate through elements.
 		for (size_t i = 0; i < (size_t)y->rows(); i++) {
@@ -90,20 +129,6 @@ public:
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
 	virtual void update(eT alpha_, eT decay_  = 0.0f) { };
-
-	/*!
-	 * Changes the size of the batch - resizes e and sum.
-	 * @param New size of the batch.
-	 */
-	virtual void resizeBatch(size_t batch_size_) {
-		// Call parent resize.
-		Layer<eT>::resizeBatch(batch_size_);
-
-		// Reshape the temporary matrices.
-		m["e"]->resize(m["e"]->rows(), batch_size_);
-		m["sum"]->resize(m["sum"]->rows(), batch_size_);
-		m["max"]->resize(m["max"]->rows(), batch_size_);
-	}
 
 	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
 	using Layer<eT>::forward;

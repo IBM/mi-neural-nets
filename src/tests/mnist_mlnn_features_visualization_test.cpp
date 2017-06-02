@@ -50,7 +50,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
-const size_t batch_size = 4;
+const size_t batch_size = 9;
 const size_t output_size = 3872;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
@@ -71,20 +71,21 @@ void batch_function (void) {
 		//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
 		//neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 8, 7, 1));
-			neural_net.pushLayer(new ReLU<float>(output_size));
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(22, 22, 8, 20, 5, 1));
+/*			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 20, 7, 1));
+			neural_net.pushLayer(new ReLU<float>(22*22*20));
+/*			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(22, 22, 8, 20, 5, 1));
 			neural_net.pushLayer(new ReLU<float>(6480));
 			neural_net.pushLayer(new Linear<float>(6480, 100));
-			neural_net.pushLayer(new ReLU<float>(100));
-			neural_net.pushLayer(new Linear<float>(100, 10));
-			neural_net.pushLayer(new Softmax<float>(10));
+			neural_net.pushLayer(new ReLU<float>(100));*/
+			neural_net.pushLayer(new Linear<float>(28*28, 28*28));
+//			neural_net.pushLayer(new ReLU<float>(28*28));
+//			neural_net.pushLayer(new Softmax<float>(10));
 			if (!neural_net.verify())
 				exit(-1);
 
 
-			//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
-			neural_net.setOptimization<  mic::neural_nets::optimization::Momentum<float> >();
+			neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
+			neural_net.setOptimization<  mic::neural_nets::optimization::GradientDescent<float> >();
 
 		LOG(LINFO) << "Generated new neural network";
 	}//: else
@@ -134,7 +135,7 @@ void batch_function (void) {
 				(*encoded_labels)[15]= 1.0;*/
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_labels, 0.1, 0.001);
+				float loss = neural_net.train (encoded_batch, encoded_batch, 0.01, 0.001);
 
 				// Get reconstruction.
 				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -144,23 +145,24 @@ void batch_function (void) {
 				{//if (iteration%10 == 0) {
 					// Visualize the weights.
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 = neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(0);
-					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv2 = neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(2);
+					//std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv2 = neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(2);
 					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations(false));
 					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
 					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());
+
+					w_conv20->setBatchDataUnsynchronized(conv1->getOutputActivations());
+					w_conv21->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
 					//w_weights3->setBatchDataUnsynchronized(layer1->getReceptiveFields(false));
 					//w_weights5->setBatchDataUnsynchronized(layer1->getInverseReceptiveFields(false));
-					//w_weights4->setBatchDataUnsynchronized(conv1->getOutputActivations());
-					//w_weights5->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
 
-					w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
+					/*w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
 					w_conv21->setBatchDataUnsynchronized(conv2->getInputGradientActivations());
 					w_conv22->setBatchDataUnsynchronized(conv2->getWeightActivations());
 					w_conv23->setBatchDataUnsynchronized(conv2->getWeightGradientActivations());
 
 					w_conv30->setBatchDataUnsynchronized(conv2->getOutputActivations());
-					w_conv31->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
+					w_conv31->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());*/
 
 				}//: if
 

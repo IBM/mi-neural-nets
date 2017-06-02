@@ -27,19 +27,42 @@ class HebbianLinear : public mic::mlnn::Layer<eT> {
 public:
 
 	/*!
-	 * Creates the linear (i.e fully connected) layer.
+	 * Creates a Hebbian (fully connected) layer - reduced number of parameters.
 	 * @param inputs_ Length of the input vector.
 	 * @param outputs_ Length of the output vector.
 	 * @param name_ Name of the layer.
 	 */
-	HebbianLinear<eT>(size_t inputs_, size_t outputs_, std::string name_ = "HebbianLinear") :
-		Layer<eT>(inputs_, outputs_, 1, LayerTypes::HebbianLinear, name_) {
+	HebbianLinear(size_t inputs_, size_t outputs_, eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5, std::string name_ = "HebbianLinear") :
+		HebbianLinear(inputs_, 1, 1, outputs_, 1, 1, permanence_threshold_, proximal_threshold_, name_)
+	{
+		std::cout<<"constructor HebbianLinear 1!\n";
+	}
+
+	/*!
+	 * Creates a Hebbian (fully connected) layer.
+	 * @param input_height_ Height of the input sample.
+	 * @param input_width_ Width of the input sample.
+	 * @param input_depth_ Depth of the input sample.
+	 * @param output_height_ Width of the output sample.
+	 * @param output_width_ Height of the output sample.
+	 * @param output_depth_ Depth of the output sample.
+	 * @param name_ Name of the layer.
+	 */
+	HebbianLinear(size_t input_height_, size_t input_width_, size_t input_depth_,
+			size_t output_height_, size_t output_width_, size_t output_depth,
+			eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5,
+			std::string name_ = "HebbianLinear") :
+		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
+				output_height_, output_width_, output_depth,
+				LayerTypes::HebbianLinear, name_)
+	{
+		std::cout<<"constructor HebbianLinear 2!\n";
 
 		// Create the weights matrix.
-		p.add ("W", outputs_, inputs_);
+		p.add ("W", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
 		// Initialize weights of the W matrix.
-		double range = sqrt(6.0 / double(inputs_ + outputs_));
+		double range = sqrt(6.0 / double(Layer<eT>::outputSize() + Layer<eT>::inputSize()));
 		Layer<eT>::p['W']->rand(-range, range);
 
 		// Set hebbian learning as default optimization function.

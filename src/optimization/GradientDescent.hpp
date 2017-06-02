@@ -43,9 +43,9 @@ public:
 	 */
 	mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> dx_, eT learning_rate_ = 0.001) {
 		assert(x_->size() == dx_->size());
-		// W = W - alpha * dW.
-		for (size_t i=0; i<(size_t)x_->size(); i++)
-			(*delta)[i] = learning_rate_ * (*dx_)[i];
+		// daltea = - alpha * dW.
+		//for (size_t i=0; i<(size_t)x_->size(); i++)
+			(*delta) = learning_rate_ * (*dx_);
 
 		// Return the update.
 		return delta;

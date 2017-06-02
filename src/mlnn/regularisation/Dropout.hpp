@@ -82,8 +82,6 @@ protected:
     using Layer<eT>::s;
     using Layer<eT>::p;
     using Layer<eT>::m;
-    using Layer<eT>::input_size;
-    using Layer<eT>::output_size;
     using Layer<eT>::batch_size;
 
 

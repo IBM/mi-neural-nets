@@ -21,11 +21,39 @@ namespace activation_function {
 template <typename eT=float>
 class Sigmoid : public mic::mlnn::Layer<eT> {
 public:
-	Sigmoid<eT>(size_t inputs, std::string name_ = "Sigmoid") :
-		Layer<eT>(inputs, inputs, 1, LayerTypes::Sigmoid, name_) {
+	/*!
+	 * Creates a Sigmoid layer - reduced number of parameters.
+	 * @param size_ Length of the input/output data.
+	 * @param name_ Name of the layer.
+	 */
+	Sigmoid(size_t size_,std::string name_ = "Linear") :
+		Sigmoid(size_, 1, 1, size_, 1, 1, name_)
+	{
+		std::cout<<"constructor Sigmoid 1!\n";
+	}
 
-	};
 
+	/*!
+	 * Creates a Sigmoid layer.
+	 * @param input_height_ Height of the input sample.
+	 * @param input_width_ Width of the input sample.
+	 * @param input_depth_ Depth of the input sample.
+	 * @param output_height_ Width of the output sample.
+	 * @param output_width_ Height of the output sample.
+	 * @param output_depth_ Depth of the output sample.
+	 * @param name_ Name of the layer.
+	 */
+	Sigmoid(size_t input_height_, size_t input_width_, size_t input_depth_, size_t output_height_, size_t output_width_, size_t output_depth, std::string name_ = "Sigmoid") :
+		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
+				output_height_, output_width_, output_depth,
+				LayerTypes::Sigmoid, name_)
+	{
+		std::cout<<"constructor Sigmoid!\n";
+	}
+
+	/*!
+	 * Virtual destructor - empty.
+	 */
 	virtual ~Sigmoid() {};
 
 	void forward(bool test = false) {

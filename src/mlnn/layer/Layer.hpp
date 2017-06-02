@@ -86,32 +86,59 @@ class Layer {
 public:
 	/*!
 	 * Default constructor of the layer parent class. Sets the input-output dimensions, layer type and name.
-	 * @param input_size_ Size of the input vector.
-	 * @param output_size_ Size of the output vector.
-	 * @param batch_size_ Size of the batch.
+	 * @param input_height_ Height of the input sample.
+	 * @param input_width_ Width of the input sample.
+	 * @param input_depth_ Depth of the input sample.
+	 * @param output_height_ Width of the output sample.
+	 * @param output_width_ Height of the output sample.
+	 * @param output_depth_ Depth of the output sample.
 	 * @param layer_type_ Type of the layer.
 	 * @param name_ Name of the layer.
 	 */
-	Layer(size_t input_size_, size_t output_size_, size_t batch_size_, LayerTypes layer_type_, std::string name_ = "layer") :
-			input_size(input_size_),
-			output_size(output_size_),
-			batch_size(batch_size_),
-			layer_type(layer_type_),
-			layer_name(name_),
-			s("state"),
-			g("gradients"),
-			p("parameters"),
-			m("memory")
-
+	Layer(size_t input_height_, size_t input_width_, size_t input_depth_,
+			size_t output_height_, size_t output_width_, size_t output_depth_,
+			LayerTypes layer_type_, std::string name_ = "layer") :
+		// Set "reduced" input dimensions.
+		input_height(input_height_),
+		input_width(input_width_),
+		input_depth(input_depth_),
+		// Set "reduced" output dimensions.
+		output_height(output_height_),
+		output_width(output_width_),
+		output_depth(output_depth_),
+		// Set batch size.
+		batch_size(1),
+		// Set layer type and name.
+		layer_type(layer_type_),
+		layer_name(name_),
+		// Initialize matrice arrays.
+		s("state"),
+		g("gradients"),
+		p("parameters"),
+		m("memory")
 	{
+		std::cout<<"constructor Layer extended (and only)!\n";
 		// State.
-		s.add ( "x", input_size, batch_size ); 	// inputs
-		s.add ( "y", output_size, batch_size); 	// outputs
+		s.add ( "x", input_depth*input_height*input_width, batch_size ); 	// inputs
+		s.add ( "y", output_depth*output_height*output_width, batch_size); 	// outputs
 
 		// Gradients.
-		g.add ( "x", input_size, batch_size ); 	// inputs
-		g.add ( "y", output_size, batch_size); 	// outputs
+		g.add ( "x", input_depth*input_height*input_width, batch_size ); 	// inputs
+		g.add ( "y", output_depth*output_height*output_width, batch_size); 	// outputs
+
+		// Allocate (temporary) memory for "input sample" - column vector.
+		m.add ("xs", input_depth*input_height*input_width, 1);
+		// Allocate (temporary) memory for "input channel" - column vector.
+		m.add ("xc", input_height*input_width, 1);
+
+		// Allocate (temporary) memory for "output sample" - a column vector of all channels of a given sample.
+		m.add ("ys", output_depth*output_height*output_width, 1);
+
+		// Allocate (temporary) memory for "output sample" - a column vector.
+		m.add ("yc", output_height * output_width, 1);
+
 	};
+
 
 	/*!
 	 * Virtual destructor - required for the correct destruction of objects of derived classes.
@@ -217,22 +244,22 @@ public:
 	virtual void update(eT alpha_, eT decay_  = 0.0f) = 0;
 
 	/// Returns size (length) of inputs.
-	size_t inputSize() {
-		return input_size;
+	inline size_t inputSize() {
+		return input_height*input_width*input_depth;
 	}
 
 	/// Returns size (length) of outputs.
-	size_t outputSize() {
-		return output_size;
+	inline size_t outputSize() {
+		return output_height*output_width*output_depth;
 	}
 
 	/// Returns size (length) of (mini)batch.
-	size_t batchSize() {
+	inline size_t batchSize() {
 		return batch_size;
 	}
 
 	/// Returns name of the layer.
-	const std::string name() const {
+	inline const std::string name() const {
 		return layer_name;
 	}
 
@@ -325,7 +352,7 @@ public:
 	 */
 	virtual std::string streamLayerParameters() {
 		std::ostringstream os_;
-		os_ << "  [" << type() << "]: " << layer_name << ": " << input_size << "x" << batch_size << " -> " << output_size << "x" << batch_size << "\n";
+		os_ << "  [" << type() << "]: " << layer_name << ": " << inputSize() << "x" << batch_size << " -> " << outputSize() << "x" << batch_size << "\n";
 		return os_.str();
 	}
 
@@ -373,13 +400,210 @@ public:
 		return os_;
 	}
 
+
+
+	/*!
+	 * Allocates memory to a matrix vector (lazy).
+	 * @param vector_ Vector that will store the matrices.
+	 * @param vector_size Number of matrices to be added.
+	 * @param matrix_height_ Height of matrices.
+	 * @param matrix_width_ Width of matrices.
+	 */
+	void lazyAllocateMatrixVector(std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & vector_, size_t vector_size_, size_t matrix_height_, size_t matrix_width_) {
+		// Check if memory for the activations was allocated.
+		if (vector_.size() == 0) {
+			for (size_t i=0; i < vector_size_; i++) {
+				// Allocate memory for activation of every neuron.
+				mic::types::MatrixPtr<eT> m = MAKE_MATRIX_PTR(eT, matrix_height_, matrix_width_);
+				vector_.push_back(m);
+			}//: for
+		}//: if
+	}
+
+
+	/*!
+	 * Normalizes the matrix. to the range <0.0, 1.0>. - for the visualization purposes.
+	 * @param matrix_ Matrix to be normalized.
+	 */
+	void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
+		// Epsilon added for numerical stability.
+		eT eps = 1e-10;
+		// Calculate l2 norm.
+		eT l2 = matrix_->norm() + eps;
+		// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
+		(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( 0.5f + x/l2 ); } );
+	}
+
+
+	/*!
+	 * Returns activations of input neurons.
+	 */
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations(bool normalize_ = true) {
+
+ 		// Allocate memory.
+		lazyAllocateMatrixVector(x_activations, input_depth * batch_size, input_height*input_width, 1);
+
+		// Get y batch.
+		mic::types::MatrixPtr<eT> batch_x = s['x'];
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_x = m["xs"];
+			(*sample_x) = batch_x->col(ib);
+
+			// Iterate through output channels.
+			for (size_t oc=0; oc< input_depth; oc++) {
+				// Get activation "row".
+				mic::types::MatrixPtr<eT> row = x_activations[ib*input_depth + oc];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = sample_x->block(oc*input_height*input_width, 0, input_height*input_width, 1);
+				row->resize(input_height, input_width);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for batch
+
+		// Return output activations.
+		return x_activations;
+	}
+
+
+	/*!
+	 * Returns activations of input gradients (dx).
+	 */
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputGradientActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(dx_activations, batch_size * input_depth, input_height*input_width, 1);
+
+		// Get dx batch.
+		mic::types::MatrixPtr<eT> batch_dx = g['x'];
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_dx = m["xs"];
+			(*sample_dx) = batch_dx->col(ib);
+
+			// Iterate through input channels.
+			for (size_t ic=0; ic< input_depth; ic++) {
+				// Get dx "row".
+				mic::types::MatrixPtr<eT> row = dx_activations[ib*input_depth + ic];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = sample_dx->block(ic*input_height*input_width, 0, input_height*input_width, 1);
+				row->resize(input_height, input_width);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for batch
+
+		// Return dx activations.
+		return dx_activations;
+	}
+
+
+	/*!
+	 * Returns activations of output neurons.
+	 */
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(y_activations, batch_size*output_depth, output_height*output_width, 1);
+
+		// Get y batch.
+		mic::types::MatrixPtr<eT> batch_y = s['y'];
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_y = m["ys"];
+			(*sample_y) = batch_y->col(ib);
+
+			// Iterate through output channels.
+			for (size_t oc=0; oc< output_depth; oc++) {
+				// Get y "row".
+				mic::types::MatrixPtr<eT> row = y_activations[ib*output_depth + oc];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = sample_y->block(oc*output_height*output_width, 0, output_height*output_width, 1);
+				row->resize(output_height, output_width);
+
+				// Normalize.
+				normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for batch
+
+		// Return output activations.
+		return y_activations;
+	}
+
+
+	/*!
+	 * Returns activations of gradients of output neurons.
+	 */
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputGradientActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(dy_activations, output_depth*batch_size, output_height*output_width, 1);
+
+		// Get y batch.
+		mic::types::MatrixPtr<eT> batch_dy = g['y'];
+
+		// Iterate through filters and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_dy = m["ys"];
+			(*sample_dy) = batch_dy->col(ib);
+
+			// Iterate through output channels.
+			for (size_t oc=0; oc< output_depth; oc++) {
+				// Get y "row".
+				mic::types::MatrixPtr<eT> row = dy_activations[ib*output_depth + oc];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = sample_dy->block(oc*output_height*output_width, 0, output_height*output_width, 1);
+				row->resize(output_height, output_width);
+
+				// Normalize.
+				normalizeMatrixForVisualization(row);
+			}//: for channel
+		}//: for batch
+
+		// Return output activations.
+		return dy_activations;
+	}
+
+
 protected:
 
-	/// Size (length) of inputs.
-	size_t input_size;
+    /// Height of the input (e.g. 28 for MNIST).
+    size_t input_height;
 
-	/// Size (length) of outputs.
-	size_t output_size;
+    /// Width of the input (e.g. 28 for MNIST).
+    size_t input_width;
+
+    /// Number of channels of the input (e.g. 3 for RGB images).
+    size_t input_depth;
+
+	/// Number of receptive fields in a single channel - vertical direction.
+	size_t output_height;
+
+	/// Number of receptive fields in a single channel - horizontal direction.
+	size_t output_width;
+
+	/// Number of filters = number of output channels.
+	size_t output_depth;
 
 	/// Size (length) of (mini)batch.
 	size_t batch_size;
@@ -389,7 +613,6 @@ protected:
 
 	/// Name (identifier of the type) of the layer.
 	std::string layer_name;
-
 
 	/// States - contains input [x] and output [y] matrices.
 	mic::types::MatrixArray<eT> s;
@@ -405,6 +628,19 @@ protected:
 
 	/// Array of optimization functions.
 	mic::neural_nets::optimization::OptimizationArray<eT> opt;
+
+	/// Vector containing activations of input neurons - used in visualization.
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > x_activations;
+
+	/// Vector containing activations of gradients of inputs (dx) - used in visualization.
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > dx_activations;
+
+	/// Vector containing activations of output neurons - used in visualization.
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > y_activations;
+
+	/// Vector containing activations of gradients of outputs (dy) - used in visualization.
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > dy_activations;
+
 
 	/*!
 	 * Protected constructor, used only by the derived classes during the serialization. Empty!!
@@ -428,8 +664,12 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
         // Archive parameters.
-        ar & input_size;
-        ar & output_size;
+        ar & input_height;
+        ar & input_width;
+        ar & input_depth;
+        ar & output_height;
+        ar & output_width;
+        ar & output_depth;
         ar & batch_size;
         ar & layer_type;
         ar & layer_name;
@@ -438,6 +678,7 @@ private:
         ar & g;
         ar & p;
         ar & m;
+        // TODO: serialize optimization function!
     }
 
 

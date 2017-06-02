@@ -39,9 +39,9 @@ public:
 
 		// Prepare matrices in the "temporal memory".
 		// For current sparsity vector.
-		m.add ("ro", output_size, 1 );
+		m.add ("ro", outputSize(), 1 );
 		// For penalty.
-		m.add ("penalty", output_size, 1 );
+		m.add ("penalty", outputSize(), 1 );
 
 		// Set desired sparsity and penalty term.
 		desired_ro = 0.1; // 10 %
@@ -65,7 +65,7 @@ public:
 
 		// Calculate the sparsity penalty - for every output neuron.
 		mic::types::MatrixPtr<eT> penalty = m["penalty"];
-		for (size_t i=0; i<output_size; i++)
+		for (size_t i=0; i<outputSize(); i++)
 			(*penalty)[i] = beta*(-desired_ro/((*ro)[i] + eps) + (1-desired_ro)/(1-(*ro)[i] + eps));
 
 
@@ -105,8 +105,8 @@ protected:
     using Layer<eT>::s;
     using Layer<eT>::p;
     using Layer<eT>::m;
-    using Layer<eT>::input_size;
-    using Layer<eT>::output_size;
+    using Layer<eT>::inputSize;
+    using Layer<eT>::outputSize;
     using Layer<eT>::batch_size;
     using Layer<eT>::opt;
 

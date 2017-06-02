@@ -27,24 +27,48 @@ class BinaryCorrelator : public mic::mlnn::Layer<eT> {
 public:
 
 	/*!
-	 * Creates the linear (i.e fully connected) layer.
+	 * Creates a "binary correlator" (i.e fully connected) layer - reduced number of parameters.
 	 * @param inputs_ Length of the input vector.
 	 * @param outputs_ Length of the output vector.
 	 * @param name_ Name of the layer.
 	 */
-	BinaryCorrelator<eT>(size_t inputs_, size_t outputs_, eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5, std::string name_ = "BinaryCorrelator") :
-		Layer<eT>(inputs_, outputs_, 1, LayerTypes::BinaryCorrelator, name_),
-		permanence_threshold(permanence_threshold_),
-		proximal_threshold(proximal_threshold_)
+	BinaryCorrelator(size_t inputs_, size_t outputs_, eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5, std::string name_ = "BinaryCorrelator") :
+		BinaryCorrelator(inputs_, 1, 1, outputs_, 1, 1, permanence_threshold_, proximal_threshold_, name_)
 	{
+		std::cout<<"constructor BinaryCorrelator 1!\n";
+	}
+
+	/*!
+	 * Creates a "binary correlator" (i.e fully connected) layer.
+	 * @param input_height_ Height of the input sample.
+	 * @param input_width_ Width of the input sample.
+	 * @param input_depth_ Depth of the input sample.
+	 * @param output_height_ Width of the output sample.
+	 * @param output_width_ Height of the output sample.
+	 * @param output_depth_ Depth of the output sample.
+	 * @param name_ Name of the layer.
+	 */
+	BinaryCorrelator(size_t input_height_, size_t input_width_, size_t input_depth_,
+			size_t output_height_, size_t output_width_, size_t output_depth,
+			eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5,
+			std::string name_ = "BinaryCorrelator") :
+		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
+				output_height_, output_width_, output_depth,
+				LayerTypes::BinaryCorrelator, name_),
+				permanence_threshold(permanence_threshold_),
+				proximal_threshold(proximal_threshold_)
+	{
+		std::cout<<"constructor BinaryCorrelator 2!\n";
+
 		// Create the permanence matrix.
-		p.add ("p", outputs_, inputs_);
+		p.add ("p", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 		// Create "connectivity" matrix.
-		m.add ("c", outputs_, inputs_);
+		m.add ("c", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
 		// Initialize permanence matrix.
 		//double range = sqrt(6.0 / double(inputs_ + outputs_));
 		p['p']->rand(0, 1);
+
 		// Initialize connectivity.
 		mic::types::MatrixPtr<eT> c = m['c'];
 		mic::types::MatrixPtr<eT> perm = p['p'];
