@@ -36,7 +36,7 @@ public:
 	Linear(size_t inputs_, size_t outputs_, std::string name_ = "Linear") :
 		Linear(inputs_, 1, 1, outputs_, 1, 1, name_)
 	{
-		std::cout<<"constructor Linear 1!\n";
+
 	}
 
 
@@ -57,8 +57,6 @@ public:
 				output_height_, output_width_, output_depth_,
 				LayerTypes::Convolution, name_)
 	{
-		std::cout<<"constructor Linear 2!\n";
-
 		// Create the weights matrix.
 		p.add ("W", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
@@ -245,10 +243,8 @@ public:
 	 * Returns inverse activations weights .
 	 */
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseOutputActivations(bool normalize_ = true) {
-
 		// Allocate memory.
 		lazyAllocateMatrixVector(inverse_y_activations, batch_size*input_depth, input_height, input_width);
-
 
 		// Get y batch.
 		mic::types::MatrixPtr<eT> batch_y = g['y'];
@@ -265,7 +261,6 @@ public:
 			// Get pointer to "x sample".
 			mic::types::MatrixPtr<eT> x_act = m["xs"];
 			(*x_act) = W->transpose() * (*sample_y);
-			std::cout << "size: " << (*x_act).cols() << " x " << (*x_act).rows() << std::endl;
 
 			// Iterate through input channels.
 			for (size_t ic=0; ic< input_depth; ic++) {

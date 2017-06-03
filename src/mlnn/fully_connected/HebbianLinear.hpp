@@ -35,7 +35,7 @@ public:
 	HebbianLinear(size_t inputs_, size_t outputs_, eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5, std::string name_ = "HebbianLinear") :
 		HebbianLinear(inputs_, 1, 1, outputs_, 1, 1, permanence_threshold_, proximal_threshold_, name_)
 	{
-		std::cout<<"constructor HebbianLinear 1!\n";
+
 	}
 
 	/*!
@@ -56,8 +56,6 @@ public:
 				output_height_, output_width_, output_depth_,
 				LayerTypes::HebbianLinear, name_)
 	{
-		std::cout<<"constructor HebbianLinear 2!\n";
-
 		// Create the weights matrix.
 		p.add ("W", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 

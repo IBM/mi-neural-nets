@@ -35,7 +35,7 @@ public:
 	BinaryCorrelator(size_t inputs_, size_t outputs_, eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5, std::string name_ = "BinaryCorrelator") :
 		BinaryCorrelator(inputs_, 1, 1, outputs_, 1, 1, permanence_threshold_, proximal_threshold_, name_)
 	{
-		std::cout<<"constructor BinaryCorrelator 1!\n";
+
 	}
 
 	/*!
@@ -58,8 +58,6 @@ public:
 				permanence_threshold(permanence_threshold_),
 				proximal_threshold(proximal_threshold_)
 	{
-		std::cout<<"constructor BinaryCorrelator 2!\n";
-
 		// Create the permanence matrix.
 		p.add ("p", Layer<eT>::outputSize(), Layer<eT>::inputSize());
 		// Create "connectivity" matrix.

@@ -44,8 +44,6 @@ public:
 				filter_size(filter_size_),
 				stride(stride_)
 	{
-		std::cout<<"constructor Convolution 2!\n";
-
 		LOG(LDEBUG)<<"====================\n";
 		LOG(LDEBUG)<<"input_height = " << input_height <<std::endl;
 		LOG(LDEBUG)<<"input_width = " << input_width <<std::endl;

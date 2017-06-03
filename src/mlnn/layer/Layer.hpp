@@ -117,7 +117,6 @@ public:
 		p("parameters"),
 		m("memory")
 	{
-		std::cout<<"constructor Layer extended (and only)!\n";
 		// State.
 		s.add ( "x", input_depth*input_height*input_width, batch_size ); 	// inputs
 		s.add ( "y", output_depth*output_height*output_width, batch_size); 	// outputs

@@ -134,7 +134,7 @@ void batch_function (void) {
 				(*encoded_labels)[15]= 1.0;*/
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_batch, 0.001, 0.0001);
+				float loss = neural_net.train (encoded_batch, encoded_batch, 0.001, 0.00001);
 
 				// Get reconstruction.
 				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -155,7 +155,7 @@ void batch_function (void) {
 					w_conv20->setBatchDataUnsynchronized(conv1->getOutputActivations());
 					w_conv21->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
 					w_conv22->setBatchDataUnsynchronized(conv1->getInverseWeightActivations());
-					//w_conv23->setBatchDataUnsynchronized(conv1->getInverseOutputActivations());
+					w_conv23->setBatchDataUnsynchronized(conv1->getInverseOutputActivations());
 
 					//w_weights3->setBatchDataUnsynchronized(layer1->getReceptiveFields(false));
 					//w_weights5->setBatchDataUnsynchronized(layer1->getInverseReceptiveFields(false));
@@ -228,7 +228,7 @@ int main(int argc, char* argv[]) {
 	w_conv20 = new WindowGrayscaleBatch("L0 y", 256, 256, 50, 336);
 	w_conv21 = new WindowGrayscaleBatch("L0 dy", 256, 256, 316, 336);
 	w_conv22 = new WindowGrayscaleBatch("L0 inverse W activation", 256, 256, 562, 336);
-	//w_conv23 = new WindowGrayscaleBatch("L0 inverse y activation", 256, 256, 818, 336);
+	w_conv23 = new WindowGrayscaleBatch("L0 inverse y activation", 256, 256, 818, 336);
 
 	//w_conv30 = new WindowGrayscaleBatch("L2 x", 256, 256, 50, 622);
 	//w_conv31 = new WindowGrayscaleBatch("L2 dx", 256, 256, 312, 622);

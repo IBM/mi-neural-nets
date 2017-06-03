@@ -29,28 +29,25 @@ public:
 	 * @param name_ Name of the layer.
 	 */
 	Softmax(size_t size_, std::string name_ = "Softmax") :
-		Softmax(size_, 1, 1, size_, 1, 1, name_)
+		Softmax(size_, 1, 1, name_)
 	{
-		std::cout<<"constructor Softmax 1!\n";
+
 	}
 
 
 	/*!
 	 * Creates a Softmax layer.
-	 * @param input_height_ Height of the input sample.
-	 * @param input_width_ Width of the input sample.
-	 * @param input_depth_ Depth of the input sample.
-	 * @param output_height_ Width of the output sample.
-	 * @param output_width_ Height of the output sample.
-	 * @param output_depth_ Depth of the output sample.
+	 * @param height_ Height of the input/output sample.
+	 * @param width_ Width of the input/output sample.
+	 * @param depth_ Depth of the input/output sample.
 	 * @param name_ Name of the layer.
 	 */
-	Softmax(size_t input_height_, size_t input_width_, size_t input_depth_, size_t output_height_, size_t output_width_, size_t output_depth, std::string name_ = "Softmax") :
-		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
-				output_height_, output_width_, output_depth,
+	Softmax(size_t height_, size_t width_, size_t depth_,
+			std::string name_ = "Softmax") :
+		Layer<eT>::Layer(height_, width_, depth_,
+				height_, width_, depth_,
 				LayerTypes::Softmax, name_)
 	{
-		std::cout<<"constructor Softmax!\n";
 		// Add "temporary" parameters.
 		m.add("e", Layer<eT>::inputSize(), 1);
 		m.add("sum", 1, 1);

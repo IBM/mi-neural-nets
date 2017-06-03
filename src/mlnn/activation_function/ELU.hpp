@@ -29,29 +29,26 @@ public:
 	 * @param size_ Length of the input/output data.
 	 * @param name_ Name of the layer.
 	 */
-	ELU(size_t size_,std::string name_ = "Linear") :
-		ELU(size_, 1, 1, size_, 1, 1, name_)
+	ELU(size_t size_,std::string name_ = "ELU") :
+		ELU(size_, 1, 1, name_)
 	{
-		std::cout<<"constructor ELU 1!\n";
+
 	}
 
 
 	/*!
 	 * Creates a ELU layer.
-	 * @param input_height_ Height of the input sample.
-	 * @param input_width_ Width of the input sample.
-	 * @param input_depth_ Depth of the input sample.
-	 * @param output_height_ Width of the output sample.
-	 * @param output_width_ Height of the output sample.
-	 * @param output_depth_ Depth of the output sample.
+	 * @param height_ Height of the input/output sample.
+	 * @param width_ Width of the input/output sample.
+	 * @param depth_ Depth of the input/output sample.
 	 * @param name_ Name of the layer.
 	 */
-	ELU(size_t input_height_, size_t input_width_, size_t input_depth_, size_t output_height_, size_t output_width_, size_t output_depth, std::string name_ = "ELU") :
-		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
-				output_height_, output_width_, output_depth,
+	ELU(size_t height_, size_t width_, size_t depth_, std::string name_ = "ELU") :
+		Layer<eT>::Layer(height_, width_, depth_,
+				height_, width_, depth_,
 				LayerTypes::ELU, name_)
 	{
-		std::cout<<"constructor ELU 2!\n";
+
 	}
 
 	/*!

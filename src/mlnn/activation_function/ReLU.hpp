@@ -36,17 +36,17 @@ public:
 
 	/*!
 	 * Creates a ReLU layer.
-	 * @param input_height_ Height of the input sample.
-	 * @param input_width_ Width of the input sample.
-	 * @param input_depth_ Depth of the input sample.
+	 * @param height_ Height of the input/output sample.
+	 * @param width_ Width of the input/output sample.
+	 * @param depth_ Depth of the input/output sample.
 	 * @param name_ Name of the layer.
 	 */
-	ReLU(size_t input_height_, size_t input_width_, size_t input_depth_, std::string name_ = "ReLU") :
-		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
-				input_height_, input_width_, input_depth_,
+	ReLU(size_t height_, size_t width_, size_t depth_, std::string name_ = "ReLU") :
+		Layer<eT>::Layer(height_, width_, depth_,
+				height_, width_, depth_,
 				LayerTypes::ReLU, name_)
 	{
-		std::cout<<"constructor RelU 2!\n";
+
 	}
 
 	/*!
