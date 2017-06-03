@@ -304,6 +304,18 @@ public:
 		mic::types::MatrixPtr<eT> batch_dx = g['x'];
 		std::cout << "backward gradient dx: min:" << (*batch_dx).minCoeff() <<" max: " << (*batch_dx).maxCoeff() << std::endl;
 
+
+		for (size_t fi=0; fi< output_depth; fi++) {
+			// A given filter (neuron layer) has in fact connection to all input channels.
+			for (size_t ic=0; ic< input_depth; ic++) {
+				mic::types::MatrixPtr<eT> dw = g['W'+std::to_string(fi)+"x"+std::to_string(ic)];
+				std::cout << "backward gradient dW"<< fi <<"x"<< ic <<": min:" << (*dw).minCoeff() <<" max: " << (*dw).maxCoeff() << std::endl;
+			}//: for
+		}//: for
+
+		mic::types::MatrixPtr<eT> db = g['b'];
+		std::cout << "backward gradient db: min:" << (*db).minCoeff() <<" max: " << (*db).maxCoeff() << std::endl;
+
 		//std::cout<<"After Backward!\n";
 	}//: backward
 
@@ -609,9 +621,11 @@ public:
 				(*row) = (*W);
 				row->resize(filter_size, filter_size);
 
+				std::cout << "weight W"<< fi <<"x"<< ic <<": min:" << (*W).minCoeff() <<" max: " << (*W).maxCoeff() << std::endl;
 				// Normalize.
 				if (normalize_ )
 					normalizeMatrixForVisualization(row);
+				//std::cout << "normalized W"<< fi <<"x"<< ic <<": min:" << (*row).minCoeff() <<" max: " << (*row).maxCoeff() << std::endl;
 			}//: for channels
 		}//: for filters
 

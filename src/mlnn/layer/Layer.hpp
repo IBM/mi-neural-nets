@@ -434,13 +434,13 @@ public:
 
 		// Calculate the norm.
 		eT max = matrix_->maxCoeff();
-		eT min = matrix_->maxCoeff();
-		eT diff =  (min - max);
+		eT min = matrix_->minCoeff();
+		eT diff =  (max - min);
 
 		// Normalize the inputs to range <0.0, 1.0>.
 		if (diff != 0.0 ) {
 			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x-min)/diff ); } );
-		}//: else: do nothin, all values are ~0 already.
+		}//: else: do nothing, all values are ~0 already.
 
 	}
 

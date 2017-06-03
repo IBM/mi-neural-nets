@@ -65,22 +65,15 @@ void batch_function (void) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
-		// Create a simple autoencoder.
-		//neural_net.pushLayer(new Linear<float>(patch_size*patch_size, patch_size*patch_size));
-		//neural_net.pushLayer(new ReLU<float>(patch_size*patch_size));
-		//neural_net.setLoss<  mic::neural_nets::loss::SquaredErrorLoss<float> >();
-		//neural_net.setOptimization<  mic::neural_nets::optimization::Adam<float> >();
 
-/*			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 20, 7, 1));
-			neural_net.pushLayer(new ReLU<float>(22*22*20));*/
-/*			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(22, 22, 8, 20, 5, 1));
-			neural_net.pushLayer(new ReLU<float>(6480));
-			neural_net.pushLayer(new Linear<float>(6480, 100));
-			neural_net.pushLayer(new ReLU<float>(100));*/
-			neural_net.pushLayer(new Linear<float>(28, 28, 1, 9, 9, 9));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 20, 7, 3));
+			neural_net.pushLayer(new ELU<float>(8, 8, 20));
+			neural_net.pushLayer(new Linear<float>(8, 8, 20, 28, 28, 1));
+
+			/*neural_net.pushLayer(new Linear<float>(28, 28, 1, 9, 9, 9));
 			neural_net.pushLayer(new ELU<float>(9, 9, 9));
-			neural_net.pushLayer(new Linear<float>(9, 9, 9, 28, 28, 1));
-			//neural_net.pushLayer(new ReLU<float>(28,28,1));
+			neural_net.pushLayer(new Linear<float>(9, 9, 9, 28, 28, 1));*/
+
 //			neural_net.pushLayer(new Softmax<float>(10));
 			if (!neural_net.verify())
 				exit(-1);
@@ -134,7 +127,7 @@ void batch_function (void) {
 				(*encoded_labels)[15]= 1.0;*/
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_batch, 0.001, 0.00001);
+				float loss = neural_net.train (encoded_batch, encoded_batch, 0.01, 0.0001);
 
 				// Get reconstruction.
 				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -145,8 +138,8 @@ void batch_function (void) {
 					// Visualize the weights.
 					/*std::shared_ptr<mic::mlnn::activation_function::ReLU<float> > conv2 =
 							neural_net.getLayer<mic::mlnn::activation_function::ReLU<float> >(1);*/
-					std::shared_ptr<mic::mlnn::Linear<float> > conv1 =
-							neural_net.getLayer<mic::mlnn::Linear<float> >(0);
+					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
+							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(0);
 					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations());
 					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
