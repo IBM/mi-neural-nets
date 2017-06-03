@@ -50,7 +50,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
-const size_t batch_size = 1;
+const size_t batch_size = 16;
 const size_t output_size = 3872;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
@@ -66,9 +66,10 @@ void batch_function (void) {
 	} else {*/
 		{
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(28, 28, 1, 20, 7, 3));
-			neural_net.pushLayer(new ELU<float>(8, 8, 20));
-			neural_net.pushLayer(new Linear<float>(8, 8, 20, 28, 28, 1));
+			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(28, 28, 1, 10));
+//			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(30, 30, 1, 20, 10, 5));
+//			neural_net.pushLayer(new ELU<float>(5, 5, 20));
+			neural_net.pushLayer(new Linear<float>(48, 48, 1, 28, 28, 1));
 
 			/*neural_net.pushLayer(new Linear<float>(28, 28, 1, 9, 9, 9));
 			neural_net.pushLayer(new ELU<float>(9, 9, 9));
@@ -138,22 +139,28 @@ void batch_function (void) {
 					// Visualize the weights.
 					/*std::shared_ptr<mic::mlnn::activation_function::ReLU<float> > conv2 =
 							neural_net.getLayer<mic::mlnn::activation_function::ReLU<float> >(1);*/
-					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
-							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(0);
+/*					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
+							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(1);
 					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations());
 					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
-					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());
+					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());*/
 
-					std::shared_ptr<mic::mlnn::Linear<float> > conv2 =
-							neural_net.getLayer<mic::mlnn::Linear<float> >(2);
-					w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
-					w_conv21->setBatchDataUnsynchronized(conv2->getInputGradientActivations());
-					w_conv22->setBatchDataUnsynchronized(conv2->getWeightActivations());
-					w_conv23->setBatchDataUnsynchronized(conv2->getWeightGradientActivations());
+					std::shared_ptr<mic::mlnn::convolution::Padding<float> > layer1 =
+							neural_net.getLayer<mic::mlnn::convolution::Padding<float> >(0);
+					w_conv10->setBatchDataUnsynchronized(layer1->getInputActivations());
+					w_conv11->setBatchDataUnsynchronized(layer1->getInputGradientActivations());
 
-					w_conv30->setBatchDataUnsynchronized(conv2->getOutputActivations());
-					w_conv31->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
+
+					std::shared_ptr<mic::mlnn::Linear<float> > layer2 =
+							neural_net.getLayer<mic::mlnn::Linear<float> >(1);
+					w_conv20->setBatchDataUnsynchronized(layer2->getInputActivations());
+					w_conv21->setBatchDataUnsynchronized(layer2->getInputGradientActivations());
+					w_conv22->setBatchDataUnsynchronized(layer2->getWeightActivations());
+					w_conv23->setBatchDataUnsynchronized(layer2->getWeightGradientActivations());
+
+					w_conv30->setBatchDataUnsynchronized(layer2->getOutputActivations());
+					w_conv31->setBatchDataUnsynchronized(layer2->getOutputGradientActivations());
 
 
 					//w_conv20->setBatchDataUnsynchronized(conv2->getOutputActivations());

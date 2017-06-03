@@ -44,13 +44,6 @@ public:
 				filter_size(filter_size_),
 				stride(stride_)
 	{
-		LOG(LDEBUG)<<"====================\n";
-		LOG(LDEBUG)<<"input_height = " << input_height <<std::endl;
-		LOG(LDEBUG)<<"input_width = " << input_width <<std::endl;
-		LOG(LDEBUG)<<"number_of_filters = " << output_depth <<std::endl;
-		LOG(LDEBUG)<<"filter_size = " << filter_size <<std::endl;
-		LOG(LDEBUG)<<"stride = " << stride <<std::endl;
-
 		// Calculate number of receptive fields within a "single input channel".
 		assert(input_height >= filter_size);
 		int height_rest = (int)input_height-filter_size;
@@ -60,7 +53,11 @@ public:
 			height_rest -= stride;
 		}//: while width
 		// Filters must "exactly" fit!
-		assert(height_rest == 0);
+		if (height_rest != 0) {
+			LOG(LERROR) << " Filter width and stride does not fit image height";
+			LOG(LINFO) << streamLayerParameters();
+			exit(-1);
+		}
 
 		assert(input_width >= filter_size);
 		int width_rest = (int)input_width-filter_size;
@@ -70,11 +67,13 @@ public:
 			width_rest -= stride;
 		}//: while width
 		// Filters must "exactly" fit!
-		assert(width_rest == 0);
+		if (height_rest != 0) {
+			LOG(LINFO) << "Filter height and stride does not fit image height";
+			LOG(LNOTICE) << streamLayerParameters();
+			exit(-1);
+		}
 
-		LOG(LDEBUG)<<"output_height = " << output_height <<std::endl;
-		LOG(LDEBUG)<<"output_width = " << output_width <<std::endl;
-		LOG(LDEBUG)<<"====================\n";
+		LOG(LDEBUG)<<streamLayerParameters();
 
 		// Set output height and resize matrices!
 		//Layer<eT>::output_size = output_depth*output_height*output_width;
@@ -168,10 +167,11 @@ public:
 		os_<<"    * stride = " << stride <<std::endl;
 		os_<<"    * output_height = " << output_height <<std::endl;
 		os_<<"    * output_width = " << output_width <<std::endl;
-		os_<<"    * output_channels = " << output_depth <<std::endl;
+		os_<<"    * output_channels = " << output_depth;
 
 		return os_.str();
 	}
+
 	/*!
 	 * Performs forward pass through the filters. Can process batches.
 	 */

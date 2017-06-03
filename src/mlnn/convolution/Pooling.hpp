@@ -16,7 +16,8 @@ namespace convolution {
 
 
 /*!
- * \author tkornuta/krocki
+ * \brief Layer performing max pooling.
+ * \author krocki/tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
@@ -79,7 +80,7 @@ public:
 	 * @param window_size
 	 * @return
 	 */
-	mic::types::MatrixXf forwardChannel(mic::types::MatrixXf& x, mic::types::MatrixXf& cache) {
+	mic::types::MatrixXf forwardChannel(mic::types::MatrixXf& x_channel_, mic::types::MatrixXf& cache_) {
 
 		size_t image_size = sqrt(x_channel_.rows());
 		// size_t y_width = image_size - window_size + 1;
@@ -237,7 +238,7 @@ protected:
 	size_t channels;
 
 	/*!
-	 * Size of the window.
+	 * Size of the pooling window.
 	 */
 	size_t window_size;
 
@@ -249,7 +250,7 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp1, typename tmp2> friend class MultiLayerNeuralNetwork;
+	template<typename tmp1> friend class MultiLayerNeuralNetwork;
 
 
 	/*!

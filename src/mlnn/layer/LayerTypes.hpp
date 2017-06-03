@@ -20,9 +20,9 @@
 
 #include <mlnn/convolution/Convolution.hpp>
 
-/*#include <mlnn/convolution/Pooling.hpp>
+#include <mlnn/convolution/Pooling.hpp>
 
-#include <mlnn/convolution/Padding.hpp>*/
+#include <mlnn/convolution/Padding.hpp>
 
 
 // Cost functions - implemented as layers.

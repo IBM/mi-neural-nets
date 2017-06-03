@@ -351,9 +351,20 @@ public:
 	 */
 	virtual std::string streamLayerParameters() {
 		std::ostringstream os_;
+		// Display id/type.
 		os_ << "  [" << type() << "]: " << layer_name << ": " << inputSize() << "x" << batch_size << " -> " << outputSize() << "x" << batch_size << "\n";
+
+		// Display dimensions.
+		os_<<"    * input_height = " << input_height <<std::endl;
+		os_<<"    * input_width = " << input_width <<std::endl;
+		os_<<"    * input_channels = " << input_depth <<std::endl;
+		os_<<"    * output_height = " << output_height <<std::endl;
+		os_<<"    * output_width = " << output_width <<std::endl;
+		os_<<"    * output_channels = " << output_depth;
+
 		return os_.str();
 	}
+
 
 	/*!
 	 * Stream operator enabling to print neural network.
@@ -437,12 +448,11 @@ public:
 		eT min = matrix_->minCoeff();
 		eT diff =  0.5*(max - min);
 
-		std::cout << "before: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
+		//std::cout << "before: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		// Normalize the inputs to range <0.0, 1.0>.
 		if ((diff != 0.0) && (min != 0.0)) {
 			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x- min)/diff  - 1.0); } );
 		}//: else: do nothing, all values are ~0 already.
-		std::cout << "normalized: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 
 	}
 
