@@ -50,9 +50,11 @@ public:
 	 * @param output_depth_ Depth of the output sample.
 	 * @param name_ Name of the layer.
 	 */
-	Linear(size_t input_height_, size_t input_width_, size_t input_depth_, size_t output_height_, size_t output_width_, size_t output_depth, std::string name_ = "Linear") :
+	Linear(size_t input_height_, size_t input_width_, size_t input_depth_,
+			size_t output_height_, size_t output_width_, size_t output_depth_,
+			std::string name_ = "Linear") :
 		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
-				output_height_, output_width_, output_depth,
+				output_height_, output_width_, output_depth_,
 				LayerTypes::Convolution, name_)
 	{
 		std::cout<<"constructor Linear 2!\n";
@@ -170,7 +172,7 @@ public:
 		row->resize(Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
 		// Normalize.
-		if (normalize_ )
+		if (normalize_)
 			normalizeMatrixForVisualization(row);
 
 		// Return activations.
@@ -207,24 +209,24 @@ public:
 
 
 	/*!
-	 * Returns activations of neurons of a given layer (simple visualization).
+	 * Returns inverse activations weights .
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseWeightActivations(bool normalize_ = true) {
 
 		// Allocate memory.
-		lazyAllocateMatrixVector(inverse_activations, Layer<eT>::outputSize(), input_height*input_width, 1);
+		lazyAllocateMatrixVector(inverse_w_activations, Layer<eT>::outputSize() * input_depth, input_height*input_width, 1);
 
 		// TODO: check different input-output depths.
 
 		mic::types::MatrixPtr<eT> W =  p["W"];
 		// Iterate through "neurons" and generate "activation image" for each one.
-		for (size_t i=0; i < output_height*output_width; i++) {
+		for (size_t i=0; i < output_height*output_width*output_depth; i++) {
 
 			for (size_t j=0; j < input_depth; j++) {
 				// "Access" activation row.
-				mic::types::MatrixPtr<eT> row = inverse_activations[i*input_depth + j];
+				mic::types::MatrixPtr<eT> row = inverse_w_activations[i*input_depth + j];
 				// Copy data.
-				(*row) = W->row(i).block(input_height*input_width, 1);
+				(*row) = W->block(i, j*input_depth, 1, input_height*input_width);
 				// Resize row.
 				row->resize( input_height, input_width);
 
@@ -235,7 +237,54 @@ public:
 		}//: for
 
 		// Return activations.
-		return inverse_activations;
+		return inverse_w_activations;
+	}
+
+
+	/*!
+	 * Returns inverse activations weights .
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseOutputActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(inverse_y_activations, batch_size*input_depth, input_height, input_width);
+
+
+		// Get y batch.
+		mic::types::MatrixPtr<eT> batch_y = g['y'];
+		// Get weights.
+		mic::types::MatrixPtr<eT> W =  p["W"];
+
+		// Iterate through batch samples and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get output sample from batch.
+			mic::types::MatrixPtr<eT> sample_y = m["ys"];
+			(*sample_y) = batch_y->col(ib);
+
+			// Get pointer to "x sample".
+			mic::types::MatrixPtr<eT> x_act = m["xs"];
+			(*x_act) = W->transpose() * (*sample_y);
+			std::cout << "size: " << (*x_act).cols() << " x " << (*x_act).rows() << std::endl;
+
+			// Iterate through input channels.
+			for (size_t ic=0; ic< input_depth; ic++) {
+				// Get activation "row".
+				mic::types::MatrixPtr<eT> row = inverse_y_activations[ib*input_depth + ic];
+
+				// Copy "channel block" from given dx sample.
+				(*row) = x_act->block(ic*input_height*input_width, 0, input_height*input_width, 1);
+				row->resize(input_height, input_width);
+
+				// Normalize.
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
+			}//: for channel
+
+		}//: for batch
+
+		// Return activations.
+		return inverse_y_activations;
 	}
 
 
@@ -264,6 +313,7 @@ protected:
 	 using Layer<eT>::lazyAllocateMatrixVector;
 	 using Layer<eT>::normalizeMatrixForVisualization;
 
+
 private:
 	// Friend class - required for using boost serialization.
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
@@ -277,8 +327,11 @@ private:
 	/// Vector containing activations of gradients of weights (dW).
 	std::vector< std::shared_ptr <mic::types::MatrixXf> > dw_activations;
 
+	/// Vector containing "inverse activations" of each neuron weights(W^T).
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > inverse_w_activations;
+
 	/// Vector containing activations of neurons (y*W^T).
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > inverse_activations;
+	std::vector< std::shared_ptr <mic::types::MatrixXf> > inverse_y_activations;
 
 	/*!
 	 * Private constructor, used only during the serialization.

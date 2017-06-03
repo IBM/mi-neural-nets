@@ -24,7 +24,6 @@ install(FILES
 	DESTINATION include/mlnn/cost_function)
 
 install(FILES
-	fully_connected/Identity.hpp
 	fully_connected/Linear.hpp
 	fully_connected/SparseLinear.hpp
 	fully_connected/HebbianLinear.hpp

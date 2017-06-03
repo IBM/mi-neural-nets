@@ -411,7 +411,10 @@ public:
 	 */
 	void lazyAllocateMatrixVector(std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & vector_, size_t vector_size_, size_t matrix_height_, size_t matrix_width_) {
 		// Check if memory for the activations was allocated.
-		if (vector_.size() == 0) {
+		if (vector_.size() != vector_size_) {
+			// Free memory.
+			vector_.clear();
+			// Allocate.
 			for (size_t i=0; i < vector_size_; i++) {
 				// Allocate memory for activation of every neuron.
 				mic::types::MatrixPtr<eT> m = MAKE_MATRIX_PTR(eT, matrix_height_, matrix_width_);
@@ -422,16 +425,24 @@ public:
 
 
 	/*!
-	 * Normalizes the matrix. to the range <0.0, 1.0>. - for the visualization purposes.
+	 * Normalizes the matrix. to the range <0.0, 1.0>, e.g. for the visualization purposes.
 	 * @param matrix_ Matrix to be normalized.
 	 */
 	void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
 		// Epsilon added for numerical stability.
-		eT eps = 1e-10;
-		// Calculate l2 norm.
-		eT l2 = matrix_->norm() + eps;
-		// Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-		(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( 0.5f + x/l2 ); } );
+		// eT eps = 1e-10;
+		//eT l2 = matrix_->norm() + eps;
+
+		// Calculate the norm.
+		eT max = matrix_->maxCoeff();
+		eT min = matrix_->maxCoeff();
+		eT diff =  (min - max);
+
+		// Normalize the inputs to range <0.0, 1.0>.
+		if (diff != 0.0 ) {
+			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x-min)/diff ); } );
+		}//: else: do nothin, all values are ~0 already.
+
 	}
 
 
@@ -453,13 +464,13 @@ public:
 			mic::types::MatrixPtr<eT> sample_x = m["xs"];
 			(*sample_x) = batch_x->col(ib);
 
-			// Iterate through output channels.
-			for (size_t oc=0; oc< input_depth; oc++) {
+			// Iterate through input channels.
+			for (size_t ic=0; ic< input_depth; ic++) {
 				// Get activation "row".
-				mic::types::MatrixPtr<eT> row = x_activations[ib*input_depth + oc];
+				mic::types::MatrixPtr<eT> row = x_activations[ib*input_depth + ic];
 
 				// Copy "channel block" from given dx sample.
-				(*row) = sample_x->block(oc*input_height*input_width, 0, input_height*input_width, 1);
+				(*row) = sample_x->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				row->resize(input_height, input_width);
 
 				// Normalize.
@@ -539,7 +550,8 @@ public:
 				row->resize(output_height, output_width);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
@@ -556,7 +568,7 @@ public:
 		// Allocate memory.
 		lazyAllocateMatrixVector(dy_activations, output_depth*batch_size, output_height*output_width, 1);
 
-		// Get y batch.
+		// Get dy batch.
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
 
 		// Iterate through filters and generate "activation image" for each one.
@@ -576,7 +588,8 @@ public:
 				row->resize(output_height, output_width);
 
 				// Normalize.
-				normalizeMatrixForVisualization(row);
+				if (normalize_ )
+					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 

@@ -49,11 +49,11 @@ public:
 	 * @param name_ Name of the layer.
 	 */
 	HebbianLinear(size_t input_height_, size_t input_width_, size_t input_depth_,
-			size_t output_height_, size_t output_width_, size_t output_depth,
+			size_t output_height_, size_t output_width_, size_t output_depth_,
 			eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5,
 			std::string name_ = "HebbianLinear") :
 		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
-				output_height_, output_width_, output_depth,
+				output_height_, output_width_, output_depth_,
 				LayerTypes::HebbianLinear, name_)
 	{
 		std::cout<<"constructor HebbianLinear 2!\n";
