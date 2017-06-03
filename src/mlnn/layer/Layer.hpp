@@ -424,7 +424,7 @@ public:
 
 
 	/*!
-	 * Normalizes the matrix. to the range <0.0, 1.0>, e.g. for the visualization purposes.
+	 * Normalizes the matrix. to the range <-1.0, 1.0>, e.g. for the visualization purposes.
 	 * @param matrix_ Matrix to be normalized.
 	 */
 	void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
@@ -435,12 +435,14 @@ public:
 		// Calculate the norm.
 		eT max = matrix_->maxCoeff();
 		eT min = matrix_->minCoeff();
-		eT diff =  (max - min);
+		eT diff =  0.5*(max - min);
 
+		std::cout << "before: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		// Normalize the inputs to range <0.0, 1.0>.
-		if (diff != 0.0 ) {
-			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x-min)/diff ); } );
+		if ((diff != 0.0) && (min != 0.0)) {
+			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x- min)/diff  - 1.0); } );
 		}//: else: do nothing, all values are ~0 already.
+		std::cout << "normalized: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 
 	}
 
