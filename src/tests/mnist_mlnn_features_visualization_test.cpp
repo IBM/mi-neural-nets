@@ -78,7 +78,7 @@ void batch_function (void) {
 			neural_net.pushLayer(new Linear<float>(6480, 100));
 			neural_net.pushLayer(new ReLU<float>(100));*/
 			neural_net.pushLayer(new Linear<float>(28, 28, 1, 9, 9, 9));
-			neural_net.pushLayer(new ReLU<float>(9, 9, 9));
+			neural_net.pushLayer(new ELU<float>(9, 9, 9));
 			neural_net.pushLayer(new Linear<float>(9, 9, 9, 28, 28, 1));
 			//neural_net.pushLayer(new ReLU<float>(28,28,1));
 //			neural_net.pushLayer(new Softmax<float>(10));
@@ -143,30 +143,34 @@ void batch_function (void) {
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
-					std::shared_ptr<mic::mlnn::Linear<float> > conv1 =
-							neural_net.getLayer<mic::mlnn::Linear<float> >(0);
 					/*std::shared_ptr<mic::mlnn::activation_function::ReLU<float> > conv2 =
 							neural_net.getLayer<mic::mlnn::activation_function::ReLU<float> >(1);*/
+					std::shared_ptr<mic::mlnn::Linear<float> > conv1 =
+							neural_net.getLayer<mic::mlnn::Linear<float> >(0);
 					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations());
 					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
 					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());
 
-					w_conv20->setBatchDataUnsynchronized(conv1->getOutputActivations());
-					w_conv21->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
-					w_conv22->setBatchDataUnsynchronized(conv1->getInverseWeightActivations());
-					w_conv23->setBatchDataUnsynchronized(conv1->getInverseOutputActivations());
+					std::shared_ptr<mic::mlnn::Linear<float> > conv2 =
+							neural_net.getLayer<mic::mlnn::Linear<float> >(2);
+					w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
+					w_conv21->setBatchDataUnsynchronized(conv2->getInputGradientActivations());
+					w_conv22->setBatchDataUnsynchronized(conv2->getWeightActivations());
+					w_conv23->setBatchDataUnsynchronized(conv2->getWeightGradientActivations());
+
+					w_conv30->setBatchDataUnsynchronized(conv2->getOutputActivations());
+					w_conv31->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
+
+
+					//w_conv20->setBatchDataUnsynchronized(conv2->getOutputActivations());
+					//w_conv21->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
+					/*w_conv22->setBatchDataUnsynchronized(conv1->getInverseWeightActivations());
+					w_conv23->setBatchDataUnsynchronized(conv1->getInverseOutputActivations());*/
 
 					//w_weights3->setBatchDataUnsynchronized(layer1->getReceptiveFields(false));
 					//w_weights5->setBatchDataUnsynchronized(layer1->getInverseReceptiveFields(false));
 
-					//w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
-					//w_conv21->setBatchDataUnsynchronized(conv2->getInputGradientActivations());
-					//w_conv22->setBatchDataUnsynchronized(conv2->getWeightActivations());
-					//w_conv23->setBatchDataUnsynchronized(conv2->getWeightGradientActivations());
-
-					//w_conv30->setBatchDataUnsynchronized(conv2->getOutputActivations(false));
-					//w_conv31->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
 
 				}//: if
 
@@ -225,15 +229,13 @@ int main(int argc, char* argv[]) {
 	w_conv12 = new WindowGrayscaleBatch("L0 W", 256, 256, 562, 50);
 	w_conv13 = new WindowGrayscaleBatch("L0 dW", 256, 256, 818, 50);
 
-	w_conv20 = new WindowGrayscaleBatch("L0 y", 256, 256, 50, 336);
-	w_conv21 = new WindowGrayscaleBatch("L0 dy", 256, 256, 316, 336);
-	w_conv22 = new WindowGrayscaleBatch("L0 inverse W activation", 256, 256, 562, 336);
-	w_conv23 = new WindowGrayscaleBatch("L0 inverse y activation", 256, 256, 818, 336);
+	w_conv20 = new WindowGrayscaleBatch("L1 x", 256, 256, 50, 336);
+	w_conv21 = new WindowGrayscaleBatch("L1 dx", 256, 256, 316, 336);
+	w_conv22 = new WindowGrayscaleBatch("L1 W", 256, 256, 562, 336);
+	w_conv23 = new WindowGrayscaleBatch("L1 dW", 256, 256, 818, 336);
 
-	//w_conv30 = new WindowGrayscaleBatch("L2 x", 256, 256, 50, 622);
-	//w_conv31 = new WindowGrayscaleBatch("L2 dx", 256, 256, 312, 622);
-
-//	w_weights5 = new WindowGrayscaleBatch("L0 inverse receptive fields", 512, 512, 1124, 612);
+	w_conv30 = new WindowGrayscaleBatch("L2 x", 256, 256, 50, 622);
+	w_conv31 = new WindowGrayscaleBatch("L2 dx", 256, 256, 312, 622);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 
