@@ -586,7 +586,7 @@ public:
 		for (auto& i: keys) {
 /*			std::cout << "* " << i.first << "\t = < " << (*p[i.first]).minCoeff() << ",\t " << (*p[i.first]).maxCoeff() << ">" <<
 					" * d" << i.first << "\t = <" << (*g[i.first]).minCoeff() << ",\t " << (*g[i.first]).maxCoeff() << ">" << std::endl;*/
-			opt[i.first]->update(p[i.first], g[i.first], alpha_, decay_);
+			opt[i.first]->update(p[i.first], g[i.first], 1.0*alpha_, decay_);
 			/*for (size_t j=0; j<(size_t)p[i.first]->size(); j++)
 				(*p[i.first])[j] -= alpha_ * (*g[i.first])[j];*/
 		}//: for
