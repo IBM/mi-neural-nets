@@ -48,12 +48,12 @@ public:
 	 * @param output_depth_ Depth of the output sample.
 	 * @param name_ Name of the layer.
 	 */
-	BinaryCorrelator(size_t input_height_, size_t input_width_, size_t depth_,
-			size_t output_height_, size_t output_width_,
+	BinaryCorrelator(size_t input_height_, size_t input_width_, size_t input_depth_,
+			size_t output_height_, size_t output_width_, size_t output_depth_,
 			eT permanence_threshold_ = 0.5, eT proximal_threshold_ = 0.5,
 			std::string name_ = "BinaryCorrelator") :
-		Layer<eT>::Layer(input_height_, input_width_, depth_,
-				output_height_, output_width_, depth_,
+		Layer<eT>::Layer(input_height_, input_width_, input_depth_,
+				output_height_, output_width_, output_depth_,
 				LayerTypes::BinaryCorrelator, name_),
 				permanence_threshold(permanence_threshold_),
 				proximal_threshold(proximal_threshold_)

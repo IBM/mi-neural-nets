@@ -73,7 +73,7 @@ int main() {
 	BackpropagationNeuralNetwork<float> nn("ConvNet");
 
 	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution<float>(28*28, input_channels, filter_size[0], filters[0]));
+/*	nn.pushLayer(new Convolution<float>(28*28, input_channels, filter_size[0], filters[0]));
 	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
 	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[0], filters[0], filter_size[1], filters[1]));
 	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
@@ -97,7 +97,7 @@ int main() {
 
 	//SOFTMAX
 	nn.pushLayer(new Linear<float>(nn.lastLayerOutputsSize(), 10));
-	nn.pushLayer(new Softmax<float>(10));
+	nn.pushLayer(new Softmax<float>(10));*/
 
 	// Set batch size.
 	nn.resizeBatch(batch_size);
