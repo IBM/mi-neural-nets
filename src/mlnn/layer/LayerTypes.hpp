@@ -35,8 +35,6 @@
 
 #include <mlnn/fully_connected/SparseLinear.hpp>
 
-#include <mlnn/fully_connected/Identity.hpp>
-
 // Regularisation layers.
 
 #include <mlnn/regularisation/Dropout.hpp>

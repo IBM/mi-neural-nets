@@ -402,9 +402,14 @@ private:
 				layer_ptr = std::make_shared<SparseLinear<eT> >(SparseLinear<eT>());
 				LOG(LDEBUG) <<  "SparseLinear";
 				break;
-			case(LayerTypes::Identity):
-				layer_ptr = std::make_shared<Identity<eT> >(Identity<eT>());
-				LOG(LDEBUG) <<  "Identity";
+			case(LayerTypes::HebbianLinear):
+				layer_ptr = std::make_shared<HebbianLinear<eT> >(HebbianLinear<eT>());
+				LOG(LDEBUG) <<  "HebbianLinear";
+				break;
+
+			case(LayerTypes::BinaryCorrelator):
+				layer_ptr = std::make_shared<BinaryCorrelator<eT> >(BinaryCorrelator<eT>());
+				LOG(LDEBUG) <<  "BinaryCorrelator";
 				break;
 
 			// regularisation

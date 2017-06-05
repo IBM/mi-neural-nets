@@ -108,7 +108,7 @@ public:
 	 * Backward pass.
 	 */
 	void backward() {
-		//LOG(LERROR) << "Backward propagation should not be used with layers relying on Hebbian learning!";
+		throw std::logic_error("Backward propagation should not be used with layers using Hebbian learning!");
 	}
 
 	/*!
@@ -139,9 +139,9 @@ public:
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
 		// Check if memory for the activations was allocated.
 		if (neuron_activations.size() == 0) {
-			for (size_t i=0; i < output_size; i++) {
+			for (size_t i=0; i < outputSize(); i++) {
 				// Allocate memory for activation of every neuron.
-				mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, input_size, 1);
+				mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, inputSize(), 1);
 				neuron_activations.push_back(row);
 			}//: for
 		}//: if
@@ -151,7 +151,7 @@ public:
 
 		mic::types::MatrixPtr<eT> perm =  p["p"];
 		// Iterate through "neurons" and generate "activation image" for each one.
-		for (size_t i=0; i < output_size; i++) {
+		for (size_t i=0; i < outputSize(); i++) {
 			// Get row.
 			mic::types::MatrixPtr<eT> row = neuron_activations[i];
 			// Copy data.
@@ -178,17 +178,18 @@ protected:
     using Layer<eT>::s;
     using Layer<eT>::p;
     using Layer<eT>::m;
-    using Layer<eT>::input_size;
-    using Layer<eT>::output_size;
+    using Layer<eT>::inputSize;
+    using Layer<eT>::outputSize;
     using Layer<eT>::batch_size;
     using Layer<eT>::opt;
 
 private:
 	// Friend class - required for using boost serialization.
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class HebbianNeuralNetwork;
 
 	/// Vector containing activations of neurons.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > neuron_activations;
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > neuron_activations;
 
 	// Permanence threshold - used for calculation of binary connectivity.
 	eT permanence_threshold;

@@ -53,13 +53,12 @@ enum class LayerTypes : short
 	// cost_function
 	Softmax,
 	// fully_connected
-	Identity,
 	Linear,
 	SparseLinear,
-	// regularization
-	Dropout,
 	HebbianLinear,
-	BinaryCorrelator
+	BinaryCorrelator,
+	// regularization
+	Dropout
 };
 
 
@@ -323,12 +322,14 @@ public:
 		case(LayerTypes::Softmax):
 			return "Softmax";
 		// fully_connected
-		case(LayerTypes::Identity):
-			return "Identity";
 		case(LayerTypes::Linear):
 			return "Linear";
 		case(LayerTypes::SparseLinear):
 			return "SparseLinear";
+		case(LayerTypes::HebbianLinear):
+			return "HebbianLinear";
+		case(LayerTypes::BinaryCorrelator):
+			return "BinaryCorrelator";
 		// regularization
 		case(LayerTypes::Dropout):
 			return "Dropout";
