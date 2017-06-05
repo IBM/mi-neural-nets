@@ -16,11 +16,11 @@
 
 #include <mlnn/activation_function/Sigmoid.hpp>
 
-// Convolution-related lyers.
+// Convolution-related layers.
 
 #include <mlnn/convolution/Convolution.hpp>
 
-#include <mlnn/convolution/Pooling.hpp>
+#include <mlnn/convolution/MaxPooling.hpp>
 
 #include <mlnn/convolution/Padding.hpp>
 

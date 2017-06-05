@@ -49,7 +49,7 @@ enum class LayerTypes : short
 	// convolution
 	Convolution,
 	Padding,
-	Pooling,
+	MaxPooling,
 	// cost_function
 	Softmax,
 	// fully_connected
@@ -63,14 +63,6 @@ enum class LayerTypes : short
 };
 
 
-/*!
- * Template inline function returning square root from (x + eps).
- * \author kmrocki/tkornuta
- */
-template <typename eT=float>
-inline eT sqrt_eps(const eT x) {
-	return sqrt(x + 1e-6);
-}
 
 // Forward declaration of MultiLayerNeuralNetwork - required for "lazy connection".
 template <typename eT>
@@ -325,8 +317,8 @@ public:
 			return "Convolution";
 		case(LayerTypes::Padding):
 			return "Padding";
-		case(LayerTypes::Pooling):
-			return "Pooling";
+		case(LayerTypes::MaxPooling):
+			return "MaxPooling";
 		// cost_function
 		case(LayerTypes::Softmax):
 			return "Softmax";

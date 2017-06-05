@@ -66,10 +66,12 @@ void batch_function (void) {
 	} else {*/
 		{
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(28, 28, 1, 10));
+			//neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(28, 28, 1, 10));
 //			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(30, 30, 1, 20, 10, 5));
 //			neural_net.pushLayer(new ELU<float>(5, 5, 20));
-			neural_net.pushLayer(new Linear<float>(48, 48, 1, 28, 28, 1));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(28, 28, 1, 4));
+			neural_net.pushLayer(new Linear<float>(7, 7, 1, 28, 28, 1));
+			neural_net.pushLayer(new ELU<float>(28, 28, 1));
 
 			/*neural_net.pushLayer(new Linear<float>(28, 28, 1, 9, 9, 9));
 			neural_net.pushLayer(new ELU<float>(9, 9, 9));
@@ -146,8 +148,8 @@ void batch_function (void) {
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
 					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());*/
 
-					std::shared_ptr<mic::mlnn::convolution::Padding<float> > layer1 =
-							neural_net.getLayer<mic::mlnn::convolution::Padding<float> >(0);
+					std::shared_ptr<mic::mlnn::convolution::MaxPooling<float> > layer1 =
+							neural_net.getLayer<mic::mlnn::convolution::MaxPooling<float> >(0);
 					w_conv10->setBatchDataUnsynchronized(layer1->getInputActivations());
 					w_conv11->setBatchDataUnsynchronized(layer1->getInputGradientActivations());
 

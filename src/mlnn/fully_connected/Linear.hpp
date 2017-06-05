@@ -88,15 +88,15 @@ public:
 	 * @param test_ It ise set to true in test mode (network verification).
 	 */
 	void forward(bool test_ = false) {
-		// Get input matrices.
-		mic::types::Matrix<eT> x = (*s['x']);
-		mic::types::Matrix<eT> W = (*p['W']);
-		mic::types::Matrix<eT> b = (*p['b']);
+		// Get pointers to data matrices.
+		mic::types::MatrixPtr<eT> x = s['x'];
+		mic::types::MatrixPtr<eT> W = p['W'];
+		mic::types::MatrixPtr<eT> b = p['b'];
 		// Get output pointer - so the results will be stored!
 		mic::types::MatrixPtr<eT> y = s['y'];
 
 		// Forward pass.
-		(*y) = W * x + b.replicate(1, x.cols());
+		(*y) = (*W) * (*x) + (*b).replicate(1, (*x).cols());
 
 /*		std::cout << "Linear forward: s['x'] = \n" << (*s['x']) << std::endl;
 		std::cout << "Linear forward: p['W'] = \n" << (*p['W']) << std::endl;
@@ -109,19 +109,19 @@ public:
 	 * Backward pass.
 	 */
 	void backward() {
-		// Get matrices.
-		mic::types::Matrix<eT> dy = (*g['y']);
-		mic::types::Matrix<eT> x = (*s['x']);
-		mic::types::Matrix<eT> W = (*p['W']);
+		// Get pointer to data matrices.
+		mic::types::MatrixPtr<eT> dy = g['y'];
+		mic::types::MatrixPtr<eT> x = s['x'];
+		mic::types::MatrixPtr<eT> W = p['W'];
 		// Get output pointers - so the results will be stored!
 		mic::types::MatrixPtr<eT> dW = g['W'];
 		mic::types::MatrixPtr<eT> db = g['b'];
 		mic::types::MatrixPtr<eT> dx = g['x'];
 
 		// Backward pass.
-		(*dW) = dy * x.transpose();
-		(*db) = dy.rowwise().sum(); // Sum for all samples in batch, similarly as it is done for dW.
-		(*dx) = W.transpose() * dy;
+		(*dW) = (*dy) * (*x).transpose();
+		(*db) = (*dy).rowwise().sum(); // Sum for all samples in batch, similarly as it is done for dW.
+		(*dx) = (*W).transpose() * (*dy);
 
 /*		std::cout << "Linear backward: g['y'] = \n" << (*g['y']) << std::endl;
 		std::cout << "Linear backward: g['x'] = \n" << (*g['x']) << std::endl;*/

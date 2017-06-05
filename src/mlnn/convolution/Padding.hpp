@@ -139,7 +139,6 @@ protected:
     using Layer<eT>::s;
     using Layer<eT>::p;
     using Layer<eT>::m;
-    using Layer<eT>::opt;
 
     // Uncover "sizes" for visualization.
     using Layer<eT>::input_height;

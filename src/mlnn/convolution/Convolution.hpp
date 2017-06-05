@@ -76,11 +76,10 @@ public:
 		LOG(LDEBUG)<<streamLayerParameters();
 
 		// Set output height and resize matrices!
-		//Layer<eT>::output_size = output_depth*output_height*output_width;
 		s["y"]->resize(Layer<eT>::outputSize(), batch_size); 	// outputs
 		g["y"]->resize(Layer<eT>::outputSize(), batch_size); 	// gradients
-		m["ys"]->resize(Layer<eT>::outputSize(), 1);
-		m["yc"]->resize(output_width*output_height, 1);
+		m["ys"]->resize(Layer<eT>::outputSize(), 1);			// sample
+		m["yc"]->resize(output_width*output_height, 1);			// channel
 
 
 		// Calculate "range" - for initialization.
