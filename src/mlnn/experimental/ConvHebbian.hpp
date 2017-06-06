@@ -198,4 +198,3 @@ private:
 } /* namespace mic */
 
 #endif /* SRC_MLNN_CONVHEBBIAN_HPP_ */
-

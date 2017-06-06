@@ -57,7 +57,7 @@ enum class LayerTypes : short
 	Linear,
 	SparseLinear,
 	HebbianLinear,
-	BinaryCorrelator,
+    BinaryCorrelator,
 	// regularization
     Dropout,
     // Experimental
