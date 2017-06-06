@@ -48,6 +48,7 @@ enum class LayerTypes : short
 	Sigmoid,
 	// convolution
 	Convolution,
+	Cropping,
 	Padding,
 	MaxPooling,
 	// cost_function
@@ -403,6 +404,116 @@ public:
 		return os_;
 	}
 
+	/*!
+	 * Returns sample from batch. If a given memory array does not contain such a memory pointer - it (lazy) allocates it.
+	 * OMP secured - critical section inside.
+	 * @param batch_ptr_ Pointer to a batch.
+	 * @param array_ Array of matrices where a given matrix (sample) is/will be stored.
+	 * @param id_ Sample id (variable prefix).
+	 * @param sample_number_ Number of the sample in batch.
+	 * @param sample_size_ Size of the sample.
+	 */
+	mic::types::MatrixPtr<eT> lazyReturnSampleFromBatch (mic::types::MatrixPtr<eT> batch_ptr_, mic::types::MatrixArray<eT> & array_, std::string id_, size_t sample_number_, size_t sample_size_){
+		// Generate "unique id" for a given sample.
+		std::string sample_id = id_ + std::to_string(sample_number_);
+		mic::types::MatrixPtr<eT> sample;
+
+		#pragma omp critical
+		{
+			if (!array_.keyExists(sample_id)) {
+				// Allocate memory.
+				array_.add(sample_id, sample_size_, 1);
+			}//: if
+
+			// Get array.
+			sample = m[sample_id];
+			// Copy data.
+			(*sample) = batch_ptr_->col(sample_number_);
+		}//: end OMP critical section
+
+		// Return it.
+		return sample;
+	}
+
+	/*!
+	 * Returns input sample, with lazy matrix ptr allocation.
+	 * @param batch_ptr_ Pointer to a batch.
+	 * @param sample_number_ Number of the sample in batch.
+	 */
+	inline mic::types::MatrixPtr<eT> lazyReturnInputSample (mic::types::MatrixPtr<eT> batch_ptr_, size_t sample_number_){
+		return lazyReturnSampleFromBatch(batch_ptr_, m, "xs", sample_number_, Layer<eT>::inputSize());
+	}
+
+
+	/*!
+	 * Returns output sample, with lazy matrix ptr allocation.
+	 * @param batch_ptr_ Pointer to a batch.
+	 * @param sample_number_ Number of the sample in batch.
+	 */
+	inline mic::types::MatrixPtr<eT> lazyReturnOutputSample (mic::types::MatrixPtr<eT> batch_ptr_, size_t sample_number_){
+		return lazyReturnSampleFromBatch(batch_ptr_, m, "ys", sample_number_, Layer<eT>::outputSize());
+	}
+
+
+	/*!
+	 * Returns channel from a sample. If a given memory array does not contain such a memory pointer - it (lazy) allocates it.
+	 * Assumes that: a) a sample is a column vector and b) there is one "channel memory ptr" for each sample (so the whole batch can be processed in parallel).
+	 * OMP secured - critical section inside.
+	 * @param sample_ptr Pointer to a sample.
+	 * @param array_ Array of matrices where a given matrix (channel) is/will be stored.
+	 * @param id_ Channel id (variable prefix).
+	 * @param sample_number_ Number of the sample in batch.
+	 * @param channel_number_ Number of the channel.
+	 * @param height_ Height of the channel.
+	 * @param width_ Width of the channel.
+	 */
+	mic::types::MatrixPtr<eT> lazyReturnChannelFromSample (mic::types::MatrixPtr<eT> sample_ptr_, mic::types::MatrixArray<eT> & array_, std::string id_, size_t sample_number_, size_t channel_number_, size_t height_, size_t width_){
+		// Generate "unique id" for a given sample.
+		std::string channel_id = id_ + std::to_string(channel_number_);
+		mic::types::MatrixPtr<eT> channel;
+
+		#pragma omp critical
+		{
+			if (!array_.keyExists(channel_id)) {
+				// Allocate memory.
+				array_.add(channel_id, height_*width_, 1);
+			}//: if
+
+			// Get array.
+			channel = m[channel_id];
+			// Just in case - resize.
+			sample_ptr_->resize(sample_ptr_->size(), 1);
+			// Copy data.
+			(*channel) = sample_ptr_->block(channel_number_*height_*width_, 0, height_*width_, 1);
+			// Resize channel.
+			channel-> resize(height_, width_);
+		}//: end OMP critical section
+
+		// Return it.
+		return channel;
+	}
+
+	/*!
+	 * Returns input channel, with lazy matrix ptr allocation.
+	 * @param batch_ptr_ Pointer to a batch.
+	 * @param sample_number_ Number of the sample in batch.
+	 * @param channel_number_ Number of the channel in sample.
+	 */
+	inline mic::types::MatrixPtr<eT> lazyReturnInputChannel (mic::types::MatrixPtr<eT> sample_ptr_, size_t sample_number_, size_t channel_number_){
+		return lazyReturnChannelFromSample(sample_ptr_, m, "xc", sample_number_, channel_number_, input_height, input_width);
+	}
+
+
+	/*!
+	 * Returns output sample, with lazy matrix ptr allocation.
+	 * @param batch_ptr_ Pointer to a batch.
+	 * @param sample_number_ Number of the sample in batch.
+	 * @param channel_number_ Number of the channel in sample.
+	 */
+	inline mic::types::MatrixPtr<eT> lazyReturnOutputChannel (mic::types::MatrixPtr<eT> sample_ptr_, size_t sample_number_, size_t channel_number_){
+		return lazyReturnChannelFromSample(sample_ptr_, m, "yc", sample_number_, channel_number_, output_height, output_width);
+	}
+
 
 
 	/*!
@@ -433,7 +544,7 @@ public:
 	 */
 	void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
 		// Epsilon added for numerical stability.
-		// eT eps = 1e-10;
+		//eT eps = 1e-5;
 		//eT l2 = matrix_->norm() + eps;
 
 		// Calculate the norm.
@@ -441,10 +552,12 @@ public:
 		eT min = matrix_->minCoeff();
 		eT diff =  0.5*(max - min);
 
-		//std::cout << "before: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
+		std::cout << "before: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		// Normalize the inputs to range <0.0, 1.0>.
-		if ((diff != 0.0) && (min != 0.0)) {
+		// Check if we can normalize.
+		if (diff != 0.0) {
 			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x- min)/diff  - 1.0); } );
+			std::cout << "after: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		}//: else: do nothing, all values are ~0 already.
 
 	}

@@ -1,12 +1,12 @@
 /*!
- * \file Padding.hpp
+ * \file Cropping.hpp
  * \brief 
  * \author tkornut
  * \date Apr 12, 2016
  */
 
-#ifndef SRC_MLNN_PADDING_HPP_
-#define SRC_MLNN_PADDING_HPP_
+#ifndef SRC_MLNN_CROPPING_HPP_
+#define SRC_MLNN_CROPPING_HPP_
 
 #include <mlnn/layer/Layer.hpp>
 
@@ -15,29 +15,29 @@ namespace mlnn {
 namespace convolution {
 
 /*!
- * \brief Class implementing padding operation - expanding the size of image (matrix) by a margin of n pixels on every image side.
+ * \brief Class implementing cropping operation - crops the size of image (matrix) by a margin of n pixels on every image side/channel.
  * \author tkornuta
  * \tparam eT Template parameter denoting precision of variables (float for calculations/double for testing).
  */
 template <typename eT=float>
-class Padding : public mic::mlnn::Layer<eT> {
+class Cropping : public mic::mlnn::Layer<eT> {
 public:
 
 	/*!
-	 * Creates a Padding layer.
+	 * Creates a cropping layer.
 	 * @param input_height_ Height of the input sample.
 	 * @param input_width_ Width of the input sample.
 	 * @param depth_ Depth of the input/output sample.
-	 * @param padding_ Padding added to each channel (width and height).
+	 * @param cropping_ Cropping size - number of pixels removed in each channel (width and height).
 	 * @param name_ Name of the layer.
 	 */
-	Padding(size_t input_height_, size_t input_width_, size_t depth_,
-			size_t padding_,
-			std::string name_ = "Padding") :
+	Cropping(size_t input_height_, size_t input_width_, size_t depth_,
+			size_t cropping_,
+			std::string name_ = "Cropping") :
 		Layer<eT>::Layer(input_height_, input_width_, depth_,
-				(input_height_ + 2*padding_), (input_width_ + 2*padding_), depth_,
-				LayerTypes::Padding, name_),
-				padding(padding_)
+				(input_height_ - 2*cropping_), (input_width_ - 2*cropping_), depth_,
+				LayerTypes::Cropping, name_),
+				cropping(cropping_)
 	{
 
 	}
@@ -45,18 +45,16 @@ public:
 	/*!
 	 * Virtual destructor - empty.
 	 */
-	virtual ~Padding() { }
+	virtual ~Cropping() { }
 
 	/*!
 	 * Performs forward pass - add padding.
 	 */
 	void forward(bool test = false) {
-		LOG(LTRACE) << "Padding::forward\n";
 
 		// Get pointer to input batch.
 		mic::types::MatrixPtr<eT> batch_x = s['x'];
-		//std::cout<< "forward batch_x=\n" << (*batch) << std::endl;
-		//std::cout << "forward input x activation: min:" << (*batch_x).minCoeff() <<" max: " << (*batch_x).maxCoeff() << std::endl;
+		LOG(LTRACE) << "Cropping::forward input x activation: min:" << (*batch_x).minCoeff() <<" max: " << (*batch_x).maxCoeff() << std::endl;
 
 		// Get pointer to output batch - so the results will be stored!
 		mic::types::MatrixPtr<eT> batch_y = s['y'];
@@ -73,61 +71,67 @@ public:
 			for (size_t ic=0; ic< input_depth; ic++) {
 
 				// Iterate through "blocks" o in channels.
-				for (size_t iw=0; iw< input_width; iw++) {
+				for (size_t iw=0; iw< output_width; iw++) {
 					// Calculate addresses.
-					size_t ia = ic * (input_width) * (input_height) + iw*(input_height);
-					size_t oa = ic * (input_width + 2*padding) * (input_height + 2*padding) + (iw+padding)*(input_height + 2*padding) + padding;
-					//std::cout << " iw = " << iw << " ia = " << ia << " oa = " << oa << std::endl;
-
+					size_t ia = ic * (input_width) * (input_height) + (iw+cropping)*(input_height) + cropping;
+					size_t oa = ic * (output_width) * (output_height) + iw*(output_height);
+					//std::cout << " ib = " << ib << " ic = " << ic <<" iw = " << iw << " ia = " << ia << " oa = " << oa << std::endl;
 
 					#pragma omp critical
 					{
 						// Copy "height" block from input to output.
-						batch_y->block(oa, ib, input_height, 1) =
-							batch_x->block(ia, ib, input_height, 1);
+						batch_y->block(oa, ib, output_height, 1) =
+							batch_x->block(ia, ib, output_height, 1);
 					}//: omp critical
 
 				}//: for width
 			}//: for channels
 		}//: for batch
-		LOG(LTRACE) << "Padding::forward end\n";
+		LOG(LTRACE) << "Cropping::forward end\n";
 	}
 
 	/*!
 	 * Backward pass.
 	 */
 	void backward() {
-		LOG(LTRACE) << "Padding::backward\n";
-
+		LOG(LTRACE) << "Cropping::backward\n";
 		// Get pointer to dy batch.
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
+		batch_dy->enumerate();
+
+		//std::cout << "batch_dy [batch x height x width] = " << batch_size << " x " << output_height << " x " << output_width << std::endl;
+		//std::cout << "batch_dx [batch x height x width] = " << batch_size << " x " << input_height << " x " << input_width << std::endl;
 
 		// Get pointer to dx batch.
 		mic::types::MatrixPtr<eT> batch_dx = g['x'];
-
+		//batch_dx->setZero();
 
 		// Iterate through batch.
-		#pragma omp parallel for
-		for (size_t bi = 0; bi < batch_size; bi++) {
+		//#pragma omp parallel for
+		for (size_t ib = 0; ib < batch_size; ib++) {
 
 			// Iterate through input/output channels.
 			for (size_t ic=0; ic< input_depth; ic++) {
 
 				// Iterate through "blocks" o in channels.
-				for (size_t iw=0; iw< input_width; iw++) {
+				for (size_t iw=0; iw< output_width; iw++) {
 					// Calculate addresses.
-					size_t ia = ic * (input_width) * (input_height) + iw*(input_height);
-					size_t oa = ic * (input_width + 2*padding) * (input_height + 2*padding) + (iw+padding)*(input_height + 2*padding) + padding;
+					size_t ia = ic * (input_width) * (input_height) + (iw+cropping)*(input_height) + cropping;
+					size_t oa = ic * (output_width) * (output_height) + iw*(output_height);
+					std::cout << " ib = " << ib << " ic = " << ic <<" iw = " << iw << " ia = " << ia << " oa = " << oa << std::endl;
 
-					// Copy "height" block from input to output.
-					batch_dx->block(ia, bi, input_height, 1) = batch_dy->block(oa, bi, input_height, 1);
+					#pragma omp critical
+					{
+						std::cout << "batch_dy->block(oa, ib, output_height, 1) = " << batch_dy->block(oa, ib, output_height, 1) << std::endl;
+						// Copy "height" block from input to output.
+						batch_dx->block(ia, ib, output_height, 1) = batch_dy->block(oa, ib, output_height, 1);
+					}//: omp critical
 
 				}//: for width
-
 			}//: for channels
 		}//: for batch
 
-		LOG(LTRACE) << "Padding::backward end\n";
+		LOG(LTRACE) << "Cropping::backward end\n";
 	}
 
 	/*!
@@ -157,8 +161,8 @@ protected:
 	using Layer<eT>::output_depth;
     using Layer<eT>::batch_size;
 
-    // Size of padding.
-	size_t padding;
+    /// Cropping size - number of pixels removed in each channel (width and height)
+	size_t cropping;
 
 private:
 	// Friend class - required for using boost serialization.
@@ -167,7 +171,7 @@ private:
 	/*!
 	 * Private constructor, used only during the serialization.
 	 */
-	Padding<eT>() : Layer<eT> () { }
+	Cropping<eT>() : Layer<eT> () { }
 
 
 
@@ -178,4 +182,4 @@ private:
 } /* namespace mlnn */
 } /* namespace mic */
 
-#endif /* SRC_MLNN_PADDING_HPP_ */
+#endif /* SRC_MLNN_CROPPING_HPP_ */

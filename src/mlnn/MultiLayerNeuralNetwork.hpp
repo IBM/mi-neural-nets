@@ -72,7 +72,7 @@ public:
 
 	/*!
 	 * Returns n-th layer of the neural network.
-	 * @param layer_ptr_ Pointer to the newly created layer.
+	 * @param layer_ptr_ Pointer to the layer.
 	 * @tparam layer_ptr_ Layer type.
 	 */
 	template <typename LayerType>
@@ -82,6 +82,16 @@ public:
 		return std::dynamic_pointer_cast< LayerType >( layers[index_] );
 	}
 
+	/*!
+	 * Returns n-th layer of the neural network.
+	 * @param layer_ptr_ Pointer to the layer.
+	 * @tparam layer_ptr_ Layer type.
+	 */
+	std::shared_ptr<Layer<eT> > getLayer(size_t index_){
+		assert(index_ < layers.size());
+		// Cast the pointer to LayerType.
+		return layers[index_];
+	}
 
 	/*!
 	 * Removes several last layers of the neural network.

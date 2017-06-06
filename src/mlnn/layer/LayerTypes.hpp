@@ -20,6 +20,8 @@
 
 #include <mlnn/convolution/Convolution.hpp>
 
+#include <mlnn/convolution/Cropping.hpp>
+
 #include <mlnn/convolution/MaxPooling.hpp>
 
 #include <mlnn/convolution/Padding.hpp>
