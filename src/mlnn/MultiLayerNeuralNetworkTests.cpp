@@ -55,12 +55,12 @@ TEST_F(Simple2LayerRegressionNN, Serialization) {
 	// Save network to file.
 	const char* fileName = "saved.txt";
 	nn.save(fileName);
-	//std::cout << "Saved network: \n" << nn;
+	std::cout << "Saved network: \n" << nn;
 
 	// Load network from file.
 	mic::mlnn::MultiLayerNeuralNetwork<double> restored_nn("simple_linear_network_loaded");
 	restored_nn.load(fileName);
-	//std::cout << "Restored network: \n" << restored_nn;
+	std::cout << "Restored network: \n" << restored_nn;
 
 	// Compare number of layers.
 	ASSERT_EQ(nn.layers.size(), restored_nn.layers.size());
