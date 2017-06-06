@@ -29,13 +29,9 @@ install(FILES
 	fully_connected/HebbianLinear.hpp
 	fully_connected/BinaryCorrelator.hpp
 	DESTINATION include/mlnn/fully_connected)
-	
-install(FILES
-        experimental/TiledHebbian.hpp
-	DESTINATION include/mlnn/experimental)
 
 install(FILES
-        experimental/TiledHebbian.hpp
+        experimental/ConvHebbian.hpp
 	DESTINATION include/mlnn/experimental)
 
 install(FILES
