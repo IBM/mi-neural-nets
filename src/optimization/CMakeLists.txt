@@ -13,6 +13,7 @@ install(FILES
 	OptimizationFunctionTypes.hpp
 	HebbianRule.hpp
 	NormalizedHebbianRule.hpp
+	NormalizedZerosumHebbianRule.hpp
 	BinaryCorrelatorLearningRule.hpp
 	DESTINATION include/optimization)
 

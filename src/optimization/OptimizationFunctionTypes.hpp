@@ -22,4 +22,6 @@
 #include <optimization/NormalizedHebbianRule.hpp>
 #include <optimization/BinaryCorrelatorLearningRule.hpp>
 
+#include <optimization/NormalizedZerosumHebbianRule.hpp>
+
 #endif /* OPTIMIZATIONFUNCTIONTYPES_HPP_ */

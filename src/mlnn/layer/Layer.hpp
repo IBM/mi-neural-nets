@@ -59,7 +59,9 @@ enum class LayerTypes : short
 	HebbianLinear,
 	BinaryCorrelator,
 	// regularization
-	Dropout
+    Dropout,
+    // Experimental
+    ConvHebbian
 };
 
 

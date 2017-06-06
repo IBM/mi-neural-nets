@@ -45,4 +45,8 @@
 
 #include <mlnn/fully_connected/BinaryCorrelator.hpp>
 
+// Experimental layers
+
+#include <mlnn/experimental/ConvHebbian.hpp>
+
 #endif /* SRC_MLNN_LAYERTYPES_HPP_ */
