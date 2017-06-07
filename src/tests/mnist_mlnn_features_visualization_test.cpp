@@ -49,9 +49,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 /// Label 2 matrix encoder (1 hot).
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
-const size_t patch_size = 28;
-const size_t batch_size = 16;
-const size_t output_size = 3872;
+const size_t batch_size = 4;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
 
@@ -68,13 +66,13 @@ void batch_function (void) {
 //			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(24, 24, 1, 1));
 
 			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 1, 8, 5, 1));
-			neural_net.pushLayer(new ELU<float>(20, 20, 8));
-			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(20, 20, 8, 2));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 1, 9, 5, 1));
+			neural_net.pushLayer(new ELU<float>(20, 20, 9));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(20, 20, 9, 2));
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(10, 10, 8, 16, 5, 1));
-			neural_net.pushLayer(new ELU<float>(6, 6, 16));
-			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(6, 6, 16, 3));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(10, 10, 9, 16, 7, 1));
+			neural_net.pushLayer(new ELU<float>(4, 4, 16));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(4, 4, 16, 2));
 
 			neural_net.pushLayer(new Linear<float>(2, 2, 16, 10, 1, 1));
 			neural_net.pushLayer(new Softmax<float>(10));
@@ -97,7 +95,7 @@ void batch_function (void) {
 
 	// Retrieve the next minibatch.
 	//mic::types::MNISTBatch bt = importer->getNextBatch();
-	importer->setNextSampleIndex(5);
+	//importer->setNextSampleIndex(5);
 
 	// Main application loop.
 	while (!APP_STATE->Quit()) {
@@ -113,7 +111,7 @@ void batch_function (void) {
 				APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
 				// Retrieve the next minibatch.
-				mic::types::MNISTBatch bt = importer->getNextBatch();
+				mic::types::MNISTBatch bt = importer->getRandomBatch();
 
 				// Encode data.
 				mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
@@ -210,7 +208,7 @@ int main(int argc, char* argv[]) {
 	importer->setBatchSize(batch_size);
 
 	// Initialize the encoders.
-	mnist_encoder = new mic::encoders::MatrixXfMatrixXfEncoder(patch_size, patch_size);
+	mnist_encoder = new mic::encoders::MatrixXfMatrixXfEncoder(28, 28);
 	label_encoder = new mic::encoders::UIntMatrixXfEncoder(10);
 
 	// Set parameters of all property-tree derived objects - USER independent part.

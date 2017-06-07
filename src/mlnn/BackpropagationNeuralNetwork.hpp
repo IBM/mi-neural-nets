@@ -115,18 +115,22 @@ public:
 		// Set pointers - pass result to the next layer: x(next layer) = y(current layer).
 		if (layers.size() > 1)
 			for (size_t i = 0; i < layers.size()-1; i++) {
+				bool layer_ok = true;
 				// Check inputs.
 				if (layers[i]->s['y']->rows() != layers[i+1]->s['x']->rows()) {
 					LOG(LERROR) << "Layer["<<i<<"].y differs from " << "Layer["<<i+1<<"].x";
 					ok = false;
-					LOG(LINFO) << "Layer["<<i<<"]: " <<  (*layers[i]).streamLayerParameters();
-					LOG(LINFO) << "Layer["<<i+1<<"]: " <<  (*layers[i+1]).streamLayerParameters();
+					layer_ok = false;
 				}
 
 				// Check gradients.
 				if (layers[i]->g['y']->rows() != layers[i+1]->g['x']->rows()) {
 					LOG(LERROR) << "Layer["<<i<<"].dy differs from " << "Layer["<<i+1<<"].dx";
 					ok = false;
+					layer_ok = false;
+				}
+				// Display parameters of botch layers.
+				if (!layer_ok) {
 					LOG(LINFO) << "Layer["<<i<<"]: " <<  (*layers[i]).streamLayerParameters();
 					LOG(LINFO) << "Layer["<<i+1<<"]: " <<  (*layers[i+1]).streamLayerParameters();
 				}

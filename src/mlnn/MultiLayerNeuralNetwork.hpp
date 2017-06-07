@@ -164,8 +164,11 @@ public:
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
 	void update(eT alpha_, eT decay_ = 0.0f) {
+		// The updates are cumulated for a batch, reduce the alpha rate.
+		eT alpha_batch = alpha_/layers[0]->batch_size;
+
 		for (size_t i = 0; i < layers.size(); i++) {
-			layers[i]->update(alpha_, decay_);
+			layers[i]->update(alpha_batch, decay_);
 		}//: for
 	}
 
