@@ -34,9 +34,9 @@ using namespace mic::mlnn;
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
 /// Windows for displaying activations.
-WindowGrayscaleBatch *w_conv10, *w_conv11, *w_conv12, *w_conv13;
-WindowGrayscaleBatch *w_conv20, *w_conv21, *w_conv22, *w_conv23;
-WindowGrayscaleBatch *w_conv30, *w_conv31;
+WindowGrayscaleBatch *w_conv10, *w_conv11, *w_conv12, *w_conv13, *w_conv14, *w_conv15;
+WindowGrayscaleBatch *w_conv20, *w_conv21, *w_conv22, *w_conv23, *w_conv24, *w_conv25;
+WindowGrayscaleBatch *w_conv30, *w_conv31, *w_conv32, *w_conv33, *w_conv34, *w_conv35;
 
 
 /// MNIST importer.
@@ -139,22 +139,36 @@ void batch_function (void) {
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
-					/*std::shared_ptr<mic::mlnn::activation_function::ReLU<float> > conv2 =
-							neural_net.getLayer<mic::mlnn::activation_function::ReLU<float> >(1);*/
+					//std::shared_ptr<Layer<float> > layer1 = neural_net.getLayer(3);
+
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
 							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(1);
 					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations());
 					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
 					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());
-					w_conv20->setBatchDataUnsynchronized(conv1->getOutputActivations());
-					w_conv21->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
+					w_conv14->setBatchDataUnsynchronized(conv1->getOutputActivations());
+					w_conv15->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
 
-					std::shared_ptr<Layer<float> > layer1 = neural_net.getLayer(3);
-					w_conv22->setBatchDataUnsynchronized(layer1->getInputActivations());
-					w_conv23->setBatchDataUnsynchronized(layer1->getInputGradientActivations());
-					w_conv30->setBatchDataUnsynchronized(layer1->getOutputActivations());
-					w_conv31->setBatchDataUnsynchronized(layer1->getOutputGradientActivations());
+					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv2 =
+							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(4);
+					w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
+					w_conv21->setBatchDataUnsynchronized(conv2->getInputGradientActivations());
+					w_conv22->setBatchDataUnsynchronized(conv2->getWeightActivations());
+					w_conv23->setBatchDataUnsynchronized(conv2->getWeightGradientActivations());
+					w_conv24->setBatchDataUnsynchronized(conv2->getOutputActivations());
+					w_conv25->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
+
+					std::shared_ptr<mic::mlnn::fully_connected::Linear<float> > lin1 =
+							neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(7);
+					w_conv30->setBatchDataUnsynchronized(lin1->getInputActivations());
+					w_conv31->setBatchDataUnsynchronized(lin1->getInputGradientActivations());
+					w_conv32->setBatchDataUnsynchronized(lin1->getWeightActivations());
+					w_conv33->setBatchDataUnsynchronized(lin1->getWeightGradientActivations());
+
+					std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(7);
+					w_conv34->setBatchDataUnsynchronized(sm1->getOutputActivations());
+					w_conv35->setBatchDataUnsynchronized(sm1->getOutputGradientActivations());
 
 
 				}//: if
@@ -209,18 +223,26 @@ int main(int argc, char* argv[]) {
 	VGL_MANAGER->initializeGLUT(argc, argv);
 
 	// Create batch visualization window.
-	w_conv10 = new WindowGrayscaleBatch("L0 x", 256, 256, 50, 50);
-	w_conv11 = new WindowGrayscaleBatch("L0 dx", 256, 256, 316, 50);
-	w_conv12 = new WindowGrayscaleBatch("L0 W", 256, 256, 562, 50);
-	w_conv13 = new WindowGrayscaleBatch("L0 dW", 256, 256, 818, 50);
+	w_conv10 = new WindowGrayscaleBatch("Conv1 x", 256, 256, 50, 50);
+	w_conv11 = new WindowGrayscaleBatch("Conv1 dx", 256, 256, 316, 50);
+	w_conv12 = new WindowGrayscaleBatch("Conv1 W", 256, 256, 562, 50);
+	w_conv13 = new WindowGrayscaleBatch("Conv1 dW", 256, 256, 818, 50);
+	w_conv14 = new WindowGrayscaleBatch("Conv1 y", 256, 256, 1074, 50);
+	w_conv15 = new WindowGrayscaleBatch("Conv1 dy", 256, 256, 1330, 50);
 
-	w_conv20 = new WindowGrayscaleBatch("L1 x", 256, 256, 50, 336);
-	w_conv21 = new WindowGrayscaleBatch("L1 dx", 256, 256, 316, 336);
-	w_conv22 = new WindowGrayscaleBatch("L1 W", 256, 256, 562, 336);
-	w_conv23 = new WindowGrayscaleBatch("L1 dW", 256, 256, 818, 336);
+	w_conv20 = new WindowGrayscaleBatch("Conv2 x", 256, 256, 50, 336);
+	w_conv21 = new WindowGrayscaleBatch("Conv2 dx", 256, 256, 316, 336);
+	w_conv22 = new WindowGrayscaleBatch("Conv2 W", 256, 256, 562, 336);
+	w_conv23 = new WindowGrayscaleBatch("Conv2 dW", 256, 256, 818, 336);
+	w_conv24 = new WindowGrayscaleBatch("Conv2 y", 256, 256, 1074, 336);
+	w_conv25 = new WindowGrayscaleBatch("Conv2 dy", 256, 256, 1330, 336);
 
-	w_conv30 = new WindowGrayscaleBatch("L2 x", 256, 256, 50, 622);
-	w_conv31 = new WindowGrayscaleBatch("L2 dx", 256, 256, 312, 622);
+	w_conv30 = new WindowGrayscaleBatch("L1 x", 256, 256, 50, 622);
+	w_conv31 = new WindowGrayscaleBatch("L1 dx", 256, 256, 316, 622);
+	w_conv32 = new WindowGrayscaleBatch("L1 W", 256, 256, 562, 622);
+	w_conv33 = new WindowGrayscaleBatch("L1 dW", 256, 256, 818, 622);
+	w_conv34 = new WindowGrayscaleBatch("SM y", 256, 256, 1074, 622);
+	w_conv35 = new WindowGrayscaleBatch("SM dy", 256, 256, 1330, 622);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 
