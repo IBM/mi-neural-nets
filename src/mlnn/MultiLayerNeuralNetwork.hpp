@@ -29,9 +29,9 @@ namespace mic {
 namespace mlnn {
 
 using namespace activation_function;
-//using namespace convolution;
 using namespace cost_function;
 using namespace fully_connected;
+using namespace convolution;
 using namespace regularisation;
 
 /*!
@@ -383,18 +383,22 @@ private:
 				break;
 
 			// convolution
-/*			case(LayerTypes::Padding):
-				layer_ptr = std::make_shared<Padding<eT> >(Padding<eT>());
-				LOG(LERROR) <<  "Padding Layer serialization not implemented (some params are not serialized)!";
-				break;
-			case(LayerTypes::Pooling):
-				layer_ptr = std::make_shared<Pooling<eT> >(Pooling<eT>());
-				LOG(LERROR) <<  "Pooling Layer serialization not implemented (some params are not serialized)!";
-				break;
 			case(LayerTypes::Convolution):
 				layer_ptr = std::make_shared<Convolution<eT> >(Convolution<eT>());
 				LOG(LERROR) <<  "Convolution Layer serialization not implemented (some params are not serialized)!";
-				break;*/
+				break;
+			case(LayerTypes::Cropping):
+				layer_ptr = std::make_shared<Cropping<eT> >(Cropping<eT>());
+				LOG(LERROR) <<  "Cropping Layer serialization not implemented (some params are not serialized)!";
+				break;
+			case(LayerTypes::MaxPooling):
+				layer_ptr = std::make_shared<MaxPooling<eT> >(MaxPooling<eT>());
+				LOG(LERROR) <<  "MaxPooling Layer serialization not implemented (some params are not serialized)!";
+				break;
+			case(LayerTypes::Padding):
+				layer_ptr = std::make_shared<Padding<eT> >(Padding<eT>());
+				LOG(LERROR) <<  "Padding Layer serialization not implemented (some params are not serialized)!";
+				break;
 
 			// cost_function
 			case(LayerTypes::Softmax):

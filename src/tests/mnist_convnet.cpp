@@ -22,9 +22,8 @@ using namespace mic::mlnn::convolution;
 
 int main() {
 	// Task parameters.
-//	size_t iterations = 500;
-	size_t 	epochs = 500;
-	size_t 	batch_size = 16;
+	size_t 	epochs = 100;
+	size_t 	batch_size = 1;
 
 	// Set console output.
 	ConsoleOutput* co = new ConsoleOutput();
@@ -60,44 +59,30 @@ int main() {
 	// Train : 99.99 %
 	// Test  : 99.61 %
 
-	size_t 	input_channels = 1;
-	size_t 	filter_size[] = {3, 3, 3, 3, 3};
-	size_t 	filters[] = {32, 32, 128, 128, 256};
-
-	size_t 	pooling_window = 2;
-	float 	dropout = 0.5f;
-
-	size_t  fully_connected_size = 256;
-
 	// Neural net.
 	BackpropagationNeuralNetwork<float> nn("ConvNet");
 
-	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-/*	nn.pushLayer(new Convolution<float>(28*28, input_channels, filter_size[0], filters[0]));
-	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[0], filters[0], filter_size[1], filters[1]));
-	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Pooling<float>(nn.lastLayerOutputsSize(), pooling_window, filters[2]));
+	// Convolution 1
+	nn.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 1));
+	nn.pushLayer(new mic::mlnn::convolution::Convolution<float>(26, 26, 1, 16, 3, 1));
+	nn.pushLayer(new ELU<float>(24, 24, 16));
+	nn.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(24, 24, 16, 2));
 
-	//CONV 3x3 -> CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[1], filters[1], filter_size[2], filters[2]));
-	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[2], filters[2], filter_size[3], filters[3]));
-	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Pooling<float>(nn.lastLayerOutputsSize(), pooling_window, filters[3]));
+	// Convolution 2
+	nn.pushLayer(new mic::mlnn::convolution::Convolution<float>(12, 12, 16, 32, 3, 1));
+	nn.pushLayer(new ELU<float>(10, 10, 32));
+	nn.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(10, 10, 32, 2));
 
-	//CONV 3x3 -> POOL 2x
-	nn.pushLayer(new Convolution<float>(nn.lastLayerOutputsSize() / filters[3], filters[3], filter_size[4], filters[4]));
-	nn.pushLayer(new Pooling<float>(nn.lastLayerOutputsSize(), pooling_window, filters[4]));
+	// Linear + dropout
+	nn.pushLayer(new Linear<float>(5, 5, 32, 100, 1, 1));
+	nn.pushLayer(new ELU<float>(100, 1, 1));
+	nn.pushLayer(new Dropout<float>(100, 0.5f));
 
-	//FULLY CONNECTED
-	nn.pushLayer(new Linear<float>(nn.lastLayerOutputsSize(), fully_connected_size));
-	nn.pushLayer(new ReLU<float>(nn.lastLayerOutputsSize()));
-	nn.pushLayer(new Dropout<float>(nn.lastLayerOutputsSize(), dropout));
-
-	//SOFTMAX
-	nn.pushLayer(new Linear<float>(nn.lastLayerOutputsSize(), 10));
-	nn.pushLayer(new Softmax<float>(10));*/
+	// Softmax
+	nn.pushLayer(new Linear<float>(100, 10));
+	nn.pushLayer(new Softmax<float>(10));
+	if (!nn.verify())
+		exit(-1);
 
 	// Set batch size.
 	nn.resizeBatch(batch_size);
@@ -106,8 +91,8 @@ int main() {
 	nn.setOptimization<mic::neural_nets::optimization::Adam<float> >();
 
 	// Set training parameters.
-	double 	learning_rate = 1e-2;
-	double 	weight_decay = 0;
+	double 	learning_rate = 1e-4;
+	double 	weight_decay = 1e-5;
 	size_t iterations = training.size() / batch_size;
 
 	MatrixXfPtr encoded_batch, encoded_targets;
@@ -124,8 +109,8 @@ int main() {
 			encoded_targets  = label_encoder.encodeBatch(rand_batch.labels());
 
 			// Train network with batch.
-			nn.train (encoded_batch, encoded_targets, learning_rate, weight_decay);
-
+			float loss = nn.train (encoded_batch, encoded_targets, learning_rate, weight_decay);
+			std::cout << " loss = " << loss << std::endl;
 		}//: for iteration
 
 		// Save results to file.
@@ -149,7 +134,7 @@ int main() {
 
 		}
 		double test_acc = (double)correct / (double)(test.size());
-		LOG(LINFO) << "Test  : " << std::setprecision(3) << 100.0 * test_acc << " %";
+		LOG(LINFO) << "Test accuracy  : " << std::setprecision(3) << 100.0 * test_acc << " %";
 
 		// Check performance on the training dataset.
 		LOG(LSTATUS) << "Calculating performance for the training dataset...";
@@ -167,7 +152,7 @@ int main() {
 
 		}
 		double train_acc = (double)correct / (double)(training.size());
-		LOG(LINFO) << "Train : " << std::setprecision(3) << 100.0 * train_acc << " %";
+		LOG(LINFO) << "Trainin accuracy : " << std::setprecision(3) << 100.0 * train_acc << " %";
 
 	}//: for epoch
 

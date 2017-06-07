@@ -50,7 +50,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t patch_size = 28;
-const size_t batch_size = 1;
+const size_t batch_size = 16;
 const size_t output_size = 3872;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
@@ -65,22 +65,19 @@ void batch_function (void) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
+//			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(24, 24, 1, 1));
 
-			//neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(28, 28, 1, 10));
-//			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(30, 30, 1, 20, 10, 5));
-//			neural_net.pushLayer(new ELU<float>(5, 5, 20));
+			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 1, 8, 5, 1));
+			neural_net.pushLayer(new ELU<float>(20, 20, 8));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(20, 20, 8, 2));
 
-			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 7));
-			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(14, 14, 1, 7));
-//			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(30, 30, 1, 5));
-/*			neural_net.pushLayer(new Linear<float>(6, 6, 1, 28, 28, 1));
-			neural_net.pushLayer(new ELU<float>(28, 28, 1));*/
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(10, 10, 8, 16, 5, 1));
+			neural_net.pushLayer(new ELU<float>(6, 6, 16));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(6, 6, 16, 3));
 
-			/*neural_net.pushLayer(new Linear<float>(28, 28, 1, 9, 9, 9));
-			neural_net.pushLayer(new ELU<float>(9, 9, 9));
-			neural_net.pushLayer(new Linear<float>(9, 9, 9, 28, 28, 1));*/
-
-//			neural_net.pushLayer(new Softmax<float>(10));
+			neural_net.pushLayer(new Linear<float>(2, 2, 16, 10, 1, 1));
+			neural_net.pushLayer(new Softmax<float>(10));
 			if (!neural_net.verify())
 				exit(-1);
 
@@ -133,7 +130,7 @@ void batch_function (void) {
 				(*encoded_labels)[15]= 1.0;*/
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_batch, 0.001, 0.0001);
+				float loss = neural_net.train (encoded_batch, encoded_labels, 0.001, 0.0001);
 
 				// Get reconstruction.
 				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
@@ -144,42 +141,20 @@ void batch_function (void) {
 					// Visualize the weights.
 					/*std::shared_ptr<mic::mlnn::activation_function::ReLU<float> > conv2 =
 							neural_net.getLayer<mic::mlnn::activation_function::ReLU<float> >(1);*/
-/*					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
+					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
 							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(1);
 					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations());
 					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
 					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
-					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());*/
+					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());
+					w_conv20->setBatchDataUnsynchronized(conv1->getOutputActivations());
+					w_conv21->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
 
-					/*std::shared_ptr<mic::mlnn::convolution::MaxPooling<float> > layer1 =
-							neural_net.getLayer<mic::mlnn::convolution::MaxPooling<float> >(0);*/
-
-					std::shared_ptr<Layer<float> > layer0 = neural_net.getLayer(0);
-					w_conv10->setBatchDataUnsynchronized(layer0->getInputActivations(false));
-					w_conv11->setBatchDataUnsynchronized(layer0->getInputGradientActivations());
-
-
-					/*std::shared_ptr<Layer<float> > layer1 = neural_net.getLayer(1);
-					w_conv20->setBatchDataUnsynchronized(layer1->getInputActivations());
-					w_conv21->setBatchDataUnsynchronized(layer1->getInputGradientActivations());*/
-					/*w_conv22->setBatchDataUnsynchronized(layer2->getWeightActivations());
-					w_conv23->setBatchDataUnsynchronized(layer2->getWeightGradientActivations());*/
-
-					/*std::shared_ptr<Layer<float> > layer2 = neural_net.getLayer(2);
-					w_conv22->setBatchDataUnsynchronized(layer2->getInputActivations());
-					w_conv23->setBatchDataUnsynchronized(layer2->getInputGradientActivations());*/
-
-					w_conv30->setBatchDataUnsynchronized(layer0->getOutputActivations());
-					w_conv31->setBatchDataUnsynchronized(layer0->getOutputGradientActivations());
-
-
-					//w_conv20->setBatchDataUnsynchronized(conv2->getOutputActivations());
-					//w_conv21->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
-					/*w_conv22->setBatchDataUnsynchronized(conv1->getInverseWeightActivations());
-					w_conv23->setBatchDataUnsynchronized(conv1->getInverseOutputActivations());*/
-
-					//w_weights3->setBatchDataUnsynchronized(layer1->getReceptiveFields(false));
-					//w_weights5->setBatchDataUnsynchronized(layer1->getInverseReceptiveFields(false));
+					std::shared_ptr<Layer<float> > layer1 = neural_net.getLayer(3);
+					w_conv22->setBatchDataUnsynchronized(layer1->getInputActivations());
+					w_conv23->setBatchDataUnsynchronized(layer1->getInputGradientActivations());
+					w_conv30->setBatchDataUnsynchronized(layer1->getOutputActivations());
+					w_conv31->setBatchDataUnsynchronized(layer1->getOutputGradientActivations());
 
 
 				}//: if

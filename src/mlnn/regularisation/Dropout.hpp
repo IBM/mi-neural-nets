@@ -28,14 +28,30 @@ public:
 	 * @param ratio_ Keep ratio denoting the probability of activations to be passed.
 	 */
 	Dropout<eT>(size_t inputs_, float ratio_, std::string name_ = "Dropout") :
-		Layer<eT>(inputs_, inputs_, 1, LayerTypes::Dropout, name_),  keep_ratio(ratio_)
+		Layer<eT>(inputs_, 1, 1,
+				inputs_, 1, 1,
+				LayerTypes::Dropout, name_),
+				keep_ratio(ratio_)
 	{
-		// Create matrices with temporary variables: random and dropout.
+		// Create matrices with temporary variables: random and dropout of size [inputxinput], so we can simply calculate: y=mask*x.
 		m.add ("random", inputs_, inputs_);
 		m.add ("dropout_mask", inputs_, inputs_);
 	}
 
 	virtual ~Dropout() {};
+
+	/*!
+	 * Changes the size of the batch - calls base Layer class resize and additionally resizes the cache size.
+	 * @param New size of the batch.
+	 */
+	virtual void resizeBatch(size_t batch_size_) {
+		// Call base Layer resize.
+		Layer<eT>::resizeBatch(batch_size_);
+
+		// Reshape pooling mask and map.
+		m["dropout_mask"]->resize(Layer<eT>::inputSize(), batch_size_);
+	}
+
 
 	void forward(bool test = false) {
 		if (test) {
@@ -43,26 +59,38 @@ public:
 			(*s['y']) = (*s['x']);
 
 		} else {
+			// Get pointers to input and output batches.
+			mic::types::MatrixPtr<eT> batch_x = s['x'];
+			mic::types::MatrixPtr<eT> batch_y = s['y'];
+
 			// Generate random matrix.
-			m["random"]->rand(0.0f, 1.0f);
+			mic::types::MatrixPtr<eT> rand = m["random"];
+			rand->rand(0.0f, 1.0f);
 
 			// Generate the dropout mask.
-			//m["dropout_mask"]->array() = (m["random"]->array() < keep_ratio).cast<eT> ();
-			for(size_t i=0; i< (size_t)m["dropout_mask"]->size(); i++)
-				(*m["dropout_mask"])[i] = (*m["random"])[i] < keep_ratio;
+			mic::types::MatrixPtr<eT> mask = m["dropout_mask"];
+
+			#pragma omp parallel for
+			for(size_t i=0; i< (size_t)mask->size(); i++)
+				(*mask)[i] = ((*rand)[i] < keep_ratio);
 
 			// Apply the dropout_mask - discard the elements where mask is 0.
-			(*s['y']) = (*s['x']) * (*m["dropout_mask"]);
+			(*batch_y) =  (*mask) * (*batch_x);
 
 			// Normalize, so that we don't have to do anything at test time.
-			(*s['y']) /= keep_ratio;
+			(*batch_y) /= keep_ratio;
 
 		}
 	}
 
 	void backward() {
+		// Get pointers to input and output batches.
+		mic::types::MatrixPtr<eT> batch_dx = g['x'];
+		mic::types::MatrixPtr<eT> batch_dy = g['y'];
+		mic::types::MatrixPtr<eT> mask = m["dropout_mask"];
+
 		// Always use dropout mask as backward pass is used only during learning.
-		(*g['x']) = (*g['y']) * (*m["dropout_mask"]);
+		(*batch_dy) =  (*mask).transpose() * (*batch_dx);
 	}
 
 	/*!
@@ -89,11 +117,6 @@ protected:
 	 * Ratio denoting the probability of activations to be passed.
 	 */
 	eT keep_ratio;
-
-	/*!
-	 * Dropout mask - computed in forward() method in every pass, do not have to be serialized, thus not included in the parameters vector (p).
-	 */
-	mic::types::Matrix<eT> dropout_mask;
 
 private:
 	// Friend class - required for using boost serialization.

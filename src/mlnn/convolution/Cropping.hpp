@@ -97,7 +97,6 @@ public:
 		LOG(LTRACE) << "Cropping::backward\n";
 		// Get pointer to dy batch.
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
-		batch_dy->enumerate();
 
 		//std::cout << "batch_dy [batch x height x width] = " << batch_size << " x " << output_height << " x " << output_width << std::endl;
 		//std::cout << "batch_dx [batch x height x width] = " << batch_size << " x " << input_height << " x " << input_width << std::endl;
@@ -118,11 +117,11 @@ public:
 					// Calculate addresses.
 					size_t ia = ic * (input_width) * (input_height) + (iw+cropping)*(input_height) + cropping;
 					size_t oa = ic * (output_width) * (output_height) + iw*(output_height);
-					std::cout << " ib = " << ib << " ic = " << ic <<" iw = " << iw << " ia = " << ia << " oa = " << oa << std::endl;
+					//std::cout << " ib = " << ib << " ic = " << ic <<" iw = " << iw << " ia = " << ia << " oa = " << oa << std::endl;
 
 					#pragma omp critical
 					{
-						std::cout << "batch_dy->block(oa, ib, output_height, 1) = " << batch_dy->block(oa, ib, output_height, 1) << std::endl;
+						//std::cout << "batch_dy->block(oa, ib, output_height, 1) = " << batch_dy->block(oa, ib, output_height, 1) << std::endl;
 						// Copy "height" block from input to output.
 						batch_dx->block(ia, ib, output_height, 1) = batch_dy->block(oa, ib, output_height, 1);
 					}//: omp critical

@@ -82,7 +82,7 @@ public:
 		pooling_map->setZero();
 
 		// TODO: should work for more channels - but requires testing!
-		assert(input_depth == 1);
+		//assert(input_depth == 1);
 
 		// Iterate through batch - cannot be done in parallel:
 		// * pooling mask is shared (ok)

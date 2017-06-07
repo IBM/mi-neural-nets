@@ -179,7 +179,7 @@ public:
 		// Get input matrix.
 		mic::types::MatrixPtr<eT> batch_x = s['x'];
 		//std::cout<< "forward batch_x=\n" << (*batch) << std::endl;
-		std::cout << "forward input x activation: min:" << (*batch_x).minCoeff() <<" max: " << (*batch_x).maxCoeff() << std::endl;
+		//std::cout << "forward input x activation: min:" << (*batch_x).minCoeff() <<" max: " << (*batch_x).maxCoeff() << std::endl;
 
 		// Get output pointer - so the results will be stored!
 		mic::types::MatrixPtr<eT> batch_y = s['y'];
@@ -278,7 +278,7 @@ public:
 		}//: for batch
 
 		//std::cout <<"output y =" << (*batch_y).transpose() <<std::endl;
-		std::cout << "forward output y activation: min:" << (*batch_y).minCoeff() <<" max: " << (*batch_y).maxCoeff() << std::endl;
+		//std::cout << "forward output y activation: min:" << (*batch_y).minCoeff() <<" max: " << (*batch_y).maxCoeff() << std::endl;
 	}//: forward
 
 	/*!
@@ -286,7 +286,7 @@ public:
 	 */
 	void backward() {
 		mic::types::MatrixPtr<eT> batch_dy = g['y'];
-		std::cout << "backward gradient dy: min:" << (*batch_dy).minCoeff() <<" max: " << (*batch_dy).maxCoeff() << std::endl;
+		//std::cout << "backward gradient dy: min:" << (*batch_dy).minCoeff() <<" max: " << (*batch_dy).maxCoeff() << std::endl;
 
 		//std::cout<<"backpropagade_dy_to_dx!\n";
 		// To dx.
@@ -300,7 +300,7 @@ public:
 		// To db.
 		backpropagade_dy_to_db();
 
-		mic::types::MatrixPtr<eT> batch_dx = g['x'];
+		/*mic::types::MatrixPtr<eT> batch_dx = g['x'];
 		std::cout << "backward gradient dx: min:" << (*batch_dx).minCoeff() <<" max: " << (*batch_dx).maxCoeff() << std::endl;
 
 
@@ -314,6 +314,7 @@ public:
 
 		mic::types::MatrixPtr<eT> db = g['b'];
 		std::cout << "backward gradient db: min:" << (*db).minCoeff() <<" max: " << (*db).maxCoeff() << std::endl;
+		 */
 
 		//std::cout<<"After Backward!\n";
 	}//: backward
@@ -578,7 +579,6 @@ public:
 	 * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
 	 */
 	void update(eT alpha_, eT decay_  = 0.0f) {
-		std::cout<<"update\n";
 		// Get keys of all parameters.
 		std::map<std::string, size_t> keys = p.keys();
 
@@ -620,7 +620,7 @@ public:
 				(*row) = (*W);
 				row->resize(filter_size, filter_size);
 
-				std::cout << "weight W"<< fi <<"x"<< ic <<": min:" << (*W).minCoeff() <<" max: " << (*W).maxCoeff() << std::endl;
+				//std::cout << "weight W"<< fi <<"x"<< ic <<": min:" << (*W).minCoeff() <<" max: " << (*W).maxCoeff() << std::endl;
 				// Normalize.
 				if (normalize_ )
 					normalizeMatrixForVisualization(row);
