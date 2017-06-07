@@ -31,22 +31,22 @@ public:
      * @param outputs_ Length of the output vector.
      * @param name_ Name of the layer.
      */
-    ConvHebbian<eT>(size_t input_l, size_t input_h, size_t channels, size_t nfilters, size_t filter_size, size_t stride = 1, std::string name_ = "ConvHebbian") :
-        output_l((input_l / stride) - filter_size),
-        output_h((input_h / stride) - filter_size),
-        input_l(input_l),
-        input_h(input_h),
-        channels(channels),
+    ConvHebbian<eT>(size_t input_width, size_t input_height, size_t input_depth, size_t nfilters, size_t filter_size, size_t stride = 1, std::string name_ = "ConvHebbian") :
+        output_width((input_width / stride) - filter_size),
+        output_height((input_height / stride) - filter_size),
+        input_width(input_width),
+        input_height(input_height),
+        input_depth(input_depth),
         nfilters(nfilters),
         filter_size(filter_size),
         stride(stride),
-        Layer<eT>(input_l * input_h * channels, this->output_l * this->output_h, 1, LayerTypes::ConvHebbian, name_) {
+        Layer<eT>(input_height, input_width, input_depth, this->output_height, this->output_width, 1, LayerTypes::ConvHebbian, name_) {
 
         // Set normalized, zero sum, hebbian learning as default optimization function.
         Layer<eT>::template setOptimization<mic::neural_nets::learning::NormalizedZerosumHebbianRule<eT> > ();
 
         // Create the weights matrix, each column is a filter kernel
-        p.add('W', output_l * output_h, filter_size * filter_size);
+        p.add('W', output_width * output_height, filter_size * filter_size);
 
         // Initialize weights of all the columns of W.
         for(size_t i = 0 ; i < p['W']->rows() ; i++) {
@@ -76,14 +76,14 @@ public:
         mic::types::MatrixPtr<eT> y = s['y'];
 
         // IM2COL
-        mic::types::Matrix<eT> x2col(filter_size * filter_size, output_l * output_h);
+        mic::types::Matrix<eT> x2col(filter_size * filter_size, output_width * output_height);
         // Iterate over the output matrix (number of image patches)
-        for(size_t oy = 0 ; oy < output_h ; oy++){
-            for(size_t ox = 0 ; ox < output_l ; ox++){
+        for(size_t oy = 0 ; oy < output_height ; oy++){
+            for(size_t ox = 0 ; ox < output_width ; ox++){
                 // Iterate over the rows of the patch
                 for(size_t patch_y = 0 ; patch_y < filter_size ; patch_y++){
                     // Copy each row of the image patch into appropriate position in x2col
-                    x2col.block(patch_y * filter_size, ox + (output_l * oy), filter_size, 1) =
+                    x2col.block(patch_y * filter_size, ox + (output_width * oy), filter_size, 1) =
                             x.block(ox * stride, oy * stride * filter_size, filter_size, 1);
                 }
             }
@@ -162,17 +162,17 @@ protected:
     using Layer<eT>::s;
     using Layer<eT>::m;
     using Layer<eT>::p;
-    using Layer<eT>::input_size;
-    using Layer<eT>::output_size;
-    using Layer<eT>::batch_size;
     using Layer<eT>::opt;
 
-    // Output size (2D)
-    size_t output_l = 0;
-    size_t output_h = 0;
-    size_t input_l = 0;
-    size_t input_h = 0;
-    size_t channels = 0;
+    // Uncover "sizes" for visualization.
+    using Layer<eT>::input_height;
+    using Layer<eT>::input_width;
+    using Layer<eT>::input_depth;
+    using Layer<eT>::output_height;
+    using Layer<eT>::output_width;
+    using Layer<eT>::output_depth;
+    using Layer<eT>::batch_size;
+
     size_t nfilters = 0;
     size_t filter_size = 0;
     size_t stride = 0;
