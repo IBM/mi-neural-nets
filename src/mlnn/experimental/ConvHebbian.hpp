@@ -35,13 +35,15 @@ public:
         nfilters(nfilters),
         filter_size(filter_size),
         stride(stride),
-        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_) {
+        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_),
+        x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
+    {
+
+        // Create the weights matrix, each row is a filter kernel
+        p.add("W", nfilters, filter_size * filter_size);
 
         // Set normalized, zero sum, hebbian learning as default optimization function.
         Layer<eT>::template setOptimization<mic::neural_nets::learning::NormalizedZerosumHebbianRule<eT> > ();
-
-        // Create the weights matrix, each column is a filter kernel
-        p.add("W", output_width * output_height, filter_size * filter_size);
 
         // Initialize weights of all the columns of W.
         p["W"]->rand();
@@ -71,29 +73,25 @@ public:
         mic::types::MatrixPtr<eT> y = s["y"];
 
         // IM2COL
-        mic::types::Matrix<eT> x2col(filter_size * filter_size, output_width * output_height);
         // Iterate over the output matrix (number of image patches)
         for(size_t oy = 0 ; oy < output_height ; oy++){
             for(size_t ox = 0 ; ox < output_width ; ox++){
                 // Iterate over the rows of the patch
                 for(size_t patch_y = 0 ; patch_y < filter_size ; patch_y++){
                     // Copy each row of the image patch into appropriate position in x2col
-                    x2col.block(patch_y * filter_size, ox + (output_width * oy), filter_size, 1) =
-                            x.block(ox * stride, oy * stride * filter_size, filter_size, 1);
+//                    std::cout << "patch_y: " << patch_y << std::endl;
+//                    std::cout << "ox: " << ox << std::endl;
+//                    std::cout << "oy: " << oy << std::endl << std::endl;
+                    x2col->block(patch_y * filter_size, ox + (output_width * oy), filter_size, 1) =
+                            x.block(ox * stride + oy * stride * filter_size, 0, filter_size, 1);
                 }
             }
         }
 
         // Forward pass.
-        (*y) = W * x;
-        for (size_t i = 0; i < (size_t)s["x"]->rows() * s["x"]->cols(); i++) {
-            // Sigmoid.
-            //(*y)[i] = 1.0f / (1.0f +::exp(-(*y)[i]));
-            // Threshold.
-            //(*y)[i] = ((*y)[i] > 0.8) ? 1.0f : 0.0f;
-            //ReLU
-            (*y) = (*y).cwiseMax(0);
-        }//: for
+        (*y) = W * (*x2col);
+        // ReLU
+        (*y) = (*y).cwiseMax(0);
     }
 
     /*!
@@ -109,7 +107,7 @@ public:
      * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
      */
     void update(eT alpha_, eT decay_  = 0.0f) {
-        opt["W"]->update(p["W"], s["x"], s["y"], alpha_);
+        opt["W"]->update(p["W"], x2col, s["y"], alpha_);
     }
 
     /*!
@@ -128,7 +126,7 @@ public:
         // Epsilon added for numerical stability.
         eT eps = 1e-10;
 
-        mic::types::MatrixPtr<eT> W =  p["W"];
+        mic::types::MatrixPtr<eT> W = p["W"];
         // Iterate through "neurons" and generate "activation image" for each one.
         for (size_t i=0 ; i < Layer<eT>::outputSize() ; i++) {
             // Get row.
@@ -173,6 +171,7 @@ protected:
     size_t stride = 0;
     // Vector of channels, Each containing a vector of filters
     std::vector<std::vector<mic::types::Matrix<eT> > > W;
+    mic::types::MatrixPtr<eT> x2col;
 
 private:
     // Friend class - required for using boost serialization.

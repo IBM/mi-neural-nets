@@ -30,7 +30,8 @@ public:
 	 * @param cols_ Number of columns of the updated matrix/its gradient.
 	 */
     NormalizedZerosumHebbianRule(size_t rows_, size_t cols_) {
-		delta = MAKE_MATRIX_PTR(eT, cols_, rows_);
+        // BUFIX?! Inverted rows and cols
+        delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
 		delta->zeros();
 
 	}
@@ -48,7 +49,7 @@ public:
 	 */
 	virtual void update(mic::types::MatrixPtr<eT> p_, mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_ = 0.001) {
 		assert(p_->rows() == y_->rows());
-		assert(p_->cols() == x_->rows());
+        assert(p_->cols() == x_->rows());
 		assert(x_->cols() == y_->cols());
 
 		// Calculate the update using hebbian "fire together, wire together".
@@ -77,11 +78,11 @@ public:
 
         // Winner take all happens in the columns of the output matrix
         Eigen::Array<eT, Eigen::Dynamic, Eigen::Dynamic> wta = (*y_).colwise().maxCoeff();
-
         // Iterate over the output columns
         for(size_t i = 0 ; i < (size_t)wta.rows() ; i++){
             // Pick the image slice and apply it to best matching filter (ie: row of p['W'])
             delta->row(i) = x_->col(wta(i));
+
             // Transform the image slice into a filter:
             // Make the vector zero-sum
             delta->row(i).array() -= delta->row(i).sum() / delta->cols();
