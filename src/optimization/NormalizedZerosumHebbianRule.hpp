@@ -56,9 +56,9 @@ public:
 
 		// weight += delta;
 		(*p_) += (*delta);
-        for(size_t row = 0 ; row < p_->rows() ; row++){
+        for(size_t row = 0 ; row < (size_t)p_->rows() ; row++){
             // Zero sum
-            p_->row(row) -= p_->row(row).sum() / p_->cols();
+            p_->row(row).array() -= p_->row(row).sum() / p_->cols();
             // Normalize.
             p_->row(row) /= p_->row(row).squaredNorm();
         }
@@ -76,15 +76,15 @@ public:
 //		(*delta) = learning_rate_ * (*y_) * ((*x_).transpose());
 
         // Winner take all happens in the columns of the output matrix
-        auto /*vector*/ wta = (*y_).colwise().maxCoeff();
+        Eigen::Array<eT, Eigen::Dynamic, Eigen::Dynamic> wta = (*y_).colwise().maxCoeff();
 
         // Iterate over the output columns
-        for(size_t i = 0 ; i < wta.rows() ; i++){
+        for(size_t i = 0 ; i < (size_t)wta.rows() ; i++){
             // Pick the image slice and apply it to best matching filter (ie: row of p['W'])
-            delta->row(i) = x_->col(wta[i]);
+            delta->row(i) = x_->col(wta(i));
             // Transform the image slice into a filter:
             // Make the vector zero-sum
-            delta->row(i) -= delta->row(i).sum() / delta->cols();
+            delta->row(i).array() -= delta->row(i).sum() / delta->cols();
             // Normalize it
             delta->row(i) /= delta->row(i).squaredNorm();
         }

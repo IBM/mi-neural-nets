@@ -32,29 +32,24 @@ public:
      * @param name_ Name of the layer.
      */
     ConvHebbian<eT>(size_t input_width, size_t input_height, size_t input_depth, size_t nfilters, size_t filter_size, size_t stride = 1, std::string name_ = "ConvHebbian") :
-        output_width((input_width / stride) - filter_size),
-        output_height((input_height / stride) - filter_size),
-        input_width(input_width),
-        input_height(input_height),
-        input_depth(input_depth),
         nfilters(nfilters),
         filter_size(filter_size),
         stride(stride),
-        Layer<eT>(input_height, input_width, input_depth, this->output_height, this->output_width, 1, LayerTypes::ConvHebbian, name_) {
+        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_) {
 
         // Set normalized, zero sum, hebbian learning as default optimization function.
         Layer<eT>::template setOptimization<mic::neural_nets::learning::NormalizedZerosumHebbianRule<eT> > ();
 
         // Create the weights matrix, each column is a filter kernel
-        p.add('W', output_width * output_height, filter_size * filter_size);
+        p.add("W", output_width * output_height, filter_size * filter_size);
 
         // Initialize weights of all the columns of W.
-        for(size_t i = 0 ; i < p['W']->rows() ; i++) {
-            p['W']->row(i).rand();
+        p["W"]->rand();
+        for(size_t i = 0 ; i < p["W"]->rows() ; i++) {
             // Make the matrix Zero Sum
-            p['W']->row(i) -= (p['W']->row(i).sum() / p['W']->row(i).cols());
+            p["W"]->row(i).array() -= (p["W"]->row(i).sum() / p["W"]->row(i).cols());
             // Normalize
-            p['W']->row(i) /= p['W']->row(i).squaredNorm();
+            p["W"]->row(i) /= p["W"]->row(i).squaredNorm();
         }
     }
 
@@ -70,10 +65,10 @@ public:
      */
     void forward(bool test_ = false) {
         // Get input matrices.
-        mic::types::Matrix<eT> x = (*s['x']);
-        mic::types::Matrix<eT> W = (*p['W']);
+        mic::types::Matrix<eT> x = (*s["x"]);
+        mic::types::Matrix<eT> W = (*p["W"]);
         // Get output pointer - so the results will be stored!
-        mic::types::MatrixPtr<eT> y = s['y'];
+        mic::types::MatrixPtr<eT> y = s["y"];
 
         // IM2COL
         mic::types::Matrix<eT> x2col(filter_size * filter_size, output_width * output_height);
@@ -91,7 +86,7 @@ public:
 
         // Forward pass.
         (*y) = W * x;
-        for (size_t i = 0; i < (size_t)s['x']->rows() * s['x']->cols(); i++) {
+        for (size_t i = 0; i < (size_t)s["x"]->rows() * s["x"]->cols(); i++) {
             // Sigmoid.
             //(*y)[i] = 1.0f / (1.0f +::exp(-(*y)[i]));
             // Threshold.
@@ -114,7 +109,7 @@ public:
      * @param decay_ Weight decay rate (determining that the "unused/unupdated" weights will decay to 0) (DEFAULT=0.0 - no decay).
      */
     void update(eT alpha_, eT decay_  = 0.0f) {
-        opt["W"]->update(p['W'], s['x'], s['y'], alpha_);
+        opt["W"]->update(p["W"], s["x"], s["y"], alpha_);
     }
 
     /*!
@@ -123,9 +118,9 @@ public:
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
         // Check if memory for the activations was allocated.
         if (neuron_activations.size() == 0) {
-            for (size_t i=0; i < output_size; i++) {
+            for (size_t i=0 ; i < Layer<eT>::outputSize() ; i++) {
                 // Allocate memory for activation of every neuron.
-                mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, input_size, 1);
+                mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, Layer<eT>::inputSize(), 1);
                 neuron_activations.push_back(row);
             }//: for
         }//: if
@@ -135,7 +130,7 @@ public:
 
         mic::types::MatrixPtr<eT> W =  p["W"];
         // Iterate through "neurons" and generate "activation image" for each one.
-        for (size_t i=0; i < output_size; i++) {
+        for (size_t i=0 ; i < Layer<eT>::outputSize() ; i++) {
             // Get row.
             mic::types::MatrixPtr<eT> row = neuron_activations[i];
             // Copy data.

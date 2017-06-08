@@ -202,3 +202,30 @@ if(${BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION})
 	install(TARGETS mnist_hebbian_features_visualization_test RUNTIME DESTINATION bin)
 	
 endif(${BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION})
+
+# =======================================================================
+# Build and install - MNIST features learning through convolutional hebbian net
+# =======================================================================
+
+set(BUILD_MNIST_CONVHEBBIAN_APP ON CACHE BOOL "Build the application using Convolutional Hebbian learning for recognition of MNIST digits")
+
+if(${BUILD_MNIST_CONVHEBBIAN_APP})
+        # Create exeutable.
+        ADD_EXECUTABLE(mnist_conv_hebbian mnist_conv_hebbian.cpp)
+        # Link it with shared libraries.
+        target_link_libraries(mnist_conv_hebbian
+			logger
+			configuration
+	        	types
+			data_io
+			encoders
+		    ${Boost_LIBRARIES}
+	    )
+        if(OpenBLAS_FOUND)
+                target_link_libraries(mnist_conv_hebbian  ${OpenBLAS_LIB} )
+        endif(OpenBLAS_FOUND)
+
+        # install test to bin directory
+        install(TARGETS mnist_conv_hebbian RUNTIME DESTINATION bin)
+
+endif(${BUILD_MNIST_CNN_APP})
