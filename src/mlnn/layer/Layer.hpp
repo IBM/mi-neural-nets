@@ -556,7 +556,7 @@ public:
 		// Normalize the inputs to range <0.0, 1.0>.
 		// Check if we can normalize.
 		if (diff != 0.0) {
-			(*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x- min)/diff  - 1.0); } );
+            (*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x- min)/diff  - 1.0); } ).template cast<eT>();
 			//std::cout << "after: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		}//: else: do nothing, all values are ~0 already.
 
