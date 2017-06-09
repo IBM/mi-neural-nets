@@ -107,39 +107,36 @@ public:
         opt["W"]->update(p["W"], x2col, s["y"], alpha_);
     }
 
-    /*!
-     * Returns activations of neurons of a given layer (simple visualization).
-     */
-    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getActivations(size_t height_, size_t width_) {
-        // Check if memory for the activations was allocated.
-        if (neuron_activations.size() == 0) {
-            for (size_t i=0 ; i < Layer<eT>::outputSize() ; i++) {
-                // Allocate memory for activation of every neuron.
-                mic::types::MatrixPtr<eT> row = MAKE_MATRIX_PTR(eT, Layer<eT>::inputSize(), 1);
-                neuron_activations.push_back(row);
-            }//: for
-        }//: if
 
-        // Epsilon added for numerical stability.
-        eT eps = 1e-10;
+
+	/*!
+	 * Returns activations of weights.
+	 */
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+
+		// Allocate memory.
+		lazyAllocateMatrixVector(w_activations, nfilters, filter_size*filter_size, 1);
 
         mic::types::MatrixPtr<eT> W = p["W"];
+
         // Iterate through "neurons" and generate "activation image" for each one.
         for (size_t i=0 ; i < nfilters ; i++) {
             // Get row.
-            mic::types::MatrixPtr<eT> row = neuron_activations[i];
+            mic::types::MatrixPtr<eT> row = w_activations[i];
             // Copy data.
             (*row) = W->row(i);
             // Resize row.
-            row->resize( height_, width_);
-            // Calculate l2 norm.
-            eT l2 = row->norm() + eps;
-            // Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
-            (*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
-        }//: for
-        // Return activations.
-        return neuron_activations;
-    }
+            row->resize( filter_size, filter_size);
+
+			// Normalize.
+			if (normalize_ )
+				normalizeMatrixForVisualization(row);
+		}//: for filters
+
+		// Return activations.
+		return w_activations;
+	}
+
 
 
     // Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
@@ -162,6 +159,10 @@ protected:
     using Layer<eT>::output_depth;
     using Layer<eT>::batch_size;
 
+    // Uncover methods useful in visualization.
+	using Layer<eT>::lazyAllocateMatrixVector;
+	using Layer<eT>::normalizeMatrixForVisualization;
+
     size_t nfilters = 0;
     size_t filter_size = 0;
     size_t stride = 0;
@@ -174,7 +175,7 @@ private:
     template<typename tmp> friend class MultiLayerNeuralNetwork;
 
     /// Vector containing activations of neurons.
-    std::vector< std::shared_ptr <mic::types::MatrixXf> > neuron_activations;
+    std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
 
     /*!
      * Private constructor, used only during the serialization.
