@@ -214,12 +214,15 @@ if(${BUILD_MNIST_CONVHEBBIAN_APP})
         ADD_EXECUTABLE(mnist_conv_hebbian mnist_conv_hebbian.cpp)
         # Link it with shared libraries.
         target_link_libraries(mnist_conv_hebbian
-			logger
-			configuration
-	        	types
-			data_io
-			encoders
-		    ${Boost_LIBRARIES}
+                    logger
+                    application
+                    types
+                    data_io
+                    encoders
+                    configuration
+                    opengl_visualization
+                    opengl_application
+                    ${Boost_LIBRARIES}
 	    )
         if(OpenBLAS_FOUND)
                 target_link_libraries(mnist_conv_hebbian  ${OpenBLAS_LIB} )
@@ -228,4 +231,4 @@ if(${BUILD_MNIST_CONVHEBBIAN_APP})
         # install test to bin directory
         install(TARGETS mnist_conv_hebbian RUNTIME DESTINATION bin)
 
-endif(${BUILD_MNIST_CNN_APP})
+endif(${BUILD_MNIST_CONVHEBBIAN_APP})

@@ -41,17 +41,18 @@ public:
 
         // Create the weights matrix, each row is a filter kernel
         p.add("W", nfilters, filter_size * filter_size);
+        mic::types::MatrixPtr<eT> W = p["W"];
 
         // Set normalized, zero sum, hebbian learning as default optimization function.
         Layer<eT>::template setOptimization<mic::neural_nets::learning::NormalizedZerosumHebbianRule<eT> > ();
 
         // Initialize weights of all the columns of W.
-        p["W"]->rand();
-        for(size_t i = 0 ; i < p["W"]->rows() ; i++) {
+        W->rand();
+        for(size_t i = 0 ; i < W->rows() ; i++) {
             // Make the matrix Zero Sum
-            p["W"]->row(i).array() -= (p["W"]->row(i).sum() / p["W"]->row(i).cols());
+            W->row(i).array() -= (W->row(i).sum() / W->row(i).cols());
             // Normalize
-            p["W"]->row(i) /= p["W"]->row(i).squaredNorm();
+            W->row(i) /= W->row(i).squaredNorm();
         }
     }
 
@@ -79,19 +80,15 @@ public:
                 // Iterate over the rows of the patch
                 for(size_t patch_y = 0 ; patch_y < filter_size ; patch_y++){
                     // Copy each row of the image patch into appropriate position in x2col
-//                    std::cout << "patch_y: " << patch_y << std::endl;
-//                    std::cout << "ox: " << ox << std::endl;
-//                    std::cout << "oy: " << oy << std::endl << std::endl;
                     x2col->block(patch_y * filter_size, ox + (output_width * oy), filter_size, 1) =
-                            x.block(ox * stride + oy * stride * filter_size, 0, filter_size, 1);
+                            x.block((oy * stride + patch_y) * input_width + ox * stride, 0, filter_size, 1);
                 }
             }
         }
-
         // Forward pass.
         (*y) = W * (*x2col);
         // ReLU
-        (*y) = (*y).cwiseMax(0);
+        //(*y) = (*y).cwiseMax(0);
     }
 
     /*!
@@ -128,7 +125,7 @@ public:
 
         mic::types::MatrixPtr<eT> W = p["W"];
         // Iterate through "neurons" and generate "activation image" for each one.
-        for (size_t i=0 ; i < Layer<eT>::outputSize() ; i++) {
+        for (size_t i=0 ; i < nfilters ; i++) {
             // Get row.
             mic::types::MatrixPtr<eT> row = neuron_activations[i];
             // Copy data.
@@ -140,7 +137,6 @@ public:
             // Normalize the inputs to <-0.5,0.5> and add 0.5f -> range <0.0, 1.0>.
             (*row) = row->unaryExpr ( [&] ( eT x ) { return ( x / l2 + 0.5f); } );
         }//: for
-
         // Return activations.
         return neuron_activations;
     }

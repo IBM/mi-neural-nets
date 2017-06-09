@@ -56,12 +56,15 @@ public:
 		mic::types::MatrixPtr<eT> delta = calculateUpdate(x_, y_, learning_rate_);
 
 		// weight += delta;
-		(*p_) += (*delta);
+        (*p_) += (*delta);
         for(size_t row = 0 ; row < (size_t)p_->rows() ; row++){
             // Zero sum
-            p_->row(row).array() -= p_->row(row).sum() / p_->cols();
+            //p_->row(row).array() -= p_->row(row).sum() / p_->cols();
             // Normalize.
-            p_->row(row) /= p_->row(row).squaredNorm();
+            eT norm = p_->row(row).squaredNorm();
+            if(norm =! 0){
+                p_->row(row) /= norm;
+            }
         }
 	}
 
@@ -77,17 +80,25 @@ public:
 //		(*delta) = learning_rate_ * (*y_) * ((*x_).transpose());
 
         // Winner take all happens in the columns of the output matrix
-        Eigen::Array<eT, Eigen::Dynamic, Eigen::Dynamic> wta = (*y_).colwise().maxCoeff();
         // Iterate over the output columns
-        for(size_t i = 0 ; i < (size_t)wta.rows() ; i++){
+        size_t argmax_x, argmax_y = 0;
+        for(size_t i = 0 ; i < (size_t)y_->cols() ; i++){
+            y_->col(i).maxCoeff(&argmax_x, &argmax_y);
             // Pick the image slice and apply it to best matching filter (ie: row of p['W'])
-            delta->row(i) = x_->col(wta(i));
+            delta->row(argmax_x) = x_->col(i);
 
             // Transform the image slice into a filter:
             // Make the vector zero-sum
-            delta->row(i).array() -= delta->row(i).sum() / delta->cols();
+            delta->row(argmax_x).array() -= delta->row(argmax_x).sum() / delta->cols();
             // Normalize it
-            delta->row(i) /= delta->row(i).squaredNorm();
+            eT norm = delta->row(argmax_x).squaredNorm();
+            if(norm =! 0){
+                delta->row(argmax_x) /= norm;
+            }
+            else
+                delta->row(argmax_x).setZero();
+            (*delta) *= learning_rate_;
+            //std::cout << *delta << std::endl;
         }
 
 
