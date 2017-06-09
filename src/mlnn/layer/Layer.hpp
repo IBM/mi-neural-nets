@@ -552,13 +552,13 @@ public:
 		// Calculate the norm.
 		eT max = matrix_->maxCoeff();
 		eT min = matrix_->minCoeff();
-		eT diff =  0.5*(max - min);
+		eT ultimate_max=  (max > -min) ? max : -min;
 
 		//std::cout << "before: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		// Normalize the inputs to range <0.0, 1.0>.
 		// Check if we can normalize.
-		if (diff != 0.0) {
-            (*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x- min)/diff  - 1.0); } ).template cast<eT>();
+		if (ultimate_max != 0.0) {
+            (*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x)/ultimate_max ); } ).template cast<eT>();
 			//std::cout << "after: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		}//: else: do nothing, all values are ~0 already.
 
