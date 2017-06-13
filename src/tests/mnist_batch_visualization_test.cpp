@@ -26,7 +26,7 @@ using namespace mic::logger;
 using namespace mic::opengl::visualization;
 
 /// Window for displaying the MNIST batch.
-WindowGrayscaleBatch* w_batch;
+WindowGrayscaleBatch<float>* w_batch;
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter* importer;
 

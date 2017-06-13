@@ -161,6 +161,8 @@ if(${BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION})
 		configuration
 		opengl_visualization
 		opengl_application
+		${OPENGL_LIBRARIES}
+		${GLUT_LIBRARY} 
 		${Boost_LIBRARIES}  
 		)
         if(OpenBLAS_FOUND)

@@ -34,9 +34,9 @@ using namespace mic::mlnn;
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
 /// Windows for displaying activations.
-WindowGrayscaleBatch *w_conv10, *w_conv11, *w_conv12, *w_conv13, *w_conv14, *w_conv15;
-WindowGrayscaleBatch *w_conv20, *w_conv21, *w_conv22, *w_conv23, *w_conv24, *w_conv25;
-WindowGrayscaleBatch *w_conv30, *w_conv31, *w_conv32, *w_conv33, *w_conv34, *w_conv35;
+WindowGrayscaleBatch<float> *w_conv10, *w_conv11, *w_conv12, *w_conv13, *w_conv14, *w_conv15;
+WindowGrayscaleBatch<float> *w_conv20, *w_conv21, *w_conv22, *w_conv23, *w_conv24, *w_conv25;
+WindowGrayscaleBatch<float> *w_conv30, *w_conv31, *w_conv32, *w_conv33, *w_conv34, *w_conv35;
 
 
 /// MNIST importer.
@@ -49,7 +49,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 /// Label 2 matrix encoder (1 hot).
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
-const size_t batch_size = 4;
+const size_t batch_size = 1;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
 
@@ -221,26 +221,26 @@ int main(int argc, char* argv[]) {
 	VGL_MANAGER->initializeGLUT(argc, argv);
 
 	// Create batch visualization window.
-	w_conv10 = new WindowGrayscaleBatch("Conv1 x", 256, 256, 50, 50);
-	w_conv11 = new WindowGrayscaleBatch("Conv1 dx", 256, 256, 316, 50);
-	w_conv12 = new WindowGrayscaleBatch("Conv1 W", 256, 256, 562, 50);
-	w_conv13 = new WindowGrayscaleBatch("Conv1 dW", 256, 256, 818, 50);
-	w_conv14 = new WindowGrayscaleBatch("Conv1 y", 256, 256, 1074, 50);
-	w_conv15 = new WindowGrayscaleBatch("Conv1 dy", 256, 256, 1330, 50);
+	w_conv10 = new WindowGrayscaleBatch<float>("Conv1 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 50, 256, 256);
+	w_conv11 = new WindowGrayscaleBatch<float>("Conv1 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 50, 256, 256);
+	w_conv12 = new WindowGrayscaleBatch<float>("Conv1 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 50, 256, 256);
+	w_conv13 = new WindowGrayscaleBatch<float>("Conv1 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 50, 256, 256);
+	w_conv14 = new WindowGrayscaleBatch<float>("Conv1 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 50, 256, 256);
+	w_conv15 = new WindowGrayscaleBatch<float>("Conv1 dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 50, 256, 256);
 
-	w_conv20 = new WindowGrayscaleBatch("Conv2 x", 256, 256, 50, 336);
-	w_conv21 = new WindowGrayscaleBatch("Conv2 dx", 256, 256, 316, 336);
-	w_conv22 = new WindowGrayscaleBatch("Conv2 W", 256, 256, 562, 336);
-	w_conv23 = new WindowGrayscaleBatch("Conv2 dW", 256, 256, 818, 336);
-	w_conv24 = new WindowGrayscaleBatch("Conv2 y", 256, 256, 1074, 336);
-	w_conv25 = new WindowGrayscaleBatch("Conv2 dy", 256, 256, 1330, 336);
+	w_conv20 = new WindowGrayscaleBatch<float>("Conv2 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 336, 256, 256);
+	w_conv21 = new WindowGrayscaleBatch<float>("Conv2 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 336, 256, 256);
+	w_conv22 = new WindowGrayscaleBatch<float>("Conv2 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 336, 256, 256);
+	w_conv23 = new WindowGrayscaleBatch<float>("Conv2 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 336, 256, 256);
+	w_conv24 = new WindowGrayscaleBatch<float>("Conv2 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 336, 256, 256);
+	w_conv25 = new WindowGrayscaleBatch<float>("Conv2 dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 336, 256, 256);
 
-	w_conv30 = new WindowGrayscaleBatch("L1 x", 256, 256, 50, 622);
-	w_conv31 = new WindowGrayscaleBatch("L1 dx", 256, 256, 316, 622);
-	w_conv32 = new WindowGrayscaleBatch("L1 W", 256, 256, 562, 622);
-	w_conv33 = new WindowGrayscaleBatch("L1 dW", 256, 256, 818, 622);
-	w_conv34 = new WindowGrayscaleBatch("SM y", 256, 256, 1074, 622);
-	w_conv35 = new WindowGrayscaleBatch("SM dy", 256, 256, 1330, 622);
+	w_conv30 = new WindowGrayscaleBatch<float>("L1 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 622, 256, 256);
+	w_conv31 = new WindowGrayscaleBatch<float>("L1 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 622, 256, 256);
+	w_conv32 = new WindowGrayscaleBatch<float>("L1 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 622, 256, 256);
+	w_conv33 = new WindowGrayscaleBatch<float>("L1 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 622, 256, 256);
+	w_conv34 = new WindowGrayscaleBatch<float>("SM y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 622, 256, 256);
+	w_conv35 = new WindowGrayscaleBatch<float>("SM dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 622, 256, 256);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 
