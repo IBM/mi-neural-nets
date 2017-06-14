@@ -14,7 +14,7 @@
 #include <opengl/application/OpenGLContinuousLearningApplication.hpp>
 
 #include <opengl/visualization/WindowMatrix2D.hpp>
-#include <opengl/visualization/WindowFloatCollectorChart.hpp>
+#include <opengl/visualization/WindowCollectorChart.hpp>
 using namespace mic::opengl::visualization;
 
 #include <data_io/MNISTPatchImporter.hpp>
@@ -91,7 +91,7 @@ private:
 	WindowMatrix2D* w2d_reconstruction;
 
 	/// Window for displaying chart with statistics.
-	WindowFloatCollectorChart* w_chart;
+	WindowCollectorChart<float>* w_chart;
 
 	/// Size of the patch - copied from importers.
 	size_t patch_size;

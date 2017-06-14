@@ -34,11 +34,11 @@ using namespace mic::mlnn;
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
 /// Window for displaying the MNIST batch.
-WindowGrayscaleBatch* w_input;
-WindowGrayscaleBatch* w_reconstruction;
+WindowGrayscaleBatch<float>* w_input;
+WindowGrayscaleBatch<float>* w_reconstruction;
 /// Window for displaying the weights.
-WindowGrayscaleBatch* w_weights1;
-WindowGrayscaleBatch* w_weights2;
+WindowGrayscaleBatch<float>* w_weights1;
+WindowGrayscaleBatch<float>* w_weights2;
 
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter* importer;
@@ -166,10 +166,10 @@ int main(int argc, char* argv[]) {
 	VGL_MANAGER->initializeGLUT(argc, argv);
 
 	// Create batch visualization window.
-	w_input = new WindowGrayscaleBatch("Input batch", 512, 512, 0, 0);
-	w_reconstruction = new WindowGrayscaleBatch("Reconstructed batch", 512, 512, 0, 580);
-	w_weights1 = new WindowGrayscaleBatch("Permanences", 512, 512, 580, 0);
-//	w_weights2 = new WindowGrayscaleBatch("Connectivity", 512, 512, 1092, 0);
+	w_input = new WindowGrayscaleBatch<float>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
+	w_reconstruction = new WindowGrayscaleBatch<float>("Reconstructed batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 320, 0, 250, 250);
+	w_weights1 = new WindowGrayscaleBatch<float>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 570, 0, 250, 250);
+//	w_weights2 = new WindowGrayscaleBatch<float>("Connectivity", 1092, 0, 512, 512);
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 

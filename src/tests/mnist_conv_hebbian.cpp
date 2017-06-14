@@ -37,9 +37,9 @@ using namespace mic::mlnn;
 using namespace mic::mlnn::experimental;
 
 /// Window for displaying the MNIST batch.
-WindowGrayscaleBatch* w_input;
+WindowGrayscaleBatch<float>* w_input;
 /// Window for displaying the weights.
-WindowGrayscaleBatch* w_weights1;
+WindowGrayscaleBatch<float>* w_weights1;
 
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter* importer;
@@ -172,8 +172,8 @@ int main(int argc, char* argv[]) {
     VGL_MANAGER->initializeGLUT(argc, argv);
 
     // Create batch visualization window.
-    w_input = new WindowGrayscaleBatch("Input batch", 512, 512, 0, 0);
-    w_weights1 = new WindowGrayscaleBatch("Permanences", 512, 512, 580, 0);
+    w_input = new WindowGrayscaleBatch<float>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
+    w_weights1 = new WindowGrayscaleBatch<float>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 320, 0, 250, 250);
 
     boost::thread batch_thread(boost::bind(&batch_function));
 

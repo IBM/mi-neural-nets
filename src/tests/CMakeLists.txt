@@ -131,6 +131,8 @@ if(${BUILD_TEST_MNIST_BATCH_VISUALIZATION})
 		configuration
 		opengl_visualization
 		opengl_application
+		${OPENGL_LIBRARIES}
+		${GLUT_LIBRARY} 
 		${Boost_LIBRARIES}  
 		)
         if(OpenBLAS_FOUND)
@@ -194,6 +196,8 @@ if(${BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION})
 		configuration
 		opengl_visualization
 		opengl_application
+		${OPENGL_LIBRARIES}
+		${GLUT_LIBRARY} 
 		${Boost_LIBRARIES}  
 		)
         if(OpenBLAS_FOUND)
@@ -224,6 +228,8 @@ if(${BUILD_MNIST_CONVHEBBIAN_APP})
                     configuration
                     opengl_visualization
                     opengl_application
+					${OPENGL_LIBRARIES}
+					${GLUT_LIBRARY} 
                     ${Boost_LIBRARIES}
 	    )
         if(OpenBLAS_FOUND)

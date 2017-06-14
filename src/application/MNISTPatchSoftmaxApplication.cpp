@@ -82,7 +82,7 @@ void MNISTPatchSoftmaxApplication::initialize(int argc, char* argv[]) {
 	collector_ptr->createContainer("test_loss",  mic::types::color_rgba(0, 255, 0, 180));
 
 	// Create the visualization windows - must be created in the same, main thread :]
-	w_chart = new WindowFloatCollectorChart("MNISTPatchReconstruction", 256, 512, 0, 310);
+	w_chart = new WindowCollectorChart<float>("MNISTPatchReconstruction", 0, 310, 512, 256);
 	w_chart->setDataCollectorPtr(collector_ptr);
 
 }

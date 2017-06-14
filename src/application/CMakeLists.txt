@@ -17,6 +17,8 @@ if(${BUILD_APP_MNIST_PATCH_RECONSTRUCTION})
 		data_io
 		opengl_visualization
 		opengl_application
+		${OPENGL_LIBRARIES}
+		${GLUT_LIBRARY} 
 		${Boost_LIBRARIES}  
 		)
 	if(OpenBLAS_FOUND)
@@ -52,6 +54,8 @@ if(${BUILD_APP_MNIST_PATCH_SOFTMAX})
 		encoders
 		opengl_visualization
 		opengl_application
+		${OPENGL_LIBRARIES}
+		${GLUT_LIBRARY} 
 		${Boost_LIBRARIES}  
 		)
 	if(OpenBLAS_FOUND)
