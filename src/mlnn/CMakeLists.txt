@@ -15,8 +15,9 @@ install(FILES
 
 install(FILES
 	convolution/Convolution.hpp
-#	convolution/Padding.hpp
-#	convolution/Pooling.hpp
+	convolution/Cropping.hpp
+	convolution/Padding.hpp
+	convolution/MaxPooling.hpp
 	DESTINATION include/mlnn/convolution)
 
 install(FILES

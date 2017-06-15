@@ -69,8 +69,8 @@ void MNISTPatchReconstructionApplication::initialize(int argc, char* argv[]) {
 	VGL_MANAGER->initializeGLUT(argc, argv);
 
 	// Create two visualization windows
-	w2d_input = new WindowMatrix2D("Input matrix", 256, 256, 0, 0);
-	w2d_reconstruction = new WindowMatrix2D("Reconstructed matrix", 256, 256, 320, 0);
+	w2d_input = new WindowMatrix2D("Input matrix", 0, 0, 256, 256);
+	w2d_reconstruction = new WindowMatrix2D("Reconstructed matrix", 320, 0, 256, 256);
 
 	collector_ptr = std::make_shared < mic::data_io::DataCollector<std::string, float> >( );
 	// Add containers to collector.
@@ -78,7 +78,7 @@ void MNISTPatchReconstructionApplication::initialize(int argc, char* argv[]) {
 	collector_ptr->createContainer("test_loss",  mic::types::color_rgba(0, 255, 0, 180));
 
 	// Create the visualization windows - must be created in the same, main thread :]
-	w_chart = new WindowFloatCollectorChart("MNISTPatchReconstruction", 256, 512, 0, 310);
+	w_chart = new WindowCollectorChart<float>("MNISTPatchReconstruction", 0, 310, 512, 256);
 	w_chart->setDataCollectorPtr(collector_ptr);
 
 }
