@@ -30,24 +30,24 @@ using namespace mic::opengl::visualization;
 using namespace mic::mlnn;
 
 // Encoders.
-#include <encoders/MatrixXfMatrixXfEncoder.hpp>
-#include <encoders/UIntMatrixXfEncoder.hpp>
+#include <encoders/ColMatrixEncoder.hpp>
+#include <encoders/UIntMatrixEncoder.hpp>
 
 #include <mlnn/experimental/ConvHebbian.hpp>
 using namespace mic::mlnn::experimental;
 
 /// Window for displaying the MNIST batch.
-WindowGrayscaleBatch* w_input;
+WindowGrayscaleBatch<double>* w_input;
 /// Window for displaying the weights.
-WindowGrayscaleBatch* w_weights1;
+WindowGrayscaleBatch<double>* w_weights1;
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter* importer;
+mic::data_io::MNISTMatrixImporter<double>* importer;
 /// Multi-layer neural network.
-HebbianNeuralNetwork<float> neural_net;
+HebbianNeuralNetwork<double> neural_net;
 
 /// MNIST matrix encoder.
-mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
+mic::encoders::ColMatrixEncoder<double>* mnist_encoder;
 /// Label 2 matrix encoder (1 hot).
 //mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
@@ -69,14 +69,14 @@ void batch_function (void) {
     } else {*/
         {
         // Create a simple hebbian network.
-        neural_net.pushLayer(new ConvHebbian<float>(patch_size, patch_size, input_channels, filters[0], filter_size[0], 1));
+        neural_net.pushLayer(new ConvHebbian<double>(patch_size, patch_size, input_channels, filters[0], filter_size[0], 1));
 
         LOG(LINFO) << "Generated new neural network";
     }//: else
 
     size_t iteration = 0;
     // Set training parameters.
-    const float learning_rate = 0.1;
+    const float learning_rate = 1e-2;
     const float weight_decay = 0.0;
     const size_t iterations = importer->size() / batch_size;
     const size_t samples = 2000;
@@ -96,23 +96,23 @@ void batch_function (void) {
                 APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
                 // Retrieve the next minibatch.
-                mic::types::MNISTBatch bt = importer->getRandomBatch();
+                mic::types::MNISTBatch<double> bt = importer->getRandomBatch();
 
                 // Set batch to be displayed.
                 w_input->setBatchDataUnsynchronized(bt.data());
 
                 // Encode data.
-                mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
+                mic::types::MatrixPtr<double> encoded_batch = mnist_encoder->encodeBatch(bt.data());
 
-                MNISTBatch next_batch = importer->getNextBatch();
+                MNISTBatch<double> next_batch = importer->getNextBatch();
                 encoded_batch  = mnist_encoder->encodeBatch(next_batch.data());
 
                 neural_net.train(encoded_batch, learning_rate);
 
                 //if (iteration % 10 == 0) {
                     //Visualize the weights.
-                    std::shared_ptr<mic::mlnn::experimental::ConvHebbian<float> > layer1 =
-                            neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<float> >(0);
+                    std::shared_ptr<mic::mlnn::experimental::ConvHebbian<double> > layer1 =
+                            neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<double> >(0);
                     w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
                 //}//: if
 
@@ -149,13 +149,13 @@ int main(int argc, char* argv[]) {
     APP_STATE;
 
     // Load dataset.
-    importer = new mic::data_io::MNISTMatrixImporter();
+    importer = new mic::data_io::MNISTMatrixImporter<double>();
     importer->setDataFilename("../data/mnist/train-images.idx3-ubyte");
     importer->setLabelsFilename("../data/mnist/train-labels.idx1-ubyte");
     importer->setBatchSize(batch_size);
 
     // Initialize the encoders.
-    mnist_encoder = new mic::encoders::MatrixXfMatrixXfEncoder(patch_size, patch_size);
+    mnist_encoder = new mic::encoders::ColMatrixEncoder<double>(patch_size, patch_size);
     //label_encoder = new mic::encoders::UIntMatrixXfEncoder(batch_size);
 
     // Set parameters of all property-tree derived objects - USER independent part.
@@ -172,8 +172,8 @@ int main(int argc, char* argv[]) {
     VGL_MANAGER->initializeGLUT(argc, argv);
 
     // Create batch visualization window.
-    w_input = new WindowGrayscaleBatch("Input batch", 512, 512, 0, 0);
-    w_weights1 = new WindowGrayscaleBatch("Permanences", 512, 512, 580, 0);
+    w_input = new WindowGrayscaleBatch<double>();
+    w_weights1 = new WindowGrayscaleBatch<double>();
 
     boost::thread batch_thread(boost::bind(&batch_function));
 
