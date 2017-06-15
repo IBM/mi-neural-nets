@@ -32,8 +32,7 @@ public:
     NormalizedZerosumHebbianRule(size_t rows_, size_t cols_) {
         // BUFIX?! Inverted rows and cols
         delta = MAKE_MATRIX_PTR(eT, rows_, cols_);
-		delta->zeros();
-
+        delta->zeros();
 	}
 
 	// Virtual destructor - empty.
@@ -55,15 +54,12 @@ public:
 		// Calculate the update using hebbian "fire together, wire together".
 		mic::types::MatrixPtr<eT> delta = calculateUpdate(x_, y_, learning_rate_);
 
-		// weight += delta;
+        // weight += delta;
         (*p_) += (*delta);
-        for(size_t row = 0 ; row < (size_t)p_->rows() ; row++){
-            // Zero sum
-            //p_->row(row).array() -= p_->row(row).sum() / p_->cols();
-            // Normalize.
-            eT norm = p_->row(row).squaredNorm();
-            if(norm =! 0){
-                p_->row(row) /= norm;
+        // Eigen doesn't check for div by 0 (the doc lies...)
+        for(size_t i = 0 ; i < (size_t)p_->rows() ; i++){
+            if(p_->row(i).norm() != 0){
+                p_->row(i) = p_->row(i).normalized();
             }
         }
 	}
@@ -76,32 +72,24 @@ public:
 	 */
 	virtual mic::types::MatrixPtr<eT> calculateUpdate(mic::types::MatrixPtr<eT> x_, mic::types::MatrixPtr<eT> y_, eT learning_rate_) {
         // delta based on winner take all: Best corresponding kernel gets to learn for each slice
-        // delta + alpha * x * y.
-//		(*delta) = learning_rate_ * (*y_) * ((*x_).transpose());
 
         // Winner take all happens in the columns of the output matrix
         // Iterate over the output columns
+        delta->zeros();
         size_t argmax_x, argmax_y = 0;
         for(size_t i = 0 ; i < (size_t)y_->cols() ; i++){
             y_->col(i).maxCoeff(&argmax_x, &argmax_y);
             // Pick the image slice and apply it to best matching filter (ie: row of p['W'])
             delta->row(argmax_x) = x_->col(i);
-
-            // Transform the image slice into a filter:
             // Make the vector zero-sum
             delta->row(argmax_x).array() -= delta->row(argmax_x).sum() / delta->cols();
-            // Normalize it
-            eT norm = delta->row(argmax_x).squaredNorm();
-            if(norm =! 0){
-                delta->row(argmax_x) /= norm;
+            // Eigen doesn't check for div by 0 (the doc lies...)
+            if(delta->row(argmax_x).norm() != 0){
+                delta->row(argmax_x) = delta->row(argmax_x).normalized();
             }
-            else
-                delta->row(argmax_x).setZero();
-            (*delta) *= learning_rate_;
-            //std::cout << *delta << std::endl;
+
         }
-
-
+        (*delta) *= learning_rate_;
 		return delta;
 	}
 

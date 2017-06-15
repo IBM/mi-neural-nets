@@ -48,12 +48,11 @@ public:
 
         // Initialize weights of all the columns of W.
         W->rand();
-        for(size_t i = 0 ; i < W->rows() ; i++) {
+        for(size_t i = 0 ; i < (size_t)W->rows() ; i++) {
             // Make the matrix Zero Sum
-            W->row(i).array() -= (W->row(i).sum() / W->row(i).cols());
-            // Normalize
-            W->row(i) /= W->row(i).squaredNorm();
+            W->row(i).array() -= W->row(i).sum() / W->row(i).cols();
         }
+        W->rowwise().normalize();
     }
 
 
@@ -171,7 +170,7 @@ private:
     template<typename tmp> friend class MultiLayerNeuralNetwork;
 
     /// Vector containing activations of neurons.
-    std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
+    std::vector< std::shared_ptr <mic::types::Matrix<double> > > w_activations;
 
     /*!
      * Private constructor, used only during the serialization.
