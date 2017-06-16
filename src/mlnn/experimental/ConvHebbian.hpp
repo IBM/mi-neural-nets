@@ -32,10 +32,10 @@ public:
      * @param name_ Name of the layer.
      */
     ConvHebbian<eT>(size_t input_width, size_t input_height, size_t input_depth, size_t nfilters, size_t filter_size, size_t stride = 1, std::string name_ = "ConvHebbian") :
+        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_),
         nfilters(nfilters),
         filter_size(filter_size),
         stride(stride),
-        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_),
         x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
     {
 
