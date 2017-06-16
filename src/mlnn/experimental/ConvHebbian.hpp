@@ -48,11 +48,13 @@ public:
 
         // Initialize weights of all the columns of W.
         W->rand();
-        for(size_t i = 0 ; i < (size_t)W->rows() ; i++) {
+        for(auto i = 0 ; i < W->rows() ; i++) {
             // Make the matrix Zero Sum
             W->row(i).array() -= W->row(i).sum() / W->row(i).cols();
+            if(W->row(i).norm() != 0){
+                W->row(i) = W->row(i).normalized();
+            }
         }
-        W->rowwise().normalize();
     }
 
 
@@ -108,30 +110,33 @@ public:
 
 
 
-	/*!
-	 * Returns activations of weights.
-	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+    /*!
+     * Returns activations of weights.
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
 
-		// Allocate memory.
-		lazyAllocateMatrixVector(w_activations, nfilters, filter_size*filter_size, 1);
+        // Allocate memory.
+        lazyAllocateMatrixVector(w_activations, nfilters, filter_size*filter_size, 1);
 
         mic::types::MatrixPtr<eT> W = p["W"];
 
         // Iterate through "neurons" and generate "activation image" for each one.
-        for (size_t i=0 ; i < nfilters ; i++) {
+        for (size_t i = 0 ; i < nfilters ; i++) {
             // Get row.
             mic::types::MatrixPtr<eT> row = w_activations[i];
             // Copy data.
             (*row) = W->row(i);
             // Resize row.
-            row->resize( filter_size, filter_size);
+            row->resize(filter_size, filter_size);
 
-		}//: for filters
+            // Normalize.
+            if (normalize_)
+                normalizeMatrixForVisualization(row);
+        }//: for filters
 
-		// Return activations.
-		return w_activations;
-	}
+        // Return activations.
+        return w_activations;
+    }
 
 
 
@@ -156,7 +161,8 @@ protected:
     using Layer<eT>::batch_size;
 
     // Uncover methods useful in visualization.
-	using Layer<eT>::lazyAllocateMatrixVector;
+    using Layer<eT>::lazyAllocateMatrixVector;
+    using Layer<eT>::normalizeMatrixForVisualization;
 
     size_t nfilters = 0;
     size_t filter_size = 0;
@@ -170,7 +176,7 @@ private:
     template<typename tmp> friend class MultiLayerNeuralNetwork;
 
     /// Vector containing activations of neurons.
-    std::vector< std::shared_ptr <mic::types::Matrix<double> > > w_activations;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_activations;
 
     /*!
      * Private constructor, used only during the serialization.

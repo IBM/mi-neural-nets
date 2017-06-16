@@ -76,8 +76,8 @@ void batch_function (void) {
 
     size_t iteration = 0;
     // Set training parameters.
-    const float learning_rate = 1e-2;
-    const float weight_decay = 0.0;
+    const double learning_rate = 5e-3;
+    const double weight_decay = 0.0;
     const size_t iterations = importer->size() / batch_size;
     const size_t samples = 2000;
 
@@ -109,15 +109,15 @@ void batch_function (void) {
 
                 neural_net.train(encoded_batch, learning_rate);
 
-                //if (iteration % 10 == 0) {
+                if (iteration % 10 == 0) {
                     //Visualize the weights.
                     std::shared_ptr<mic::mlnn::experimental::ConvHebbian<double> > layer1 =
                             neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<double> >(0);
                     w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
-                //}//: if
+                    LOG(LINFO) << "Iteration: " << iteration;
+                }//: if
 
                 iteration++;
-                LOG(LINFO) << "Iteration: " << iteration;
             }//: end of critical section
 
         }//: if
