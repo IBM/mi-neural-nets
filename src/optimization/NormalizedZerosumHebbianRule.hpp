@@ -76,8 +76,7 @@ public:
 
         // Iterate over the output columns
         delta->zeros();
-        typename mic::types::Matrix<eT>::Index argmax;
-        eT max;
+        typename mic::types::Matrix<eT>::Index argmax, argmin;
 
         //Randomize access to the indices of image patches
         std::vector<typename mic::types::Matrix<eT>::Index> shuffled_indices;
@@ -85,8 +84,10 @@ public:
         std::random_shuffle(std::begin(shuffled_indices), std::end(shuffled_indices));
 
         for(auto i: shuffled_indices){
-            max = y_->col(i).maxCoeff(&argmax);
-            if(max > 0){ // ReLU to avoid having all the things that fit nowhere in particular applied to the first filter
+            y_->col(i).maxCoeff(&argmax);
+            y_->col(i).minCoeff(&argmin);
+            //argmax = am(y_->col(i));
+            if(argmin != argmax){ // If all filters respond equally, then do nothing about this input patch
                 // Pick the image slice and apply it to best matching filter (ie: row of p['W'])
                 delta->row(argmax) = x_->col(i);
                 // Make the vector zero-sum
@@ -106,7 +107,6 @@ public:
 protected:
     /// Calculated update.
     mic::types::MatrixPtr<eT> delta;
-
 };
 
 } //: namespace learning
