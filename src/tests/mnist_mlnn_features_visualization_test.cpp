@@ -133,7 +133,7 @@ void batch_function (void) {
 				// Get reconstruction.
 				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
 				std::vector<mic::types::MatrixXfPtr> decoded_reconstruction = mnist_encoder->decodeBatch(encoded_reconstruction);
-				w_reconstruction->setBatchDataUnsynchronized(decoded_reconstruction);*/
+				w_reconstruction->setBatchUnsynchronized(decoded_reconstruction);*/
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
@@ -141,32 +141,32 @@ void batch_function (void) {
 
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
 							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(1);
-					w_conv10->setBatchDataUnsynchronized(conv1->getInputActivations());
-					w_conv11->setBatchDataUnsynchronized(conv1->getInputGradientActivations());
-					w_conv12->setBatchDataUnsynchronized(conv1->getWeightActivations());
-					w_conv13->setBatchDataUnsynchronized(conv1->getWeightGradientActivations());
-					w_conv14->setBatchDataUnsynchronized(conv1->getOutputActivations());
-					w_conv15->setBatchDataUnsynchronized(conv1->getOutputGradientActivations());
+					w_conv10->setBatchUnsynchronized(conv1->getInputActivations());
+					w_conv11->setBatchUnsynchronized(conv1->getInputGradientActivations());
+					w_conv12->setBatchUnsynchronized(conv1->getWeightActivations());
+					w_conv13->setBatchUnsynchronized(conv1->getWeightGradientActivations());
+					w_conv14->setBatchUnsynchronized(conv1->getOutputActivations());
+					w_conv15->setBatchUnsynchronized(conv1->getOutputGradientActivations());
 
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv2 =
 							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(4);
-					w_conv20->setBatchDataUnsynchronized(conv2->getInputActivations());
-					w_conv21->setBatchDataUnsynchronized(conv2->getInputGradientActivations());
-					w_conv22->setBatchDataUnsynchronized(conv2->getWeightActivations());
-					w_conv23->setBatchDataUnsynchronized(conv2->getWeightGradientActivations());
-					w_conv24->setBatchDataUnsynchronized(conv2->getOutputActivations());
-					w_conv25->setBatchDataUnsynchronized(conv2->getOutputGradientActivations());
+					w_conv20->setBatchUnsynchronized(conv2->getInputActivations());
+					w_conv21->setBatchUnsynchronized(conv2->getInputGradientActivations());
+					w_conv22->setBatchUnsynchronized(conv2->getWeightActivations());
+					w_conv23->setBatchUnsynchronized(conv2->getWeightGradientActivations());
+					w_conv24->setBatchUnsynchronized(conv2->getOutputActivations());
+					w_conv25->setBatchUnsynchronized(conv2->getOutputGradientActivations());
 
 					std::shared_ptr<mic::mlnn::fully_connected::Linear<float> > lin1 =
 							neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(7);
-					w_conv30->setBatchDataUnsynchronized(lin1->getInputActivations());
-					w_conv31->setBatchDataUnsynchronized(lin1->getInputGradientActivations());
-					w_conv32->setBatchDataUnsynchronized(lin1->getWeightActivations());
-					w_conv33->setBatchDataUnsynchronized(lin1->getWeightGradientActivations());
+					w_conv30->setBatchUnsynchronized(lin1->getInputActivations());
+					w_conv31->setBatchUnsynchronized(lin1->getInputGradientActivations());
+					w_conv32->setBatchUnsynchronized(lin1->getWeightActivations());
+					w_conv33->setBatchUnsynchronized(lin1->getWeightGradientActivations());
 
 					std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(7);
-					w_conv34->setBatchDataUnsynchronized(sm1->getOutputActivations());
-					w_conv35->setBatchDataUnsynchronized(sm1->getOutputGradientActivations());
+					w_conv34->setBatchUnsynchronized(sm1->getOutputActivations());
+					w_conv35->setBatchUnsynchronized(sm1->getOutputGradientActivations());
 
 
 				}//: if

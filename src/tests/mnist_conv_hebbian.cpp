@@ -99,7 +99,7 @@ void batch_function (void) {
                 mic::types::MNISTBatch bt = importer->getRandomBatch();
 
                 // Set batch to be displayed.
-                w_input->setBatchDataUnsynchronized(bt.data());
+                w_input->setBatchUnsynchronized(bt.data());
 
                 // Encode data.
                 mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
@@ -113,7 +113,7 @@ void batch_function (void) {
                     //Visualize the weights.
                     std::shared_ptr<mic::mlnn::experimental::ConvHebbian<float> > layer1 =
                             neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<float> >(0);
-                    w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
+                    w_weights1->setBatchUnsynchronized(layer1->getWeightActivations());
                 //}//: if
 
                 iteration++;

@@ -53,10 +53,10 @@ TEST_F(Vectors4x1Float2, SquaredErrorLoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(target_y, predicted_y1);
-	EXPECT_LE(std::abs(l1-0.0225), eps);
+	EXPECT_LE(fabs(l1-0.0225), eps);
 
 	float l2 = loss.calculateLoss(target_y, predicted_y2);
-	EXPECT_LE(std::abs(l2-0.0225), eps);
+	EXPECT_LE(fabs(l2-0.0225), eps);
 }
 
 /*!
@@ -68,10 +68,10 @@ TEST_F(Vectors4x1Float2, SquaredErrorMSELoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateMeanLoss(target_y, predicted_y1);
-	EXPECT_LE(std::abs(l1-0.0225), eps);
+	EXPECT_LE(fabs(l1-0.0225), eps);
 
 	float l2 = loss.calculateMeanLoss(target_y, predicted_y2);
-	EXPECT_LE(std::abs(l2-0.0225), eps);
+	EXPECT_LE(fabs(l2-0.0225), eps);
 }
 
 /*!
@@ -83,16 +83,16 @@ TEST_F(Vectors4x1Float2, SquaredErrorGradient) {
 	float eps = 1e-5;
 
 	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(target_y, predicted_y1);
-	EXPECT_LE(std::abs((*dy1)[0] + 0.15), eps) << "Gradient error at position i=0";
-	EXPECT_LE(std::abs((*dy1)[1] - 0.15), eps) << "Gradient error at position i=1";
-	EXPECT_LE(std::abs((*dy1)[2] - 0.0), eps) << "Gradient error at position i=2";
-	EXPECT_LE(std::abs((*dy1)[3] - 0.0), eps) << "Gradient error at position i=3";
+	EXPECT_LE(fabs((*dy1)[0] + 0.15), eps) << "Gradient error at position i=0";
+	EXPECT_LE(fabs((*dy1)[1] - 0.15), eps) << "Gradient error at position i=1";
+	EXPECT_LE(fabs((*dy1)[2] - 0.0), eps) << "Gradient error at position i=2";
+	EXPECT_LE(fabs((*dy1)[3] - 0.0), eps) << "Gradient error at position i=3";
 
 	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(target_y, predicted_y2);
-	EXPECT_LE(std::abs((*dy2)[0] - 0.0), eps) << "Gradient error at position i=0";
-	EXPECT_LE(std::abs((*dy2)[1] - 0.0), eps) << "Gradient error at position i=1";
-	EXPECT_LE(std::abs((*dy2)[2] + 0.15), eps) << "Gradient error at position i=2";
-	EXPECT_LE(std::abs((*dy2)[3] - 0.15), eps) << "Gradient error at position i=3";
+	EXPECT_LE(fabs((*dy2)[0] - 0.0), eps) << "Gradient error at position i=0";
+	EXPECT_LE(fabs((*dy2)[1] - 0.0), eps) << "Gradient error at position i=1";
+	EXPECT_LE(fabs((*dy2)[2] + 0.15), eps) << "Gradient error at position i=2";
+	EXPECT_LE(fabs((*dy2)[3] - 0.15), eps) << "Gradient error at position i=3";
 }
 
 
@@ -106,10 +106,10 @@ TEST_F(Vectors4x1Float2, CrossEntropyLoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(target_y, predicted_y1);
-	EXPECT_LE(std::abs(l1 - 2.0), eps);
+	EXPECT_LE(fabs(l1 - 2.0), eps);
 
 	float l2 = loss.calculateLoss(target_y, predicted_y2);
-	EXPECT_LE(std::abs(l2 - 2.02193), eps);
+	EXPECT_LE(fabs(l2 - 2.02193), eps);
 }
 
 /*!
@@ -121,10 +121,10 @@ TEST_F(Vectors4x1Float2, CrossEntropyACELoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateMeanLoss(target_y, predicted_y1);
-	EXPECT_LE(std::abs(l1 - 2.0), eps);
+	EXPECT_LE(fabs(l1 - 2.0), eps);
 
 	float l2 = loss.calculateMeanLoss(target_y, predicted_y2);
-	EXPECT_LE(std::abs(l2 - 2.02193), eps);
+	EXPECT_LE(fabs(l2 - 2.02193), eps);
 }
 
 
@@ -137,16 +137,16 @@ TEST_F(Vectors4x1Float2, CrossEntropyGradient) {
 	double eps = 1e-5;
 
 	mic::types::MatrixPtr<float> dy1 = loss.calculateGradient(target_y, predicted_y1);
-	EXPECT_LE(std::abs((*dy1)[0] + 0.15), eps) << "Gradient error at position i=0";
-	EXPECT_LE(std::abs((*dy1)[1] - 0.15), eps) << "Gradient error at position i=1";
-	EXPECT_LE(std::abs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
-	EXPECT_LE(std::abs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
+	EXPECT_LE(fabs((*dy1)[0] + 0.15), eps) << "Gradient error at position i=0";
+	EXPECT_LE(fabs((*dy1)[1] - 0.15), eps) << "Gradient error at position i=1";
+	EXPECT_LE(fabs((*dy1)[2] + 0.0), eps) << "Gradient error at position i=2";
+	EXPECT_LE(fabs((*dy1)[3] + 0.0), eps) << "Gradient error at position i=3";
 
 	mic::types::MatrixPtr<float> dy2 = loss.calculateGradient(target_y, predicted_y2);
-	EXPECT_LE(std::abs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
-	EXPECT_LE(std::abs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
-	EXPECT_LE(std::abs((*dy2)[2] + 0.15), eps) << "Gradient error at position i=2";
-	EXPECT_LE(std::abs((*dy2)[3] - 0.15), eps) << "Gradient error at position i=3";
+	EXPECT_LE(fabs((*dy2)[0] + 0.0), eps) << "Gradient error at position i=0";
+	EXPECT_LE(fabs((*dy2)[1] + 0.0), eps) << "Gradient error at position i=1";
+	EXPECT_LE(fabs((*dy2)[2] + 0.15), eps) << "Gradient error at position i=2";
+	EXPECT_LE(fabs((*dy2)[3] - 0.15), eps) << "Gradient error at position i=3";
 }
 
 
@@ -159,7 +159,7 @@ TEST_F(Vectors3x2Float, SquaredErrorLoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(target_y, predicted_y);
-	EXPECT_LE(std::abs(l1 - 0.145), eps);
+	EXPECT_LE(fabs(l1 - 0.145), eps);
 }
 
 /*!
@@ -171,7 +171,7 @@ TEST_F(Vectors3x2Float, SquaredErrorACELoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateMeanLoss(target_y, predicted_y);
-	EXPECT_LE(std::abs(l1 - 0.0725), eps);
+	EXPECT_LE(fabs(l1 - 0.0725), eps);
 }
 
 
@@ -185,12 +185,12 @@ TEST_F(Vectors3x2Float, SquaredErrorGradient) {
 
 	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
 
-	EXPECT_LE(std::abs((*dy)(0,0) - 0.1), eps) << "Gradient error at position (0,0)";
-	EXPECT_LE(std::abs((*dy)(0,1) + 0.0), eps) << "Gradient error at position (0,1)";
-	EXPECT_LE(std::abs((*dy)(1,0) - 0.1), eps) << "Gradient error at position (1,0)";
-	EXPECT_LE(std::abs((*dy)(1,1) + 0.1), eps) << "Gradient error at position (1,1)";
-	EXPECT_LE(std::abs((*dy)(2,0) + 0.1), eps) << "Gradient error at position (2,0)";
-	EXPECT_LE(std::abs((*dy)(2,1) - 0.5), eps) << "Gradient error at position (2,1)";
+	EXPECT_LE(fabs((*dy)(0,0) - 0.1), eps) << "Gradient error at position (0,0)";
+	EXPECT_LE(fabs((*dy)(0,1) + 0.0), eps) << "Gradient error at position (0,1)";
+	EXPECT_LE(fabs((*dy)(1,0) - 0.1), eps) << "Gradient error at position (1,0)";
+	EXPECT_LE(fabs((*dy)(1,1) + 0.1), eps) << "Gradient error at position (1,1)";
+	EXPECT_LE(fabs((*dy)(2,0) + 0.1), eps) << "Gradient error at position (2,0)";
+	EXPECT_LE(fabs((*dy)(2,1) - 0.5), eps) << "Gradient error at position (2,1)";
 }
 
 
@@ -204,7 +204,7 @@ TEST_F(Vectors3x2Float, CrossEntropyLoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateLoss(target_y, predicted_y);
-	EXPECT_LE(std::abs(l1 - 2.42782), eps);
+	EXPECT_LE(fabs(l1 - 2.42782), eps);
 
 }
 
@@ -217,7 +217,7 @@ TEST_F(Vectors3x2Float, CrossEntropyACELoss) {
 	float eps = 1e-5;
 
 	float l1 = loss.calculateMeanLoss(target_y, predicted_y);
-	EXPECT_LE(std::abs(l1 - 1.21391), eps);
+	EXPECT_LE(fabs(l1 - 1.21391), eps);
 }
 
 /*!
@@ -230,12 +230,12 @@ TEST_F(Vectors3x2Float, CrossEntropyGradient) {
 
 	mic::types::MatrixPtr<float> dy = loss.calculateGradient(target_y, predicted_y);
 
-	EXPECT_LE(std::abs((*dy)(0,0) - 0.1), eps) << "Gradient error at position (0,0)";
-	EXPECT_LE(std::abs((*dy)(0,1) + 0.0), eps) << "Gradient error at position (0,1)";
-	EXPECT_LE(std::abs((*dy)(1,0) - 0.1), eps) << "Gradient error at position (1,0)";
-	EXPECT_LE(std::abs((*dy)(1,1) + 0.1), eps) << "Gradient error at position (1,1)";
-	EXPECT_LE(std::abs((*dy)(2,0) + 0.1), eps) << "Gradient error at position (2,0)";
-	EXPECT_LE(std::abs((*dy)(2,1) - 0.5), eps) << "Gradient error at position (2,1)";
+	EXPECT_LE(fabs((*dy)(0,0) - 0.1), eps) << "Gradient error at position (0,0)";
+	EXPECT_LE(fabs((*dy)(0,1) + 0.0), eps) << "Gradient error at position (0,1)";
+	EXPECT_LE(fabs((*dy)(1,0) - 0.1), eps) << "Gradient error at position (1,0)";
+	EXPECT_LE(fabs((*dy)(1,1) + 0.1), eps) << "Gradient error at position (1,1)";
+	EXPECT_LE(fabs((*dy)(2,0) + 0.1), eps) << "Gradient error at position (2,0)";
+	EXPECT_LE(fabs((*dy)(2,1) - 0.5), eps) << "Gradient error at position (2,1)";
 }
 
 

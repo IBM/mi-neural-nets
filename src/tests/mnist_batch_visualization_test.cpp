@@ -53,7 +53,7 @@ void batch_function (void) {
 				mic::types::MNISTBatch bt = importer->getNextBatch();
 
 				// Set batch to be displayed.
-				w_batch->setBatchDataUnsynchronized(bt.data());
+				w_batch->setBatchUnsynchronized(bt.data());
 
 			}//: end of critical section
 

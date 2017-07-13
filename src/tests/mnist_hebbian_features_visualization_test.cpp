@@ -90,7 +90,7 @@ void batch_function (void) {
 				mic::types::MNISTBatch bt = importer->getRandomBatch();
 
 				// Set batch to be displayed.
-				w_input->setBatchDataUnsynchronized(bt.data());
+				w_input->setBatchUnsynchronized(bt.data());
 
 				// Encode data.
 				mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
@@ -103,12 +103,12 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
 
 				std::vector<mic::types::MatrixXfPtr> decoded_reconstruction = mnist_encoder->decodeBatch(encoded_reconstruction);
-				w_reconstruction->setBatchDataUnsynchronized(decoded_reconstruction);
+				w_reconstruction->setBatchUnsynchronized(decoded_reconstruction);
 
 				if (iteration%10 == 0) {
 					// Visualize the weights.
 					std::shared_ptr<mic::mlnn::BinaryCorrelator<float> > layer1 = neural_net.getLayer<mic::mlnn::BinaryCorrelator<float> >(0);
-					w_weights1->setBatchDataUnsynchronized(layer1->getActivations(patch_size, patch_size));
+					w_weights1->setBatchUnsynchronized(layer1->getActivations(patch_size, patch_size));
 
 				}//: if
 
