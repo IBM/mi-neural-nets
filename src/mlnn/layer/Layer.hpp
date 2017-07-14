@@ -542,9 +542,10 @@ public:
 
 	/*!
 	 * Normalizes the matrix. to the range <-1.0, 1.0>, e.g. for the visualization purposes.
+	 * DEPRICATED - functionality moved to mi-visualization!
 	 * @param matrix_ Matrix to be normalized.
 	 */
-	void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
+	/*void normalizeMatrixForVisualization(mic::types::MatrixPtr<eT> matrix_) {
 		// Epsilon added for numerical stability.
 		//eT eps = 1e-5;
 		//eT l2 = matrix_->norm() + eps;
@@ -561,14 +562,13 @@ public:
             (*matrix_) = matrix_->unaryExpr ( [&] ( eT x ) { return ( (x)/ultimate_max ); } ).template cast<eT>();
 			//std::cout << "after: min:" << (*matrix_).minCoeff() <<" max: " << (*matrix_).maxCoeff() << std::endl;
 		}//: else: do nothing, all values are ~0 already.
-
-	}
+	}*/
 
 
 	/*!
 	 * Returns activations of input neurons.
 	 */
-	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations(bool normalize_ = true) {
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputActivations() {
 
  		// Allocate memory.
 		lazyAllocateMatrixVector(x_activations, input_depth * batch_size, input_height*input_width, 1);
@@ -592,9 +592,6 @@ public:
 				(*row) = sample_x->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				row->resize(input_height, input_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
@@ -606,7 +603,7 @@ public:
 	/*!
 	 * Returns activations of input gradients (dx).
 	 */
-	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputGradientActivations(bool normalize_ = true) {
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInputGradientActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dx_activations, batch_size * input_depth, input_height*input_width, 1);
@@ -630,9 +627,6 @@ public:
 				(*row) = sample_dx->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				row->resize(input_height, input_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
@@ -644,7 +638,7 @@ public:
 	/*!
 	 * Returns activations of output neurons.
 	 */
-	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(bool normalize_ = true) {
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(y_activations, batch_size*output_depth, output_height*output_width, 1);
@@ -668,9 +662,6 @@ public:
 				(*row) = sample_y->block(oc*output_height*output_width, 0, output_height*output_width, 1);
 				row->resize(output_height, output_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 
@@ -682,7 +673,7 @@ public:
 	/*!
 	 * Returns activations of gradients of output neurons.
 	 */
-	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputGradientActivations(bool normalize_ = true) {
+	virtual std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputGradientActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dy_activations, output_depth*batch_size, output_height*output_width, 1);
@@ -706,9 +697,6 @@ public:
 				(*row) = sample_dy->block(oc*output_height*output_width, 0, output_height*output_width, 1);
 				row->resize(output_height, output_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for batch
 

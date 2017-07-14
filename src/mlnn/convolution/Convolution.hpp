@@ -601,7 +601,7 @@ public:
 	/*!
 	 * Returns activations of weights.
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(w_activations, output_depth*input_depth, filter_size*filter_size, 1);
@@ -620,11 +620,6 @@ public:
 				(*row) = (*W);
 				row->resize(filter_size, filter_size);
 
-				//std::cout << "weight W"<< fi <<"x"<< ic <<": min:" << (*W).minCoeff() <<" max: " << (*W).maxCoeff() << std::endl;
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
-				//std::cout << "normalized W"<< fi <<"x"<< ic <<": min:" << (*row).minCoeff() <<" max: " << (*row).maxCoeff() << std::endl;
 			}//: for channels
 		}//: for filters
 
@@ -637,7 +632,7 @@ public:
 	/*!
 	 * Returns activations of weight gradients (dx).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dw_activations, output_depth * input_depth, filter_size*filter_size, 1);
@@ -656,9 +651,6 @@ public:
 				// Copy data.
 				(*row) = (*W);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for channel
 		}//: for filter
 
@@ -671,7 +663,7 @@ public:
 	 * Returns activations of receptive fields.
 	 * Limitation: displays receptive fields of the last sample from batch!
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getReceptiveFields(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getReceptiveFields() {
 
 		// TODO: batch!
 		//assert(batch_size==1);
@@ -692,9 +684,6 @@ public:
 				(*row) = *(xrf);
 				row->resize(filter_size, filter_size);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for ry
 		}//: for rx
 
@@ -706,7 +695,7 @@ public:
 	 * Returns activations of inverse receptive fields.
 	 * Limitation: displays receptive fields of the last sample from batch!
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseReceptiveFields(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseReceptiveFields() {
 
 		// TODO: batch!
 		//assert(batch_size==1);
@@ -726,9 +715,6 @@ public:
 				(*row) = *(ixrf);
 				row->resize(output_height, output_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 				}//: for rx
 			}//: for ry
 
@@ -766,7 +752,6 @@ protected:
 
 	 // Uncover methods useful in visualization.
 	 using Layer<eT>::lazyAllocateMatrixVector;
-	 using Layer<eT>::normalizeMatrixForVisualization;
 
 private:
 	// Friend class - required for using boost serialization.

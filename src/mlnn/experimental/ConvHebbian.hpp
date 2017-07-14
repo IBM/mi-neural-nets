@@ -128,9 +128,6 @@ public:
             // Resize row.
             row->resize( filter_size, filter_size);
 
-			// Normalize.
-			if (normalize_ )
-				normalizeMatrixForVisualization(row);
 		}//: for filters
 
 		// Return activations.
@@ -161,7 +158,6 @@ protected:
 
     // Uncover methods useful in visualization.
 	using Layer<eT>::lazyAllocateMatrixVector;
-	using Layer<eT>::normalizeMatrixForVisualization;
 
     size_t nfilters = 0;
     size_t filter_size = 0;

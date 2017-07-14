@@ -155,7 +155,7 @@ public:
 	/*!
 	 * Returns activations of weights.
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(w_activations, 1, Layer<eT>::outputSize()*Layer<eT>::inputSize(), 1);
@@ -169,10 +169,6 @@ public:
 		(*row) = (*W);
 		row->resize(Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
-		// Normalize.
-		if (normalize_)
-			normalizeMatrixForVisualization(row);
-
 		// Return activations.
 		return w_activations;
 	}
@@ -182,7 +178,7 @@ public:
 	/*!
 	 * Returns activations of weight gradients (dx).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dw_activations, 1, Layer<eT>::outputSize()*Layer<eT>::inputSize(), 1);
@@ -196,10 +192,6 @@ public:
 		(*row) = (*dW);
 		row->resize(Layer<eT>::outputSize(), Layer<eT>::inputSize());
 
-		// Normalize.
-		if (normalize_ )
-			normalizeMatrixForVisualization(row);
-
 		// Return activations.
 		return dw_activations;
 	}
@@ -207,9 +199,9 @@ public:
 
 
 	/*!
-	 * Returns inverse activations weights .
+	 * Returns "inverse activations" of each neuron weights (W^T) - shows what activates given neuron.
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseWeightActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseWeightActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(inverse_w_activations, Layer<eT>::outputSize() * input_depth, input_height*input_width, 1);
@@ -228,9 +220,6 @@ public:
 				// Resize row.
 				row->resize( input_height, input_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for
 		}//: for
 
@@ -242,7 +231,7 @@ public:
 	/*!
 	 * Returns inverse activations weights .
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseOutputActivations(bool normalize_ = true) {
+	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseOutputActivations() {
 		// Allocate memory.
 		lazyAllocateMatrixVector(inverse_y_activations, batch_size*input_depth, input_height, input_width);
 
@@ -271,9 +260,6 @@ public:
 				(*row) = x_act->block(ic*input_height*input_width, 0, input_height*input_width, 1);
 				row->resize(input_height, input_width);
 
-				// Normalize.
-				if (normalize_ )
-					normalizeMatrixForVisualization(row);
 			}//: for channel
 
 		}//: for batch
@@ -306,7 +292,6 @@ protected:
 
 	 // Uncover methods useful in visualization.
 	 using Layer<eT>::lazyAllocateMatrixVector;
-	 using Layer<eT>::normalizeMatrixForVisualization;
 
 
 private:
