@@ -41,6 +41,8 @@ WindowGrayscaleBatch<double>* w_input;
 /// Window for displaying the weights.
 WindowGrayscaleBatch<double>* w_weights1;
 
+WindowGrayscaleBatch<double>* w_output;
+
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter<double>* importer;
 /// Multi-layer neural network.
@@ -74,6 +76,9 @@ void batch_function (void) {
         LOG(LINFO) << "Generated new neural network";
     }//: else
 
+    std::shared_ptr<mic::mlnn::experimental::ConvHebbian<double> > layer1 =
+            neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<double> >(0);
+
     size_t iteration = 0;
     // Set training parameters.
     const double learning_rate = 5e-3;
@@ -98,9 +103,6 @@ void batch_function (void) {
                 // Retrieve the next minibatch.
                 mic::types::MNISTBatch<double> bt = importer->getRandomBatch();
 
-                // Set batch to be displayed.
-                w_input->setBatchDataUnsynchronized(bt.data());
-
                 // Encode data.
                 mic::types::MatrixPtr<double> encoded_batch = mnist_encoder->encodeBatch(bt.data());
 
@@ -111,9 +113,10 @@ void batch_function (void) {
 
                 if (iteration % 10 == 0) {
                     //Visualize the weights.
-                    std::shared_ptr<mic::mlnn::experimental::ConvHebbian<double> > layer1 =
-                            neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<double> >(0);
+                    // Set batch to be displayed.
+                    w_input->setBatchDataUnsynchronized(bt.data());
                     w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
+                    w_output->setBatchDataUnsynchronized(layer1->getOutputActivations());
                     LOG(LINFO) << "Iteration: " << iteration;
                 }//: if
 
@@ -173,7 +176,8 @@ int main(int argc, char* argv[]) {
 
     // Create batch visualization window.
     w_input = new WindowGrayscaleBatch<double>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
-    w_weights1 = new WindowGrayscaleBatch<double>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 320, 0, 250, 250);
+    w_weights1 = new WindowGrayscaleBatch<double>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+250, 0, 250, 250);
+    w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(2*250), 0, 250, 250);
 
     boost::thread batch_thread(boost::bind(&batch_function));
 
