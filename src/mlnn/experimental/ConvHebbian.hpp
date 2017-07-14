@@ -113,6 +113,34 @@ public:
     /*!
      * Returns activations of weights.
      */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(bool normalize_ = true) {
+
+        // Allocate memory.
+        lazyAllocateMatrixVector(o_activations, nfilters, output_height * output_width, 1);
+
+        mic::types::MatrixPtr<eT> W = s["y"];
+
+        // Iterate through "neurons" and generate "activation image" for each one.
+        for (size_t i = 0 ; i < nfilters ; i++) {
+            // Get row.
+            mic::types::MatrixPtr<eT> row = o_activations[i];
+            // Copy data.
+            (*row) = W->row(i);
+            // Resize row.
+            row->resize(output_width, output_height);
+
+            // Normalize.
+            if (normalize_)
+                normalizeMatrixForVisualization(row);
+        }//: for filters
+
+        // Return activations.
+        return o_activations;
+    }
+
+    /*!
+     * Returns activations of weights.
+     */
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
 
         // Allocate memory.
@@ -137,7 +165,6 @@ public:
         // Return activations.
         return w_activations;
     }
-
 
 
     // Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
@@ -177,6 +204,7 @@ private:
 
     /// Vector containing activations of neurons.
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_activations;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_activations;
 
     /*!
      * Private constructor, used only during the serialization.
