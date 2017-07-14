@@ -155,7 +155,7 @@ public:
 	/*!
 	 * Returns activations of weights.
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations() {
+	std::vector< mic::types::MatrixPtr<eT> > & getWeightActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(w_activations, 1, Layer<eT>::outputSize()*Layer<eT>::inputSize(), 1);
@@ -178,7 +178,7 @@ public:
 	/*!
 	 * Returns activations of weight gradients (dx).
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightGradientActivations() {
+	std::vector< mic::types::MatrixPtr<eT> > & getWeightGradientActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(dw_activations, 1, Layer<eT>::outputSize()*Layer<eT>::inputSize(), 1);
@@ -201,7 +201,7 @@ public:
 	/*!
 	 * Returns "inverse activations" of each neuron weights (W^T) - shows what activates given neuron.
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseWeightActivations() {
+	std::vector< mic::types::MatrixPtr<eT> > & getInverseWeightActivations() {
 
 		// Allocate memory.
 		lazyAllocateMatrixVector(inverse_w_activations, Layer<eT>::outputSize() * input_depth, input_height*input_width, 1);
@@ -229,14 +229,14 @@ public:
 
 
 	/*!
-	 * Returns inverse activations weights .
+	 * Returns inverse activations of output neurons (y*W^T) - reconstruction of the input.
 	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getInverseOutputActivations() {
+	std::vector< mic::types::MatrixPtr<eT> > & getInverseOutputActivations() {
 		// Allocate memory.
 		lazyAllocateMatrixVector(inverse_y_activations, batch_size*input_depth, input_height, input_width);
 
 		// Get y batch.
-		mic::types::MatrixPtr<eT> batch_y = g['y'];
+		mic::types::MatrixPtr<eT> batch_y = s['y'];
 		// Get weights.
 		mic::types::MatrixPtr<eT> W =  p["W"];
 
@@ -266,6 +266,39 @@ public:
 
 		// Return activations.
 		return inverse_y_activations;
+	}
+
+	/*!
+	 * Calculates mean reconstruction error (mean of all RMS errors between input and reconstructed samples).
+	 */
+	eT calculateMeanReconstructionError() {
+
+		// Get input batch.
+		mic::types::MatrixPtr<eT> batch_x = s['x'];
+		// Calculate the reconstruction.
+		std::vector< mic::types::MatrixPtr<eT> > reconstructed_batch_x = getInverseOutputActivations();
+
+		// Calculate the reconstruction error for the whole batch.
+		eT error =0;
+		// Iterate through batch samples and generate "activation image" for each one.
+		for (size_t ib=0; ib< batch_size; ib++) {
+
+			// Get input sample from batch!
+			mic::types::MatrixPtr<eT> sample_x = m["xs"];
+			(*sample_x) = batch_x->col(ib);
+			eT* sample_x_ptr = (*sample_x).data();
+
+			// Get reconstruction.
+			mic::types::MatrixPtr<eT> reconstructed_x = reconstructed_batch_x[ib];
+			eT* reconstructed_x_ptr = (*reconstructed_x).data();
+
+			// Calculate the error for a given sample.
+			for (size_t i=0; i< input_height*input_width*input_depth; i++)
+				error += fabs(sample_x_ptr[i] - reconstructed_x_ptr[i]);// * (sample_x_ptr[i] - reconstructed_x_ptr[i]);
+		}//: for batch
+
+		// Return mean error.
+		return (error/batch_size);
 	}
 
 
@@ -302,16 +335,16 @@ private:
 	template<typename tmp> friend class SparseLinear;
 
 	/// Vector containing activations of weights/filters.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
+	std::vector< mic::types::MatrixPtr<eT> > w_activations;
 
 	/// Vector containing activations of gradients of weights (dW).
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > dw_activations;
+	std::vector< mic::types::MatrixPtr<eT> > dw_activations;
 
 	/// Vector containing "inverse activations" of each neuron weights(W^T).
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > inverse_w_activations;
+	std::vector< mic::types::MatrixPtr<eT> > inverse_w_activations;
 
 	/// Vector containing activations of neurons (y*W^T).
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > inverse_y_activations;
+	std::vector< mic::types::MatrixPtr<eT> > inverse_y_activations;
 
 	/*!
 	 * Private constructor, used only during the serialization.

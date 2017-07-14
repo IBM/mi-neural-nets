@@ -60,26 +60,32 @@ endif(${BUILD_TEST_BATCH_TRAINING_MLNN})
 # Build and install - MNIST recognition based on CNNs.
 # =======================================================================
 
-set(BUILD_MNIST_CNN_APP OFF CACHE BOOL "Build the application using Convolutional Neural Network for recognition of MNIST digits")
+set(BUILD_MNIST_CNN_APP OFF CACHE BOOL "Build the application for visualization of features of convolutional neural net trained on MNIST digits")
 
 if(${BUILD_MNIST_CNN_APP})
         # Create exeutable.
-        ADD_EXECUTABLE(mnist_convnet mnist_convnet.cpp)
+        ADD_EXECUTABLE(mnist_convnet_features_visualization_test mnist_convnet_features_visualization_test.cpp)
         # Link it with shared libraries.
-        target_link_libraries(mnist_convnet
+        target_link_libraries(mnist_convnet_features_visualization_test
 			logger
+			application
 			configuration
 	        types
 			data_io
 			encoders
-		    ${Boost_LIBRARIES}
+			configuration
+			opengl_visualization
+			opengl_application
+			${OPENGL_LIBRARIES}
+			${GLUT_LIBRARY} 
+			${Boost_LIBRARIES}  
 	    )
         if(OpenBLAS_FOUND)
-                target_link_libraries(mnist_convnet  ${OpenBLAS_LIB} )
+                target_link_libraries(mnist_convnet_features_visualization_test  ${OpenBLAS_LIB} )
         endif(OpenBLAS_FOUND)
 
         # install test to bin directory
-        install(TARGETS mnist_convnet RUNTIME DESTINATION bin)
+        install(TARGETS mnist_convnet_features_visualization_test RUNTIME DESTINATION bin)
 
 endif(${BUILD_MNIST_CNN_APP})
 

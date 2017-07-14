@@ -1,6 +1,6 @@
 /*!
- * @file mnist_mlnn_features_visualization_test.cpp
- * @brief Program for visualization of features of mlnn layers trained on MNIST digits.
+ * @file mnist_convnet_features_visualization_test.cpp
+ * @brief Program for visualization of features of convolutional neural net trained on MNIST digits.
  * @author tkornuta
  * @date:   03-04-2017
  *
@@ -68,7 +68,20 @@ void batch_function (void) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
+//			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(24, 24, 1, 1));
+
 			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
+	/*		neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 1, 9, 5, 1));
+			neural_net.pushLayer(new ELU<float>(20, 20, 9));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(20, 20, 9, 2));
+
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(10, 10, 9, 16, 7, 1));
+			neural_net.pushLayer(new ELU<float>(4, 4, 16));
+			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(4, 4, 16, 2));
+
+			neural_net.pushLayer(new Linear<float>(2, 2, 16, 10, 1, 1));
+			neural_net.pushLayer(new Softmax<float>(10));*/
+
 			neural_net.pushLayer(new Linear<float>(24, 24, 1, 10, 1, 1));
 			neural_net.pushLayer(new Softmax<float>(10));
 
@@ -113,10 +126,56 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
 				mic::types::MatrixXfPtr encoded_labels = label_encoder->encodeBatch(bt.labels());
 
+/*				mic::types::MatrixPtr<float> encoded_batch = MAKE_MATRIX_PTR(float, patch_size*patch_size, 1);
+				for (size_t i=0; i<patch_size*patch_size; i++)
+					(*encoded_batch)[i]= 1.0 -(float)i/(patch_size*patch_size);*/
+				/*mic::types::MatrixPtr<float> encoded_labels = MAKE_MATRIX_PTR(float, output_size, 1);
+				encoded_labels->setZero();
+				(*encoded_labels)[0]= 1.0;*/
+				/*(*encoded_labels)[6]= 1.0;
+				(*encoded_labels)[9]= 1.0;
+				(*encoded_labels)[15]= 1.0;*/
+
 				// Train the autoencoder.
 				float loss = neural_net.train (encoded_batch, encoded_labels, 0.001, 0.0001);
 
+				// Get reconstruction.
+				/*mic::types::MatrixXfPtr encoded_reconstruction = neural_net.getPredictions();
+				std::vector<mic::types::MatrixXfPtr> decoded_reconstruction = mnist_encoder->decodeBatch(encoded_reconstruction);
+				w_reconstruction->setBatchUnsynchronized(decoded_reconstruction);*/
+
 				if (iteration%10 == 0) {
+					// Visualize the weights.
+					//std::shared_ptr<Layer<float> > layer1 = neural_net.getLayer(3);
+
+/*					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
+							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(1);
+					w_conv10->setBatchUnsynchronized(conv1->getInputActivations());
+					w_conv11->setBatchUnsynchronized(conv1->getInputGradientActivations());
+					w_conv12->setBatchUnsynchronized(conv1->getWeightActivations());
+					w_conv13->setBatchUnsynchronized(conv1->getWeightGradientActivations());
+					w_conv14->setBatchUnsynchronized(conv1->getOutputActivations());
+					w_conv15->setBatchUnsynchronized(conv1->getOutputGradientActivations());
+
+					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv2 =
+							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(4);
+					w_conv20->setBatchUnsynchronized(conv2->getInputActivations());
+					w_conv21->setBatchUnsynchronized(conv2->getInputGradientActivations());
+					w_conv22->setBatchUnsynchronized(conv2->getWeightActivations());
+					w_conv23->setBatchUnsynchronized(conv2->getWeightGradientActivations());
+					w_conv24->setBatchUnsynchronized(conv2->getOutputActivations());
+					w_conv25->setBatchUnsynchronized(conv2->getOutputGradientActivations());
+
+					std::shared_ptr<mic::mlnn::fully_connected::Linear<float> > lin1 =
+							neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(7);
+					w_conv30->setBatchUnsynchronized(lin1->getInputActivations());
+					w_conv31->setBatchUnsynchronized(lin1->getInputGradientActivations());
+					w_conv32->setBatchUnsynchronized(lin1->getWeightActivations());
+					w_conv33->setBatchUnsynchronized(lin1->getWeightGradientActivations());
+
+					std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(7);
+					w_conv34->setBatchUnsynchronized(sm1->getOutputActivations());
+					w_conv35->setBatchUnsynchronized(sm1->getOutputGradientActivations());*/
 
 					std::shared_ptr<mic::mlnn::fully_connected::Linear<float> > lin1 =
 							neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(1);
@@ -192,15 +251,15 @@ int main(int argc, char* argv[]) {
 	VGL_MANAGER->initializeGLUT(argc, argv);
 
 	// Create batch visualization window.
-	w_conv10 = new WindowGrayscaleBatch<float>("Lin1 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 50, 256, 256);
-	w_conv11 = new WindowGrayscaleBatch<float>("Lin1 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 50, 256, 256);
-	w_conv12 = new WindowGrayscaleBatch<float>("Lin1 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 50, 256, 256);
-	w_conv13 = new WindowGrayscaleBatch<float>("Lin1 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 50, 256, 256);
-	w_conv14 = new WindowGrayscaleBatch<float>("Lin1 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 50, 256, 256);
-	w_conv15 = new WindowGrayscaleBatch<float>("Lin1 dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 50, 256, 256);
+	w_conv10 = new WindowGrayscaleBatch<float>("Conv1 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 50, 256, 256);
+	w_conv11 = new WindowGrayscaleBatch<float>("Conv1 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 50, 256, 256);
+	w_conv12 = new WindowGrayscaleBatch<float>("Conv1 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 50, 256, 256);
+	w_conv13 = new WindowGrayscaleBatch<float>("Conv1 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 50, 256, 256);
+	w_conv14 = new WindowGrayscaleBatch<float>("Conv1 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 50, 256, 256);
+	w_conv15 = new WindowGrayscaleBatch<float>("Conv1 dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 50, 256, 256);
 
-	w_conv20 = new WindowGrayscaleBatch<float>("Lin1 inverse neuron activation", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 336, 256, 256);
-	w_conv21 = new WindowGrayscaleBatch<float>("Lin1 inverse output activation", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 336, 256, 256);
+	w_conv20 = new WindowGrayscaleBatch<float>("Conv2 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 336, 256, 256);
+	w_conv21 = new WindowGrayscaleBatch<float>("Conv2 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 336, 256, 256);
 	w_conv22 = new WindowGrayscaleBatch<float>("Conv2 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 336, 256, 256);
 	w_conv23 = new WindowGrayscaleBatch<float>("Conv2 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 336, 256, 256);
 	w_conv24 = new WindowGrayscaleBatch<float>("Conv2 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 336, 256, 256);

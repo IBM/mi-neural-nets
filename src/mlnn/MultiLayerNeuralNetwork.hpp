@@ -197,11 +197,19 @@ public:
 	}
 
 	/*!
-	 * Returns the predictions (output of the forward processing).
-	 * @param predictions_ Predictions in the form of a matrix of size [label_size x batch_size].
+	 * Returns the predictions (output of the forward processing) of the last layer in the form of a matrix of size [output_size x batch_size].
 	 */
 	mic::types::MatrixPtr<eT> getPredictions() {
 		return layers.back()->s['y'];
+	}
+
+	/*!
+	 * Returns the predictions (output of the forward processing) of a given layer in the form of a matrix of size [output_size x batch_size].
+	 * @param layer_nr_ Layer number.
+	 */
+	mic::types::MatrixPtr<eT> getPredictions(size_t layer_nr_) {
+		assert(layer_nr_ < layers.size());
+		return layers[layer_nr_]->s['y'];
 	}
 
 	/*!
