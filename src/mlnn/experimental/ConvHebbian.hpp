@@ -32,11 +32,12 @@ public:
      * @param name_ Name of the layer.
      */
     ConvHebbian<eT>(size_t input_width, size_t input_height, size_t input_depth, size_t nfilters, size_t filter_size, size_t stride = 1, std::string name_ = "ConvHebbian") :
-        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_),
+        Layer<eT>(input_height, input_width, input_depth, (input_height - filter_size) / stride, (input_width - filter_size) / stride, 1, LayerTypes::ConvHebbian, name_),
         nfilters(nfilters),
         filter_size(filter_size),
         stride(stride),
-        x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
+        x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height)),
+        conv2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
     {
 
         // Create the weights matrix, each row is a filter kernel
@@ -82,7 +83,7 @@ public:
                 for(size_t patch_y = 0 ; patch_y < filter_size ; patch_y++){
                     // Copy each row of the image patch into appropriate position in x2col
                     x2col->block(patch_y * filter_size, ox + (output_width * oy), filter_size, 1) =
-                            x.block((oy * stride + patch_y) * input_width + ox * stride, 0, filter_size, 1);
+                            x.block((((oy * stride) + patch_y) * input_width) + (ox * stride), 0, filter_size, 1);
                 }
             }
         }
@@ -136,6 +137,53 @@ public:
 
         // Return activations.
         return o_activations;
+    }
+
+    /*!
+     * Returns reconstruction from feature maps and filters
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputReconstruction(bool normalize_ = true) {
+
+        // Allocate memory.
+        lazyAllocateMatrixVector(o_reconstruction, 1, input_width, input_height);
+        conv2col->zeros();
+
+        mic::types::MatrixPtr<eT> o = s["y"];
+        mic::types::MatrixPtr<eT> w = p["W"];
+
+        //Reconstruct in im2col format
+        for(size_t i = 0 ; i < output_width * output_height ; i++){
+            for(size_t ker = 0 ; ker < nfilters ; ker++){
+//                // ReLU on the filters and feature maps
+//                mic::types::Matrix<eT> k ;
+//                k = w->row(ker);
+//                k = k.array().max(0.);
+//                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+//                        * k;
+                // No ReLU at all
+                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+                        * w->row(ker);
+            }
+        }
+
+        for(size_t x = 0 ; x < output_width ; x ++){
+            for(size_t y = 0 ; y < output_height ; y ++){
+                for(size_t ker = 0 ; ker < nfilters ; ker++){
+                    mic::types::Matrix<eT> temp;
+                    temp = conv2col->col(y + (x * output_height));
+                    temp.resize(filter_size, filter_size);
+                    o_reconstruction[0]->block(y * stride, x * stride, filter_size, filter_size) += temp;
+                }
+            }
+        }
+
+        //o_reconstruction[0]->transpose();
+        // Normalize.
+        if (normalize_)
+            normalizeMatrixForVisualization(o_reconstruction[0]);
+
+        // Return reconstruction
+        return o_reconstruction;
     }
 
     /*!
@@ -197,6 +245,7 @@ protected:
     // Vector of channels, Each containing a vector of filters
     std::vector<std::vector<mic::types::Matrix<eT> > > W;
     mic::types::MatrixPtr<eT> x2col;
+    mic::types::MatrixPtr<eT> conv2col;
 
 private:
     // Friend class - required for using boost serialization.
@@ -205,6 +254,7 @@ private:
     /// Vector containing activations of neurons.
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_activations;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_activations;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_reconstruction;
 
     /*!
      * Private constructor, used only during the serialization.

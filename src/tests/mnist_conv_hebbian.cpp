@@ -42,6 +42,7 @@ WindowGrayscaleBatch<double>* w_input;
 WindowGrayscaleBatch<double>* w_weights1;
 
 WindowGrayscaleBatch<double>* w_output;
+WindowGrayscaleBatch<double>* w_reconstruction;
 
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter<double>* importer;
@@ -57,7 +58,8 @@ const size_t patch_size = 28;
 const size_t batch_size = 1;
 const size_t input_channels = 1;
 const size_t filter_size[] = {7};
-const size_t filters[] = {20};
+const size_t filters[] = {16};
+const size_t stride[] = {3};
 
 
 /*!
@@ -71,7 +73,7 @@ void batch_function (void) {
     } else {*/
         {
         // Create a simple hebbian network.
-        neural_net.pushLayer(new ConvHebbian<double>(patch_size, patch_size, input_channels, filters[0], filter_size[0], 1));
+        neural_net.pushLayer(new ConvHebbian<double>(patch_size, patch_size, input_channels, filters[0], filter_size[0], stride[0]));
 
         LOG(LINFO) << "Generated new neural network";
     }//: else
@@ -114,9 +116,10 @@ void batch_function (void) {
                 if (iteration % 10 == 0) {
                     //Visualize the weights.
                     // Set batch to be displayed.
-                    w_input->setBatchDataUnsynchronized(bt.data());
+                    w_input->setBatchDataUnsynchronized(layer1->getInputActivations());
                     w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
                     w_output->setBatchDataUnsynchronized(layer1->getOutputActivations());
+                    w_reconstruction->setBatchDataUnsynchronized(layer1->getOutputReconstruction());
                     LOG(LINFO) << "Iteration: " << iteration;
                 }//: if
 
@@ -178,6 +181,7 @@ int main(int argc, char* argv[]) {
     w_input = new WindowGrayscaleBatch<double>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
     w_weights1 = new WindowGrayscaleBatch<double>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+250, 0, 250, 250);
     w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(2*250), 0, 250, 250);
+    w_reconstruction = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
 
     boost::thread batch_thread(boost::bind(&batch_function));
 
