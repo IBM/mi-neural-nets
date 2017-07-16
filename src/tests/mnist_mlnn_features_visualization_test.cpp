@@ -68,9 +68,13 @@ void batch_function (void) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
-			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
+			/*neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
 			neural_net.pushLayer(new Linear<float>(24, 24, 1, 10, 1, 1));
-			neural_net.pushLayer(new Softmax<float>(10));
+			neural_net.pushLayer(new Softmax<float>(10));*/
+
+			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
+			neural_net.pushLayer(new Linear<float>(24, 24, 1, 24, 24, 1));
+			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(24, 24, 1, 2));
 
 			if (!neural_net.verify())
 				exit(-1);
@@ -114,7 +118,7 @@ void batch_function (void) {
 				mic::types::MatrixXfPtr encoded_labels = label_encoder->encodeBatch(bt.labels());
 
 				// Train the autoencoder.
-				float loss = neural_net.train (encoded_batch, encoded_labels, 0.001, 0.0001);
+				float loss = neural_net.train (encoded_batch, encoded_batch, 0.001, 0.0001);
 
 				if (iteration%10 == 0) {
 
@@ -130,9 +134,9 @@ void batch_function (void) {
 					w_conv20->setBatchUnsynchronized(lin1->getInverseWeightActivations());
 					w_conv21->setBatchUnsynchronized(lin1->getInverseOutputActivations());
 
-					std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(2);
+					/*std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(2);
 					w_conv34->setBatchUnsynchronized(sm1->getOutputActivations());
-					w_conv35->setBatchUnsynchronized(sm1->getOutputGradientActivations());
+					w_conv35->setBatchUnsynchronized(sm1->getOutputGradientActivations());*/
 
 					// Add data to chart window.
 					collector_ptr->addDataToContainer("Loss", loss);
@@ -201,7 +205,7 @@ int main(int argc, char* argv[]) {
 
 	w_conv20 = new WindowGrayscaleBatch<float>("Lin1 inverse neuron activation", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 336, 256, 256);
 	w_conv21 = new WindowGrayscaleBatch<float>("Lin1 inverse output activation", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 336, 256, 256);
-	w_conv22 = new WindowGrayscaleBatch<float>("Conv2 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 336, 256, 256);
+	/*w_conv22 = new WindowGrayscaleBatch<float>("Conv2 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 336, 256, 256);
 	w_conv23 = new WindowGrayscaleBatch<float>("Conv2 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 336, 256, 256);
 	w_conv24 = new WindowGrayscaleBatch<float>("Conv2 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 336, 256, 256);
 	w_conv25 = new WindowGrayscaleBatch<float>("Conv2 dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 336, 256, 256);
@@ -211,7 +215,7 @@ int main(int argc, char* argv[]) {
 	w_conv32 = new WindowGrayscaleBatch<float>("L1 W", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 562, 622, 256, 256);
 	w_conv33 = new WindowGrayscaleBatch<float>("L1 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 622, 256, 256);
 	w_conv34 = new WindowGrayscaleBatch<float>("SM y", WindowGrayscaleBatch<float>::Norm_None, WindowGrayscaleBatch<float>::Grid_Both, 1074, 622, 256, 256);
-	w_conv35 = new WindowGrayscaleBatch<float>("SM dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 622, 256, 256);
+	w_conv35 = new WindowGrayscaleBatch<float>("SM dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 622, 256, 256);*/
 
 	// Chart.
 	w_chart = new WindowCollectorChart<float>("Statistics", 60, 878, 512, 256);

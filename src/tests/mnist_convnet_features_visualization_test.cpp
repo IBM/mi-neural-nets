@@ -35,7 +35,7 @@ using namespace mic::mlnn;
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
 /// Windows for displaying activations.
-WindowGrayscaleBatch<float> *w_conv10, *w_conv11, *w_conv12, *w_conv13, *w_conv14, *w_conv15;
+WindowGrayscaleBatch<float> *w_conv10, *w_conv11, *w_conv12, *w_conv13, *w_conv14, *w_conv15, *w_conv16;
 WindowGrayscaleBatch<float> *w_conv20, *w_conv21, *w_conv22, *w_conv23, *w_conv24, *w_conv25;
 WindowGrayscaleBatch<float> *w_conv30, *w_conv31, *w_conv32, *w_conv33, *w_conv34, *w_conv35;
 /// Window for displaying chart with statistics.
@@ -54,7 +54,7 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 /// Label 2 matrix encoder (1 hot).
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
-const size_t batch_size = 9;
+const size_t batch_size = 1;
 const char* fileName = "nn_autoencoder_weights_visualization.txt";
 
 
@@ -68,10 +68,8 @@ void batch_function (void) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
-//			neural_net.pushLayer(new mic::mlnn::convolution::Padding<float>(24, 24, 1, 1));
-
 			neural_net.pushLayer(new mic::mlnn::convolution::Cropping<float>(28, 28, 1, 2));
-	/*		neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 1, 9, 5, 1));
+			neural_net.pushLayer(new mic::mlnn::convolution::Convolution<float>(24, 24, 1, 9, 5, 1));
 			neural_net.pushLayer(new ELU<float>(20, 20, 9));
 			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(20, 20, 9, 2));
 
@@ -80,9 +78,6 @@ void batch_function (void) {
 			neural_net.pushLayer(new mic::mlnn::convolution::MaxPooling<float>(4, 4, 16, 2));
 
 			neural_net.pushLayer(new Linear<float>(2, 2, 16, 10, 1, 1));
-			neural_net.pushLayer(new Softmax<float>(10));*/
-
-			neural_net.pushLayer(new Linear<float>(24, 24, 1, 10, 1, 1));
 			neural_net.pushLayer(new Softmax<float>(10));
 
 			if (!neural_net.verify())
@@ -148,7 +143,7 @@ void batch_function (void) {
 					// Visualize the weights.
 					//std::shared_ptr<Layer<float> > layer1 = neural_net.getLayer(3);
 
-/*					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
+					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv1 =
 							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(1);
 					w_conv10->setBatchUnsynchronized(conv1->getInputActivations());
 					w_conv11->setBatchUnsynchronized(conv1->getInputGradientActivations());
@@ -156,6 +151,25 @@ void batch_function (void) {
 					w_conv13->setBatchUnsynchronized(conv1->getWeightGradientActivations());
 					w_conv14->setBatchUnsynchronized(conv1->getOutputActivations());
 					w_conv15->setBatchUnsynchronized(conv1->getOutputGradientActivations());
+
+					// Similarity.
+					mic::types::MatrixPtr<float> similarity = conv1->getFilterSimilarityMatrix();
+					w_conv16->setSampleUnsynchronized(similarity);
+
+					float max_similarity = 0;
+					float mean_similarity = 0;
+					for (size_t i=0; i<9; i++)
+						for (size_t j=0; j<i; j++) {
+							std::string label = "Similarity " + std::to_string(i) + "-" +std::to_string(j);
+							collector_ptr->addDataToContainer(label, (*similarity)(i,j));
+							mean_similarity += (*similarity)(i,j);
+							max_similarity = ((*similarity)(i,j) > max_similarity) ? (*similarity)(i,j) : max_similarity;
+						}//: for
+
+					collector_ptr->addDataToContainer("Similarity max", max_similarity);
+					mean_similarity /= (1+2+3+4+5+6+7+8);
+					collector_ptr->addDataToContainer("Similarity mean", mean_similarity);
+
 
 					std::shared_ptr<mic::mlnn::convolution::Convolution<float> > conv2 =
 							neural_net.getLayer<mic::mlnn::convolution::Convolution<float> >(4);
@@ -175,28 +189,12 @@ void batch_function (void) {
 
 					std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(7);
 					w_conv34->setBatchUnsynchronized(sm1->getOutputActivations());
-					w_conv35->setBatchUnsynchronized(sm1->getOutputGradientActivations());*/
-
-					std::shared_ptr<mic::mlnn::fully_connected::Linear<float> > lin1 =
-							neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(1);
-					w_conv10->setBatchUnsynchronized(lin1->getInputActivations());
-					w_conv11->setBatchUnsynchronized(lin1->getInputGradientActivations());
-					w_conv12->setBatchUnsynchronized(lin1->getWeightActivations());
-					w_conv13->setBatchUnsynchronized(lin1->getWeightGradientActivations());
-					w_conv14->setBatchUnsynchronized(lin1->getOutputActivations());
-					w_conv15->setBatchUnsynchronized(lin1->getOutputGradientActivations());
-
-					w_conv20->setBatchUnsynchronized(lin1->getInverseWeightActivations());
-					w_conv21->setBatchUnsynchronized(lin1->getInverseOutputActivations());
-
-					std::shared_ptr<Layer<float> > sm1 = neural_net.getLayer(2);
-					w_conv34->setBatchUnsynchronized(sm1->getOutputActivations());
 					w_conv35->setBatchUnsynchronized(sm1->getOutputGradientActivations());
 
 					// Add data to chart window.
 					collector_ptr->addDataToContainer("Loss", loss);
-					float reconstruction_error = neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(1)->calculateMeanReconstructionError();
-					collector_ptr->addDataToContainer("Reconstruction Error", reconstruction_error);
+					//float reconstruction_error = neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(1)->calculateMeanReconstructionError();
+					//collector_ptr->addDataToContainer("Reconstruction Error", reconstruction_error);
 				}//: if
 
 				iteration++;
@@ -257,6 +255,7 @@ int main(int argc, char* argv[]) {
 	w_conv13 = new WindowGrayscaleBatch<float>("Conv1 dW", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 818, 50, 256, 256);
 	w_conv14 = new WindowGrayscaleBatch<float>("Conv1 y", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1074, 50, 256, 256);
 	w_conv15 = new WindowGrayscaleBatch<float>("Conv1 dy", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1330, 50, 256, 256);
+	w_conv16 = new WindowGrayscaleBatch<float>("Conv1 similarity", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 1586, 50, 256, 256);
 
 	w_conv20 = new WindowGrayscaleBatch<float>("Conv2 x", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 50, 336, 256, 256);
 	w_conv21 = new WindowGrayscaleBatch<float>("Conv2 dx", WindowGrayscaleBatch<float>::Norm_HotCold, WindowGrayscaleBatch<float>::Grid_Both, 316, 336, 256, 256);
@@ -278,8 +277,15 @@ int main(int argc, char* argv[]) {
 	w_chart->setDataCollectorPtr(collector_ptr);
 
 	// Create data containers.
-	collector_ptr->createContainer("Loss", mic::types::color_rgba(255, 0, 0, 180));
-	collector_ptr->createContainer("Reconstruction Error", mic::types::color_rgba(255, 255, 255, 180));
+	collector_ptr->createContainer("Loss", mic::types::color_rgba(0, 100, 0, 180));
+	//collector_ptr->createContainer("Reconstruction Error", mic::types::color_rgba(255, 255, 255, 180));
+	collector_ptr->createContainer("Similarity max", mic::types::color_rgba(255, 0, 0, 180));
+	collector_ptr->createContainer("Similarity mean", mic::types::color_rgba(0, 0, 255, 180));
+	for (size_t i=0; i<9; i++)
+		for (size_t j=0; j<i; j++) {
+			std::string label = "Similarity " + std::to_string(i) + "-" +std::to_string(j);
+			collector_ptr->createContainer(label, mic::types::color_rgba(255*(9*i+j)/81, 255*(9*i+j)/81, 255*(9*i+j)/81, 180));
+		}
 
 	boost::thread batch_thread(boost::bind(&batch_function));
 

@@ -123,15 +123,6 @@ public:
 			m.add ("yc"+std::to_string(fi), output_height, output_width);
 		}//: for
 
-/*		// Allocate memory for "gradient x channel".
-		m.add ("xc", input_height, input_width);
-
-		// Allocate memory for "gradient x sample".
-		m.add ("xs", input_channels * input_height * input_width, 1);
-
-		// Allocate memory for "gradient y sample".
-		m.add ("ys", number_of_filters * output_height * output_width, 1);*/
-
 		// Allocate (temporary) memory for "inverse input receptive fields" - used in backpropagation.
 		for (size_t ry=0; ry< filter_size; ry++) {
 			for (size_t rx=0; rx< filter_size; rx++) {
@@ -139,6 +130,9 @@ public:
 				m.add ("ixrf"+std::to_string(ry)+"x"+std::to_string(rx), output_height, output_width);
 			}//: for
 		}//: for
+
+		// Allocate memory for "filter similarity".
+		m.add ("fs", input_depth*output_depth, input_depth*output_depth);
 
 		// Set gradient descent as default optimization function.
 		Layer<eT>::template setOptimization<mic::neural_nets::optimization::GradientDescent<eT> > ();
@@ -722,6 +716,60 @@ public:
 		return irf_activations;
 	}
 
+	/*!
+	 * Returns a matrix containing filter similarities.
+	 * Note: in diagonal zeros.
+	 */
+	mic::types::MatrixPtr<eT> getFilterSimilarityMatrix() {
+		// Get filter similarity matrix.
+		mic::types::MatrixPtr<eT> fs = m["fs"];
+		// Reset.
+		fs->zeros();
+
+		// Iterate through filters.
+		for (size_t fi=0; fi< output_depth; fi++) {
+			// A given filter (neuron layer) has in fact connection to all input channels.
+			for (size_t ic=0; ic< input_depth; ic++) {
+				// Get i-th filter.
+				mic::types::MatrixPtr<eT> iW = p["W"+std::to_string(fi)+"x"+std::to_string(ic)];
+				// Calculate index.
+				size_t i = fi*input_depth + ic;
+
+				for (size_t fj=0; fj < fi; fj++) {
+					// A given filter (neuron layer) has in fact connection to all input channels.
+					for (size_t jc=0; jc< input_depth; jc++) {
+						// Get j-th filter.
+						mic::types::MatrixPtr<eT> jW = p["W"+std::to_string(fj)+"x"+std::to_string(jc)];
+						// Calculate index.
+						size_t j = fj*input_depth + jc;
+
+						// Calculate the similarity - absolute value!
+						//(*fs)(j, i) =
+						(*fs)(i, j) = cosineSimilarity(iW->data(), jW->data(), filter_size*filter_size);
+					}
+				}// :for j
+			}
+		}//: for i
+		return fs;
+	}
+
+	/*!
+	 * Calculates the cosine similarity between two vectors/matrices.
+	 * \param A Pointer to a memory with the first vector.
+	 * \param B Pointer to a memory with the second vector.
+	 * \param length_ Length of (both) vector(s).
+	 */
+	eT cosineSimilarity(eT *A, eT *B, size_t length_)
+	{
+		eT dot = 0.0, denom_a = 0.0, denom_b = 0.0 ;
+	     for(size_t i = 0; i < length_; ++i) {
+	        dot += A[i] * B[i] ;
+	        denom_a += A[i] * A[i] ;
+	        denom_b += B[i] * B[i] ;
+	    }
+	    return dot / (sqrt(denom_a) * sqrt(denom_b)) ;
+	}
+
 
 	// Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
 	using Layer<eT>::forward;
@@ -758,16 +806,16 @@ private:
 	template<typename tmp> friend class MultiLayerNeuralNetwork;
 
 	/// Vector containing activations of weights/filters.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
+	std::vector<mic::types::MatrixPtr<eT> > w_activations;
 
 	/// Vector containing activations of gradients of weights (dW).
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > dw_activations;
+	std::vector<mic::types::MatrixPtr<eT> > dw_activations;
 
 	/// Vector containing receptive fields.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > xrf_activations;
+	std::vector<mic::types::MatrixPtr<eT> > xrf_activations;
 
 	/// Vector containing inverse receptive fields.
-	std::vector< std::shared_ptr <mic::types::MatrixXf> > irf_activations;
+	std::vector<mic::types::MatrixPtr<eT> > irf_activations;
 
 	/*!
 	 * Private constructor, used only during the serialization.
