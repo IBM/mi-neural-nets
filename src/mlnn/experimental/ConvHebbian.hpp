@@ -154,12 +154,12 @@ public:
         //Reconstruct in im2col format
         for(size_t i = 0 ; i < output_width * output_height ; i++){
             for(size_t ker = 0 ; ker < nfilters ; ker++){
-//                // ReLU on the filters and feature maps
-//                mic::types::Matrix<eT> k ;
-//                k = w->row(ker);
-//                k = k.array().max(0.);
-//                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
-//                        * k;
+                //                // ReLU on the filters and feature maps
+                //                mic::types::Matrix<eT> k ;
+                //                k = w->row(ker);
+                //                k = k.array().max(0.);
+                //                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+                //                        * k;
                 // No ReLU at all
                 conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
                         * w->row(ker);
@@ -214,6 +214,36 @@ public:
         return w_activations;
     }
 
+    /*!
+     * Returns activations of weights.
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity(bool normalize_ = true) {
+
+        // Allocate memory.
+        lazyAllocateMatrixVector(w_similarity, 1, nfilters * nfilters, 1);
+
+        mic::types::MatrixPtr<eT> W = p["W"];
+        mic::types::MatrixPtr<eT> row = w_similarity[0];
+
+        // Iterate through "neurons" and generate "activation image" for each one.
+        for (size_t i = 0 ; i < nfilters ; i++) {
+            for(size_t j = 0 ; j < nfilters ; j++){
+                // Compute cosine similarity between filter i and j
+                (*row)(j + (nfilters * i)) = std::abs(W->row(j).dot(W->row(i)));
+                (*row)(j + (nfilters * i)) /= W->row(i).norm() * W->row(j).norm();
+            }
+        }
+
+        row->resize(nfilters, nfilters);
+
+        // Normalize.
+        if (normalize_)
+            normalizeMatrixForVisualization(row);
+
+        // Return activations.
+        return w_similarity;
+    }
+
 
     // Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
     using Layer<eT>::forward;
@@ -255,7 +285,7 @@ private:
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_activations;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_activations;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_reconstruction;
-
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_similarity;
     /*!
      * Private constructor, used only during the serialization.
      */

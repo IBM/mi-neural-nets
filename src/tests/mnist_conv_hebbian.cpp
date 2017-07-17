@@ -43,6 +43,7 @@ WindowGrayscaleBatch<double>* w_weights1;
 
 WindowGrayscaleBatch<double>* w_output;
 WindowGrayscaleBatch<double>* w_reconstruction;
+WindowGrayscaleBatch<double>* w_similarity;
 
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter<double>* importer;
@@ -59,7 +60,7 @@ const size_t batch_size = 1;
 const size_t input_channels = 1;
 const size_t filter_size[] = {7};
 const size_t filters[] = {16};
-const size_t stride[] = {3};
+const size_t stride[] = {1};
 
 
 /*!
@@ -118,6 +119,7 @@ void batch_function (void) {
                     // Set batch to be displayed.
                     w_input->setBatchDataUnsynchronized(layer1->getInputActivations());
                     w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
+                    w_similarity->setBatchDataUnsynchronized(layer1->getWeightSimilarity(true));
                     w_output->setBatchDataUnsynchronized(layer1->getOutputActivations());
                     w_reconstruction->setBatchDataUnsynchronized(layer1->getOutputReconstruction());
                     LOG(LINFO) << "Iteration: " << iteration;
@@ -180,8 +182,9 @@ int main(int argc, char* argv[]) {
     // Create batch visualization window.
     w_input = new WindowGrayscaleBatch<double>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
     w_weights1 = new WindowGrayscaleBatch<double>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+250, 0, 250, 250);
-    w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(2*250), 0, 250, 250);
-    w_reconstruction = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
+    w_similarity = new WindowGrayscaleBatch<double>("Cosine similarity matrix", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(2*250), 0, 250, 250);
+    w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
+    w_reconstruction = new WindowGrayscaleBatch<double>("Reconstruction", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(4*250), 0, 250, 250);
 
     boost::thread batch_thread(boost::bind(&batch_function));
 
