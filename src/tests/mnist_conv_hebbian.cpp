@@ -119,7 +119,7 @@ void batch_function (void) {
                     // Set batch to be displayed.
                     w_input->setBatchDataUnsynchronized(layer1->getInputActivations());
                     w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
-                    w_similarity->setBatchDataUnsynchronized(layer1->getWeightSimilarity(true));
+                    w_similarity->setBatchDataUnsynchronized(layer1->getWeightSimilarity());
                     w_output->setBatchDataUnsynchronized(layer1->getOutputActivations());
                     w_reconstruction->setBatchDataUnsynchronized(layer1->getOutputReconstruction());
                     LOG(LINFO) << "Iteration: " << iteration;

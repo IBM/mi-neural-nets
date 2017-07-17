@@ -114,7 +114,7 @@ public:
     /*!
      * Returns activations of weights.
      */
-    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations(bool normalize_ = true) {
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations() {
 
         // Allocate memory.
         lazyAllocateMatrixVector(o_activations, nfilters, output_height * output_width, 1);
@@ -130,9 +130,6 @@ public:
             // Resize row.
             row->resize(output_width, output_height);
 
-            // Normalize.
-            if (normalize_)
-                normalizeMatrixForVisualization(row);
         }//: for filters
 
         // Return activations.
@@ -142,10 +139,11 @@ public:
     /*!
      * Returns reconstruction from feature maps and filters
      */
-    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputReconstruction(bool normalize_ = true) {
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputReconstruction() {
 
         // Allocate memory.
         lazyAllocateMatrixVector(o_reconstruction, 1, input_width, input_height);
+        o_reconstruction[0]->zeros();
         conv2col->zeros();
 
         mic::types::MatrixPtr<eT> o = s["y"];
@@ -178,9 +176,6 @@ public:
         }
 
         //o_reconstruction[0]->transpose();
-        // Normalize.
-        if (normalize_)
-            normalizeMatrixForVisualization(o_reconstruction[0]);
 
         // Return reconstruction
         return o_reconstruction;
@@ -189,7 +184,7 @@ public:
     /*!
      * Returns activations of weights.
      */
-    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations() {
 
         // Allocate memory.
         lazyAllocateMatrixVector(w_activations, nfilters, filter_size*filter_size, 1);
@@ -205,9 +200,6 @@ public:
             // Resize row.
             row->resize(filter_size, filter_size);
 
-            // Normalize.
-            if (normalize_)
-                normalizeMatrixForVisualization(row);
         }//: for filters
 
         // Return activations.
@@ -217,7 +209,7 @@ public:
     /*!
      * Returns activations of weights.
      */
-    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity(bool normalize_ = true) {
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity() {
 
         // Allocate memory.
         lazyAllocateMatrixVector(w_similarity, 1, nfilters * nfilters, 1);
@@ -235,10 +227,6 @@ public:
         }
 
         row->resize(nfilters, nfilters);
-
-        // Normalize.
-        if (normalize_)
-            normalizeMatrixForVisualization(row);
 
         // Return activations.
         return w_similarity;
@@ -267,7 +255,6 @@ protected:
 
     // Uncover methods useful in visualization.
     using Layer<eT>::lazyAllocateMatrixVector;
-    using Layer<eT>::normalizeMatrixForVisualization;
 
     size_t nfilters = 0;
     size_t filter_size = 0;
