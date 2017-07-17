@@ -41,7 +41,7 @@ WindowGrayscaleBatch<float>* w_weights1;
 WindowGrayscaleBatch<float>* w_weights2;
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter* importer;
+mic::data_io::MNISTMatrixImporter<float>* importer;
 /// Multi-layer neural network.
 HebbianNeuralNetwork<float> neural_net;
 
@@ -87,7 +87,7 @@ void batch_function (void) {
 				APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
 				// Retrieve the next minibatch.
-				mic::types::MNISTBatch bt = importer->getRandomBatch();
+				mic::types::MNISTBatch<float> bt = importer->getRandomBatch();
 
 				// Set batch to be displayed.
 				w_input->setBatchUnsynchronized(bt.data());
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 	APP_STATE;
 
 	// Load dataset.
-	importer = new mic::data_io::MNISTMatrixImporter();
+	importer = new mic::data_io::MNISTMatrixImporter<float>();
 	importer->setBatchSize(batch_size);
 
 	// Initialize the encoders.

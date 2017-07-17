@@ -28,7 +28,7 @@ using namespace mic::opengl::visualization;
 /// Window for displaying the MNIST batch.
 WindowGrayscaleBatch<float>* w_batch;
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter* importer;
+mic::data_io::MNISTMatrixImporter<float>* importer;
 
 
 /*!
@@ -50,7 +50,7 @@ void batch_function (void) {
 				APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
 				// Retrieve the next minibatch.
-				mic::types::MNISTBatch bt = importer->getNextBatch();
+				mic::types::MNISTBatch<float> bt = importer->getNextBatch();
 
 				// Set batch to be displayed.
 				w_batch->setBatchUnsynchronized(bt.data());
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 	APP_STATE;
 
 	// Load dataset.
-	importer = new mic::data_io::MNISTMatrixImporter();
+	importer = new mic::data_io::MNISTMatrixImporter<float>();
 	importer->setBatchSize(100);
 
 	// Set parameters of all property-tree derived objects - USER independent part.

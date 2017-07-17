@@ -30,24 +30,28 @@ using namespace mic::opengl::visualization;
 using namespace mic::mlnn;
 
 // Encoders.
-#include <encoders/MatrixXfMatrixXfEncoder.hpp>
-#include <encoders/UIntMatrixXfEncoder.hpp>
+#include <encoders/ColMatrixEncoder.hpp>
+#include <encoders/UIntMatrixEncoder.hpp>
 
 #include <mlnn/experimental/ConvHebbian.hpp>
 using namespace mic::mlnn::experimental;
 
 /// Window for displaying the MNIST batch.
-WindowGrayscaleBatch<float>* w_input;
+WindowGrayscaleBatch<double>* w_input;
 /// Window for displaying the weights.
-WindowGrayscaleBatch<float>* w_weights1;
+WindowGrayscaleBatch<double>* w_weights1;
+
+WindowGrayscaleBatch<double>* w_output;
+WindowGrayscaleBatch<double>* w_reconstruction;
+WindowGrayscaleBatch<double>* w_similarity;
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter* importer;
+mic::data_io::MNISTMatrixImporter<double>* importer;
 /// Multi-layer neural network.
-HebbianNeuralNetwork<float> neural_net;
+HebbianNeuralNetwork<double> neural_net;
 
 /// MNIST matrix encoder.
-mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
+mic::encoders::ColMatrixEncoder<double>* mnist_encoder;
 /// Label 2 matrix encoder (1 hot).
 //mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
@@ -55,7 +59,8 @@ const size_t patch_size = 28;
 const size_t batch_size = 1;
 const size_t input_channels = 1;
 const size_t filter_size[] = {7};
-const size_t filters[] = {20};
+const size_t filters[] = {16};
+const size_t stride[] = {1};
 
 
 /*!
@@ -69,15 +74,18 @@ void batch_function (void) {
     } else {*/
         {
         // Create a simple hebbian network.
-        neural_net.pushLayer(new ConvHebbian<float>(patch_size, patch_size, input_channels, filters[0], filter_size[0], 1));
+        neural_net.pushLayer(new ConvHebbian<double>(patch_size, patch_size, input_channels, filters[0], filter_size[0], stride[0]));
 
         LOG(LINFO) << "Generated new neural network";
     }//: else
 
+    std::shared_ptr<mic::mlnn::experimental::ConvHebbian<double> > layer1 =
+            neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<double> >(0);
+
     size_t iteration = 0;
     // Set training parameters.
-    const float learning_rate = 0.1;
-    const float weight_decay = 0.0;
+    const double learning_rate = 5e-3;
+    const double weight_decay = 0.0;
     const size_t iterations = importer->size() / batch_size;
     const size_t samples = 2000;
 
@@ -96,28 +104,28 @@ void batch_function (void) {
                 APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
                 // Retrieve the next minibatch.
-                mic::types::MNISTBatch bt = importer->getRandomBatch();
-
-                // Set batch to be displayed.
-                w_input->setBatchUnsynchronized(bt.data());
+                mic::types::MNISTBatch<double> bt = importer->getRandomBatch();
 
                 // Encode data.
-                mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
+                mic::types::MatrixPtr<double> encoded_batch = mnist_encoder->encodeBatch(bt.data());
 
-                MNISTBatch next_batch = importer->getNextBatch();
+                MNISTBatch<double> next_batch = importer->getNextBatch();
                 encoded_batch  = mnist_encoder->encodeBatch(next_batch.data());
 
                 neural_net.train(encoded_batch, learning_rate);
 
-                //if (iteration % 10 == 0) {
+                if (iteration % 10 == 0) {
                     //Visualize the weights.
-                    std::shared_ptr<mic::mlnn::experimental::ConvHebbian<float> > layer1 =
-                            neural_net.getLayer<mic::mlnn::experimental::ConvHebbian<float> >(0);
+                    // Set batch to be displayed.
+                    w_input->setBatchUnsynchronized(layer1->getInputActivations());
                     w_weights1->setBatchUnsynchronized(layer1->getWeightActivations());
-                //}//: if
+                    w_similarity->setBatchUnsynchronized(layer1->getWeightSimilarity());
+                    w_output->setBatchUnsynchronized(layer1->getOutputActivations());
+                    w_reconstruction->setBatchUnsynchronized(layer1->getOutputReconstruction());
+                    LOG(LINFO) << "Iteration: " << iteration;
+                }//: if
 
                 iteration++;
-                LOG(LINFO) << "Iteration: " << iteration;
             }//: end of critical section
 
         }//: if
@@ -149,13 +157,13 @@ int main(int argc, char* argv[]) {
     APP_STATE;
 
     // Load dataset.
-    importer = new mic::data_io::MNISTMatrixImporter();
+    importer = new mic::data_io::MNISTMatrixImporter<double>();
     importer->setDataFilename("../data/mnist/train-images.idx3-ubyte");
     importer->setLabelsFilename("../data/mnist/train-labels.idx1-ubyte");
     importer->setBatchSize(batch_size);
 
     // Initialize the encoders.
-    mnist_encoder = new mic::encoders::MatrixXfMatrixXfEncoder(patch_size, patch_size);
+    mnist_encoder = new mic::encoders::ColMatrixEncoder<double>(patch_size, patch_size);
     //label_encoder = new mic::encoders::UIntMatrixXfEncoder(batch_size);
 
     // Set parameters of all property-tree derived objects - USER independent part.
@@ -172,8 +180,11 @@ int main(int argc, char* argv[]) {
     VGL_MANAGER->initializeGLUT(argc, argv);
 
     // Create batch visualization window.
-    w_input = new WindowGrayscaleBatch<float>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
-    w_weights1 = new WindowGrayscaleBatch<float>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 320, 0, 250, 250);
+    w_input = new WindowGrayscaleBatch<double>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
+    w_weights1 = new WindowGrayscaleBatch<double>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+250, 0, 250, 250);
+    w_similarity = new WindowGrayscaleBatch<double>("Cosine similarity matrix", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(2*250), 0, 250, 250);
+    w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
+    w_reconstruction = new WindowGrayscaleBatch<double>("Reconstruction", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(4*250), 0, 250, 250);
 
     boost::thread batch_thread(boost::bind(&batch_function));
 

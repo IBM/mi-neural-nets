@@ -32,11 +32,12 @@ public:
      * @param name_ Name of the layer.
      */
     ConvHebbian<eT>(size_t input_width, size_t input_height, size_t input_depth, size_t nfilters, size_t filter_size, size_t stride = 1, std::string name_ = "ConvHebbian") :
+        Layer<eT>(input_height, input_width, input_depth, (input_height - filter_size) / stride, (input_width - filter_size) / stride, 1, LayerTypes::ConvHebbian, name_),
         nfilters(nfilters),
         filter_size(filter_size),
         stride(stride),
-        Layer<eT>(input_height, input_width, input_depth, (input_height / stride) - filter_size, (input_width / stride) - filter_size, 1, LayerTypes::ConvHebbian, name_),
-        x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
+        x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height)),
+        conv2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
     {
 
         // Create the weights matrix, each row is a filter kernel
@@ -48,11 +49,12 @@ public:
 
         // Initialize weights of all the columns of W.
         W->rand();
-        for(size_t i = 0 ; i < W->rows() ; i++) {
+        for(auto i = 0 ; i < W->rows() ; i++) {
             // Make the matrix Zero Sum
-            W->row(i).array() -= (W->row(i).sum() / W->row(i).cols());
-            // Normalize
-            W->row(i) /= W->row(i).squaredNorm();
+            W->row(i).array() -= W->row(i).sum() / W->row(i).cols();
+            if(W->row(i).norm() != 0){
+                W->row(i) = W->row(i).normalized();
+            }
         }
     }
 
@@ -81,7 +83,7 @@ public:
                 for(size_t patch_y = 0 ; patch_y < filter_size ; patch_y++){
                     // Copy each row of the image patch into appropriate position in x2col
                     x2col->block(patch_y * filter_size, ox + (output_width * oy), filter_size, 1) =
-                            x.block((oy * stride + patch_y) * input_width + ox * stride, 0, filter_size, 1);
+                            x.block((((oy * stride) + patch_y) * input_width) + (ox * stride), 0, filter_size, 1);
                 }
             }
         }
@@ -109,31 +111,125 @@ public:
 
 
 
-	/*!
-	 * Returns activations of weights.
-	 */
-	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations(bool normalize_ = true) {
+    /*!
+     * Returns activations of weights.
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputActivations() {
 
-		// Allocate memory.
-		lazyAllocateMatrixVector(w_activations, nfilters, filter_size*filter_size, 1);
+        // Allocate memory.
+        lazyAllocateMatrixVector(o_activations, nfilters, output_height * output_width, 1);
+
+        mic::types::MatrixPtr<eT> W = s["y"];
+
+        // Iterate through "neurons" and generate "activation image" for each one.
+        for (size_t i = 0 ; i < nfilters ; i++) {
+            // Get row.
+            mic::types::MatrixPtr<eT> row = o_activations[i];
+            // Copy data.
+            (*row) = W->row(i);
+            // Resize row.
+            row->resize(output_width, output_height);
+
+        }//: for filters
+
+        // Return activations.
+        return o_activations;
+    }
+
+    /*!
+     * Returns reconstruction from feature maps and filters
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getOutputReconstruction() {
+
+        // Allocate memory.
+        lazyAllocateMatrixVector(o_reconstruction, 1, input_width, input_height);
+        o_reconstruction[0]->zeros();
+        conv2col->zeros();
+
+        mic::types::MatrixPtr<eT> o = s["y"];
+        mic::types::MatrixPtr<eT> w = p["W"];
+
+        //Reconstruct in im2col format
+        for(size_t i = 0 ; i < output_width * output_height ; i++){
+            for(size_t ker = 0 ; ker < nfilters ; ker++){
+                //                // ReLU on the filters and feature maps
+                //                mic::types::Matrix<eT> k ;
+                //                k = w->row(ker);
+                //                k = k.array().max(0.);
+                //                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+                //                        * k;
+                // No ReLU at all
+                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+                        * w->row(ker);
+            }
+        }
+
+        for(size_t x = 0 ; x < output_width ; x ++){
+            for(size_t y = 0 ; y < output_height ; y ++){
+                for(size_t ker = 0 ; ker < nfilters ; ker++){
+                    mic::types::Matrix<eT> temp;
+                    temp = conv2col->col(y + (x * output_height));
+                    temp.resize(filter_size, filter_size);
+                    o_reconstruction[0]->block(y * stride, x * stride, filter_size, filter_size) += temp;
+                }
+            }
+        }
+
+        //o_reconstruction[0]->transpose();
+
+        // Return reconstruction
+        return o_reconstruction;
+    }
+
+    /*!
+     * Returns activations of weights.
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightActivations() {
+
+        // Allocate memory.
+        lazyAllocateMatrixVector(w_activations, nfilters, filter_size*filter_size, 1);
 
         mic::types::MatrixPtr<eT> W = p["W"];
 
         // Iterate through "neurons" and generate "activation image" for each one.
-        for (size_t i=0 ; i < nfilters ; i++) {
+        for (size_t i = 0 ; i < nfilters ; i++) {
             // Get row.
             mic::types::MatrixPtr<eT> row = w_activations[i];
             // Copy data.
             (*row) = W->row(i);
             // Resize row.
-            row->resize( filter_size, filter_size);
+            row->resize(filter_size, filter_size);
+        }//: for filters
 
-		}//: for filters
+        // Return activations.
+        return w_activations;
+    }
 
-		// Return activations.
-		return w_activations;
-	}
+    /*!
+     * Returns activations of weights.
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity() {
 
+        // Allocate memory.
+        lazyAllocateMatrixVector(w_similarity, 1, nfilters * nfilters, 1);
+
+        mic::types::MatrixPtr<eT> W = p["W"];
+        mic::types::MatrixPtr<eT> row = w_similarity[0];
+
+        // Iterate through "neurons" and generate "activation image" for each one.
+        for (size_t i = 0 ; i < nfilters ; i++) {
+            for(size_t j = 0 ; j < nfilters ; j++){
+                // Compute cosine similarity between filter i and j
+                (*row)(j + (nfilters * i)) = std::abs(W->row(j).dot(W->row(i)));
+                (*row)(j + (nfilters * i)) /= W->row(i).norm() * W->row(j).norm();
+            }
+        }
+
+        row->resize(nfilters, nfilters);
+
+        // Return activations.
+        return w_similarity;
+    }
 
 
     // Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
@@ -157,7 +253,7 @@ protected:
     using Layer<eT>::batch_size;
 
     // Uncover methods useful in visualization.
-	using Layer<eT>::lazyAllocateMatrixVector;
+    using Layer<eT>::lazyAllocateMatrixVector;
 
     size_t nfilters = 0;
     size_t filter_size = 0;
@@ -165,14 +261,17 @@ protected:
     // Vector of channels, Each containing a vector of filters
     std::vector<std::vector<mic::types::Matrix<eT> > > W;
     mic::types::MatrixPtr<eT> x2col;
+    mic::types::MatrixPtr<eT> conv2col;
 
 private:
     // Friend class - required for using boost serialization.
     template<typename tmp> friend class MultiLayerNeuralNetwork;
 
     /// Vector containing activations of neurons.
-    std::vector< std::shared_ptr <mic::types::MatrixXf> > w_activations;
-
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_activations;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_activations;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_reconstruction;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_similarity;
     /*!
      * Private constructor, used only during the serialization.
      */

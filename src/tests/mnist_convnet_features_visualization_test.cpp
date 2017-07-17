@@ -40,12 +40,12 @@ WindowGrayscaleBatch<float> *w_conv20, *w_conv21, *w_conv22, *w_conv23, *w_conv2
 WindowGrayscaleBatch<float> *w_conv30, *w_conv31, *w_conv32, *w_conv33, *w_conv34, *w_conv35;
 /// Window for displaying chart with statistics.
 WindowCollectorChart<float>* w_chart;
-/// Data collector .
+/// Data collector.
 mic::data_io::DataCollectorPtr<std::string, float> collector_ptr;
 
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter* importer;
+mic::data_io::MNISTMatrixImporter<float>* importer;
 /// Multi-layer neural network.
 BackpropagationNeuralNetwork<float> neural_net;
 
@@ -55,7 +55,8 @@ mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
 mic::encoders::UIntMatrixXfEncoder* label_encoder;
 
 const size_t batch_size = 1;
-const char* fileName = "nn_autoencoder_weights_visualization.txt";
+const char* convent_filename = "nn_convent.txt";
+const char* convnet_log = "nn_convent_log.csv";
 
 
 /*!
@@ -64,7 +65,7 @@ const char* fileName = "nn_autoencoder_weights_visualization.txt";
  */
 void batch_function (void) {
 
-/*	if (neural_net.load(fileName)) {
+/*	if (neural_net.load(convent_filename)) {
 		LOG(LINFO) << "Loaded neural network from a file";
 	} else {*/
 		{
@@ -115,7 +116,7 @@ void batch_function (void) {
 				APP_DATA_SYNCHRONIZATION_SCOPED_LOCK();
 
 				// Retrieve the next minibatch.
-				mic::types::MNISTBatch bt = importer->getRandomBatch();
+				mic::types::MNISTBatch<float> bt = importer->getRandomBatch();
 
 				// Encode data.
 				mic::types::MatrixXfPtr encoded_batch = mnist_encoder->encodeBatch(bt.data());
@@ -195,6 +196,9 @@ void batch_function (void) {
 					collector_ptr->addDataToContainer("Loss", loss);
 					//float reconstruction_error = neural_net.getLayer<mic::mlnn::fully_connected::Linear<float> >(1)->calculateMeanReconstructionError();
 					//collector_ptr->addDataToContainer("Reconstruction Error", reconstruction_error);
+
+					// Export to file.
+					collector_ptr->exportDataToCsv(convnet_log);
 				}//: if
 
 				iteration++;
@@ -232,7 +236,7 @@ int main(int argc, char* argv[]) {
 	APP_STATE;
 
 	// Load dataset.
-	importer = new mic::data_io::MNISTMatrixImporter();
+	importer = new mic::data_io::MNISTMatrixImporter<float>();
 	importer->setBatchSize(batch_size);
 
 	// Initialize the encoders.

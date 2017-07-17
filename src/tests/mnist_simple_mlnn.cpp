@@ -46,7 +46,7 @@ int main() {
 
 	//[60000, 784]
 	// Load the MNIST training...
-	mic::data_io::MNISTMatrixImporter training;
+	mic::data_io::MNISTMatrixImporter<float> training;
 	// Manually set paths. DEPRICATED! Used here only for simplification of the test.
 	training.setDataFilename("../data/mnist/train-images.idx3-ubyte");
 	training.setLabelsFilename("../data/mnist/train-labels.idx1-ubyte");
@@ -56,7 +56,7 @@ int main() {
 		return -1;
 
 	// ... and test datasets.
-	mic::data_io::MNISTMatrixImporter test;
+	mic::data_io::MNISTMatrixImporter<float> test;
 	// Manually set paths. DEPRICATED! Used here only for simplification of the test.
 	test.setDataFilename("../data/mnist/t10k-images.idx3-ubyte");
 	test.setLabelsFilename("../data/mnist/t10k-labels.idx1-ubyte");
@@ -79,7 +79,7 @@ int main() {
 		LOG(LINFO) << "Batch " << std::setw(4) << ii << "/" << std::setw(4) << iterations;
 
 		// Get random batch [784 x batch_size].
-		MNISTBatch rand_batch = training.getRandomBatch();
+		MNISTBatch<float> rand_batch = training.getRandomBatch();
 		encoded_batch  = mnist_encoder.encodeBatch(rand_batch.data());
 		encoded_targets  = label_encoder.encodeBatch(rand_batch.labels());
 
@@ -97,7 +97,7 @@ int main() {
 	while(!test.isLastBatch()) {
 
 		// Get next batch [784 x batch_size].
-		MNISTBatch next_batch = test.getNextBatch();
+		MNISTBatch<float> next_batch = test.getNextBatch();
 		encoded_batch  = mnist_encoder.encodeBatch(next_batch.data());
 		encoded_targets  = label_encoder.encodeBatch(next_batch.labels());
 
@@ -122,7 +122,7 @@ int main() {
 	while(!training.isLastBatch()) {
 
 		// Get next batch [784 x batch_size].
-		MNISTBatch next_batch = training.getNextBatch();
+		MNISTBatch<float> next_batch = training.getNextBatch();
 		encoded_batch  = mnist_encoder.encodeBatch(next_batch.data());
 		encoded_targets  = label_encoder.encodeBatch(next_batch.labels());
 

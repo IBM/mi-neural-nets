@@ -131,7 +131,7 @@ void MNISTPatchReconstructionApplication::initializePropertyDependentVariables()
 bool MNISTPatchReconstructionApplication::performLearningStep() {
 
 	// Random select sample from training dataset.
-	mic::types::MNISTSample sample = training_dataset_importer->getRandomSample();
+	mic::types::MNISTSample<float> sample = training_dataset_importer->getRandomSample();
 
 	// Copy sample data to input matrix - for visualization.
 	(*input_image) = (*sample.data());
@@ -158,7 +158,7 @@ bool MNISTPatchReconstructionApplication::performLearningStep() {
 
 void MNISTPatchReconstructionApplication::collectTestStatistics() {
 	// Random select sample from test dataset.
-	mic::types::MNISTSample sample = test_dataset_importer->getRandomSample();
+	mic::types::MNISTSample<float> sample = test_dataset_importer->getRandomSample();
 
 	// Copy sample data to input matrix - for visualization.
 	(*input_image) = (*sample.data());
