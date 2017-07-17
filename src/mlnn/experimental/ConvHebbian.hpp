@@ -199,7 +199,6 @@ public:
             (*row) = W->row(i);
             // Resize row.
             row->resize(filter_size, filter_size);
-
         }//: for filters
 
         // Return activations.
