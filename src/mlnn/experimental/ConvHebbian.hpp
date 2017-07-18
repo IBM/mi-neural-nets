@@ -206,7 +206,7 @@ public:
     }
 
     /*!
-     * Returns activations of weights.
+     * Returns similarity of filters.
      */
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity() {
 
@@ -220,7 +220,7 @@ public:
         for (size_t i = 0 ; i < nfilters ; i++) {
             for(size_t j = 0 ; j < nfilters ; j++){
                 // Compute cosine similarity between filter i and j
-                (*row)(j + (nfilters * i)) = std::abs(W->row(j).dot(W->row(i)));
+                (*row)(j + (nfilters * i)) = W->row(j).dot(W->row(i));
                 (*row)(j + (nfilters * i)) /= W->row(i).norm() * W->row(j).norm();
             }
         }
@@ -229,6 +229,34 @@ public:
 
         // Return activations.
         return w_similarity;
+    }
+
+    /*!
+     * Returns dissimilarity of filters.
+     */
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightDissimilarity() {
+
+        // Allocate memory.
+        lazyAllocateMatrixVector(w_dissimilarity, 1, nfilters * nfilters, 1);
+
+        mic::types::MatrixPtr<eT> W = p["W"];
+        mic::types::MatrixPtr<eT> row = w_dissimilarity[0];
+
+        // Iterate through "neurons" and generate "activation image" for each one.
+        for (size_t i = 0 ; i < nfilters ; i++) {
+            for(size_t j = 0 ; j < nfilters ; j++){
+                // Compute cosine similarity between filter i and j
+                (*row)(j + (nfilters * i)) = std::abs(W->row(j).dot(W->row(i)));
+                (*row)(j + (nfilters * i)) /= W->row(i).norm() * W->row(j).norm();
+                // Convert to sine
+                (*row)(j + (nfilters * i)) = std::sqrt(1 - std::pow((*row)(j + (nfilters * i)), 2));
+            }
+        }
+
+        row->resize(nfilters, nfilters);
+
+        // Return activations.
+        return w_dissimilarity;
     }
 
 
@@ -272,6 +300,7 @@ private:
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_activations;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_reconstruction;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_similarity;
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_dissimilarity;
     /*!
      * Private constructor, used only during the serialization.
      */
