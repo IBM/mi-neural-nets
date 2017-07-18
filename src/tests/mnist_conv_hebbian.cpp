@@ -118,12 +118,12 @@ void batch_function (void) {
                 if (iteration % 10 == 0) {
                     //Visualize the weights.
                     // Set batch to be displayed.
-                    w_input->setBatchDataUnsynchronized(layer1->getInputActivations());
-                    w_weights1->setBatchDataUnsynchronized(layer1->getWeightActivations());
-                    w_similarity->setBatchDataUnsynchronized(layer1->getWeightSimilarity());
-                    w_dissimilarity->setBatchDataUnsynchronized(layer1->getWeightDissimilarity());
-                    w_output->setBatchDataUnsynchronized(layer1->getOutputActivations());
-                    w_reconstruction->setBatchDataUnsynchronized(layer1->getOutputReconstruction());
+                    w_input->setBatchUnsynchronized(layer1->getInputActivations());
+                    w_weights1->setBatchUnsynchronized(layer1->getWeightActivations());
+                    w_similarity->setBatchUnsynchronized(layer1->getWeightSimilarity());
+                    w_dissimilarity->setBatchUnsynchronized(layer1->getWeightDissimilarity());
+                    w_output->setBatchUnsynchronized(layer1->getOutputActivations());
+                    w_reconstruction->setBatchUnsynchronized(layer1->getOutputReconstruction());
                     LOG(LINFO) << "Iteration: " << iteration;
                 }//: if
 

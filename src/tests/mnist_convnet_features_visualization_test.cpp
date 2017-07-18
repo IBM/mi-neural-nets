@@ -151,7 +151,7 @@ void batch_function (void) {
 					w_conv12->setBatchUnsynchronized(conv1->getWeightActivations());
 					w_conv13->setBatchUnsynchronized(conv1->getWeightGradientActivations());
 					w_conv14->setBatchUnsynchronized(conv1->getOutputActivations());
-					w_conv15->setBatchUnsynchronized(conv1->getOutputGradientActivations());
+                    w_conv15->setBatchUnsynchronized(conv1->getOutputGradientActivations());
 
 					// Similarity.
 					mic::types::MatrixPtr<float> similarity = conv1->getFilterSimilarityMatrix();
