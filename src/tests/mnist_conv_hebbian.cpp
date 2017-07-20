@@ -23,6 +23,8 @@ using namespace mic::logger;
 
 #include <opengl/visualization/WindowManager.hpp>
 #include <opengl/visualization/WindowGrayscaleBatch.hpp>
+#include <opengl/visualization/WindowCollectorChart.hpp>
+
 using namespace mic::opengl::visualization;
 
 // Hebbian neural net.
@@ -46,6 +48,10 @@ WindowGrayscaleBatch<double>* w_reconstruction;
 WindowGrayscaleBatch<double>* w_similarity;
 WindowGrayscaleBatch<double>* w_dissimilarity;
 
+/// Data collector.
+WindowCollectorChart<double>* w_chart;
+mic::data_io::DataCollectorPtr<std::string, double> collector_ptr;
+
 /// MNIST importer.
 mic::data_io::MNISTMatrixImporter<double>* importer;
 /// Multi-layer neural network.
@@ -59,8 +65,8 @@ mic::encoders::ColMatrixEncoder<double>* mnist_encoder;
 const size_t patch_size = 28;
 const size_t batch_size = 1;
 const size_t input_channels = 1;
-const size_t filter_size[] = {5};
-const size_t filters[] = {16};
+const size_t filter_size[] = {4};
+const size_t filters[] = {32};
 const size_t stride[] = {2};
 
 
@@ -127,6 +133,8 @@ void batch_function (void) {
                     LOG(LINFO) << "Iteration: " << iteration;
                 }//: if
 
+                collector_ptr->addDataToContainer("Reconstruction error", layer1->getOutputReconstructionError());
+
                 iteration++;
             }//: end of critical section
 
@@ -188,6 +196,14 @@ int main(int argc, char* argv[]) {
     w_dissimilarity = new WindowGrayscaleBatch<double>("Sine dissimilarity matrix", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
     w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(4*250), 0, 250, 250);
     w_reconstruction = new WindowGrayscaleBatch<double>("Reconstruction", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(5*250), 0, 250, 250);
+
+    // Chart.
+    w_chart = new WindowCollectorChart<double>("Statistics", 60, 878, 512, 256);
+    collector_ptr= std::make_shared < mic::data_io::DataCollector<std::string, double> >( );
+    w_chart->setDataCollectorPtr(collector_ptr);
+
+    // Create data containers.
+    collector_ptr->createContainer("Reconstruction error", mic::types::color_rgba(255, 255, 255, 180));
 
     boost::thread batch_thread(boost::bind(&batch_function));
 
