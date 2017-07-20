@@ -39,7 +39,6 @@ public:
         x2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height)),
         conv2col(new mic::types::Matrix<eT>(filter_size * filter_size, output_width * output_height))
     {
-
         // Create the weights matrix, each row is a filter kernel
         p.add("W", nfilters, filter_size * filter_size);
         mic::types::MatrixPtr<eT> W = p["W"];
@@ -89,6 +88,7 @@ public:
         }
         // Forward pass.
         (*y) = W * (*x2col);
+        o_reconstruction_updated = false;
         // ReLU
         //(*y) = (*y).cwiseMax(0);
     }
@@ -152,15 +152,14 @@ public:
         //Reconstruct in im2col format
         for(size_t i = 0 ; i < output_width * output_height ; i++){
             for(size_t ker = 0 ; ker < nfilters ; ker++){
-                //                // ReLU on the filters and feature maps
-                //                mic::types::Matrix<eT> k ;
-                //                k = w->row(ker);
-                //                k = k.array().max(0.);
-                //                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
-                //                        * k;
+                // ReLU on the filters and feature maps
+                mic::types::Matrix<eT> k;
+                k = (w->row(ker)).transpose();
+                k = k.array().max(0.);
+                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0) * k;
                 // No ReLU at all
-                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
-                        * w->row(ker);
+//                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+//                        * w->row(ker);
             }
         }
 
@@ -175,10 +174,27 @@ public:
             }
         }
 
-        //o_reconstruction[0]->transpose();
-
         // Return reconstruction
+        o_reconstruction_updated = true;
         return o_reconstruction;
+    }
+
+    /*!
+     * \brief getOutputReconstructionError
+     * \return Squared reconstruction error
+     * \details If the reconstruction hasn't been updated, will call getOutputReconstruction(). To avoid computing the reconstruction twice, remember to call getOutputReconstruction() first if you need it.
+     */
+    eT getOutputReconstructionError() {
+        if(!o_reconstruction_updated) {
+            getOutputReconstruction();
+        }
+
+        Eigen::Map<Eigen::Matrix<eT, Eigen::Dynamic, 1> > r(o_reconstruction[0]->data(), o_reconstruction[0]->size());
+
+        mic::types::Matrix<eT> diff;
+        diff = r.normalized() - (*s["x"]).normalized();
+        eT error = diff.squaredNorm();
+        return error;
     }
 
     /*!
@@ -259,6 +275,11 @@ public:
         return w_dissimilarity;
     }
 
+    /*!
+      * Returns mean value of dissimilarity.
+      */
+
+
 
     // Unhide the overloaded methods inherited from the template class Layer fields via "using" statement.
     using Layer<eT>::forward;
@@ -299,6 +320,7 @@ private:
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_activations;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_activations;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > o_reconstruction;
+    bool o_reconstruction_updated = false;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_similarity;
     std::vector< std::shared_ptr <mic::types::Matrix<eT> > > w_dissimilarity;
     /*!
