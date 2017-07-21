@@ -158,8 +158,8 @@ public:
                 k = k.array().max(0.);
                 conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0) * k;
                 // No ReLU at all
-//                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
-//                        * w->row(ker);
+                //                conv2col->col(i) += ((*o)(ker, i) > 0 ? (*o)(ker, i) : 0)
+                //                        * w->row(ker);
             }
         }
 
@@ -222,9 +222,11 @@ public:
     }
 
     /*!
-     * Returns similarity of filters.
+     * \brief Returns cosine similarity matrix of filters.
+     * \details Give only positive similarities above the diagonal, and negative ones below, else 0.
+     * @param fillDiagonal Fill the diagonal with alternating 1,-1 to 'calibrate' the visualization.
      */
-    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity() {
+    std::vector< std::shared_ptr <mic::types::Matrix<eT> > > & getWeightSimilarity(bool fillDiagonal = false) {
 
         // Allocate memory.
         lazyAllocateMatrixVector(w_similarity, 1, nfilters * nfilters, 1);
@@ -234,10 +236,21 @@ public:
 
         // Iterate through "neurons" and generate "activation image" for each one.
         for (size_t i = 0 ; i < nfilters ; i++) {
-            for(size_t j = 0 ; j < nfilters ; j++){
+            for(size_t j = 0 ; j < i ; j++) {
                 // Compute cosine similarity between filter i and j
-                (*row)(j + (nfilters * i)) = W->row(j).dot(W->row(i));
-                (*row)(j + (nfilters * i)) /= W->row(i).norm() * W->row(j).norm();
+                eT sim = W->row(j).dot(W->row(i));
+                sim /= W->row(i).norm() * W->row(j).norm();
+                if(sim > 0.)    // positive similarity above diagonal
+                    (*row)(j + (nfilters * i)) = sim;
+                else            // negative similarity below diagonal
+                    (*row)(i + (nfilters * j)) = sim;
+            }
+        }
+
+        if(fillDiagonal) {
+            // Fill diagonal with alternating 1,-1 to 'calibrate' visualization
+            for (size_t i = 0 ; i < nfilters ; i++) {
+                (*row)(i + (nfilters * i)) = 1 - (int)(2 * (i % 2));
             }
         }
 

@@ -46,7 +46,6 @@ WindowGrayscaleBatch<double>* w_weights1;
 WindowGrayscaleBatch<double>* w_output;
 WindowGrayscaleBatch<double>* w_reconstruction;
 WindowGrayscaleBatch<double>* w_similarity;
-WindowGrayscaleBatch<double>* w_dissimilarity;
 
 /// Data collector.
 WindowCollectorChart<double>* w_chart;
@@ -65,9 +64,9 @@ mic::encoders::ColMatrixEncoder<double>* mnist_encoder;
 const size_t patch_size = 28;
 const size_t batch_size = 1;
 const size_t input_channels = 1;
-const size_t filter_size[] = {4};
-const size_t filters[] = {32};
-const size_t stride[] = {2};
+const size_t filter_size[] = {5};
+const size_t filters[] = {16};
+const size_t stride[] = {1};
 
 
 /*!
@@ -92,10 +91,6 @@ void batch_function (void) {
     size_t iteration = 0;
     // Set training parameters.
     const double learning_rate = 5e-3;
-    const double weight_decay = 0.0;
-    const size_t iterations = importer->size() / batch_size;
-    const size_t samples = 2000;
-
 
     // Main application loop.
     while (!APP_STATE->Quit()) {
@@ -126,14 +121,12 @@ void batch_function (void) {
                     // Set batch to be displayed.
                     w_input->setBatchUnsynchronized(layer1->getInputActivations());
                     w_weights1->setBatchUnsynchronized(layer1->getWeightActivations());
-                    w_similarity->setBatchUnsynchronized(layer1->getWeightSimilarity());
-                    w_dissimilarity->setBatchUnsynchronized(layer1->getWeightDissimilarity());
+                    w_similarity->setBatchUnsynchronized(layer1->getWeightSimilarity(true));
                     w_output->setBatchUnsynchronized(layer1->getOutputActivations());
                     w_reconstruction->setBatchUnsynchronized(layer1->getOutputReconstruction());
+                    collector_ptr->addDataToContainer("Reconstruction error", layer1->getOutputReconstructionError());
                     LOG(LINFO) << "Iteration: " << iteration;
                 }//: if
-
-                collector_ptr->addDataToContainer("Reconstruction error", layer1->getOutputReconstructionError());
 
                 iteration++;
             }//: end of critical section
@@ -193,9 +186,8 @@ int main(int argc, char* argv[]) {
     w_input = new WindowGrayscaleBatch<double>("Input batch", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70, 0, 250, 250);
     w_weights1 = new WindowGrayscaleBatch<double>("Permanences", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+250, 0, 250, 250);
     w_similarity = new WindowGrayscaleBatch<double>("Cosine similarity matrix", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(2*250), 0, 250, 250);
-    w_dissimilarity = new WindowGrayscaleBatch<double>("Sine dissimilarity matrix", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
-    w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(4*250), 0, 250, 250);
-    w_reconstruction = new WindowGrayscaleBatch<double>("Reconstruction", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(5*250), 0, 250, 250);
+    w_output = new WindowGrayscaleBatch<double>("Output", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(3*250), 0, 250, 250);
+    w_reconstruction = new WindowGrayscaleBatch<double>("Reconstruction", Grayscale::Norm_HotCold, Grayscale::Grid_Both, 70+(4*250), 0, 250, 250);
 
     // Chart.
     w_chart = new WindowCollectorChart<double>("Statistics", 60, 878, 512, 256);
