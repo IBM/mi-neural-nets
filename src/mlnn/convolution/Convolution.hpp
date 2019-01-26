@@ -803,7 +803,7 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class mic::mlnn::MultiLayerNeuralNetwork;
 
 	/// Vector containing activations of weights/filters.
 	std::vector<mic::types::MatrixPtr<eT> > w_activations;

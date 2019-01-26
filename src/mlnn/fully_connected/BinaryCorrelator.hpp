@@ -185,8 +185,8 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp> friend class MultiLayerNeuralNetwork;
-	template<typename tmp> friend class HebbianNeuralNetwork;
+	template<typename tmp> friend class mic::mlnn::MultiLayerNeuralNetwork;
+	//template<typename tmp> friend class mic::mlnn::HebbianNeuralNetwork;
 
 	/// Vector containing activations of neurons.
 	std::vector< std::shared_ptr <mic::types::Matrix<eT> > > neuron_activations;

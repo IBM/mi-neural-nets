@@ -329,10 +329,10 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class mic::mlnn::MultiLayerNeuralNetwork;
 
 	// Friend class - required for accessing private constructor.
-	template<typename tmp> friend class SparseLinear;
+	template<typename tmp> friend class mic::mlnn::fully_connected::SparseLinear;
 
 	/// Vector containing activations of weights/filters.
 	std::vector< mic::types::MatrixPtr<eT> > w_activations;

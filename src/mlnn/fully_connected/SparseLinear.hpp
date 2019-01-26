@@ -112,7 +112,7 @@ protected:
 
 private:
 	// Friend class - required for using boost serialization.
-	template<typename tmp> friend class MultiLayerNeuralNetwork;
+	template<typename tmp> friend class mic::mlnn::MultiLayerNeuralNetwork;
 
     /*!
 	 * Private constructor, used only during the deserialization.
