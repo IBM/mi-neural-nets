@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LINEARLAYERTESTS_HPP_
-#define LINEARLAYERTESTS_HPP_
+#ifndef CONVOLUTIONLAYERTESTS_HPP_
+#define CONVOLUTIONLAYERTESTS_HPP_
 
 #include <gtest/gtest.h>
 
@@ -648,4 +648,4 @@ private:
 
 } } } //: namespaces
 
-#endif /* LINEARLAYERTESTS_HPP_ */
+#endif /* CONVOLUTIONLAYERTESTS_HPP_ */
