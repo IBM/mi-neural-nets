@@ -6,10 +6,10 @@
 		"learning_iterations_to_test_ratio": "100",
 		"number_of_averaged_test_measures": "5",
 		"autoencoder_filename": "mnist_patch_autoencoder-mlnn-9x9-2layers-20.txt",
-		"autoencoder_layers_to_be_removed": 3,
+		"autoencoder_layers_to_be_removed": 1,
 		"softmax_filename": "mnist_patch_softmax-mlnn-9x9-2layers-20.txt",
 		"softmax_save" : 1,
-		"softmax_load" : 1
+		"softmax_load" : 0
 	},
 	"mnist_training_dataset_importer" : {
 		"patch_size" : 9,
