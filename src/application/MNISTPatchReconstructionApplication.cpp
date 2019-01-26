@@ -76,6 +76,10 @@ MNISTPatchReconstructionApplication::MNISTPatchReconstructionApplication(std::st
 MNISTPatchReconstructionApplication::~MNISTPatchReconstructionApplication() {
 	delete(training_dataset_importer);
 	delete(test_dataset_importer);
+	// Delete visualization windows.
+	delete (w2d_input);
+	delete (w2d_reconstruction);
+	delete (w_chart);
 }
 
 void MNISTPatchReconstructionApplication::initialize(int argc, char* argv[]) {
