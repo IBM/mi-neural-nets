@@ -14,8 +14,9 @@ cmake_minimum_required(VERSION 3.2)
 # =======================================================================
 # Set compiler/linker flags.
 # =======================================================================
-# Add C++11 dependency.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -fopenmp -Wall")
+# Add C++11 dependency. 
+# -fopenmp commented
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11  -Wall")
 
 # Check, whether all necessary libraries are linked
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}") 

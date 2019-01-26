@@ -154,7 +154,7 @@ public:
 	void setOptimization () {
 		// Iterate through layers and set optimization function for each one.
 		for (size_t i = 0; i < layers.size(); i++)
-			layers[i]->setOptimization<omT> ();
+			layers[i]->template setOptimization<omT> ();
 	}
 
 
