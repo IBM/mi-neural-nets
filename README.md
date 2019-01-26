@@ -1,8 +1,11 @@
-#Machine Intelligence Core: Neural Nets
+# Machine Intelligence Core: Neural Nets
 
-Status of Travis Continuous Integration:
-
-[![Build Status](https://travis.ibm.com/tkornut/mi-neural-nets.svg?token=9XHfj7QaSbmFqHsyaQes&branch=master)](https://travis.ibm.com/tkornut/mi-neural-nets)
+![Language](https://img.shields.io/badge/language-C%2B%2B-blue.svg)
+[![GitHub license](https://img.shields.io/github/license/IBM/mi-neural-nets.svg)](https://github.com/IBM/mi-neural-nets/blob/master/LICENSE)
+![](https://img.shields.io/github/release/IBM/mi-neural-nets.svg)
+[![Build Status](https://travis-ci.com/IBM/mi-neural-nets.svg?branch=master)](https://travis-ci.com/IBM/mi-neural-nets)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/IBM/mi-neural-nets.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/IBM/mi-neural-nets/context:cpp)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/IBM/mi-neural-nets.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/IBM/mi-neural-nets/alerts/)
 
 ## Description
 
