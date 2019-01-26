@@ -68,9 +68,9 @@ In order to generate a "living" documentation of the code please run Doxygen:
     doxygen mi-neural-nets.doxyfile
     firefox html/index.html
 
-The current documentation (generated straight from the code and automatically uploaded to GH pages by Travis) is available at:
+The current documentation (generated straight from the code and automatically uploaded to github pages by Travis) is available at:
 
-https://pages.github.ibm.com/tkornut/mi-neural-nets/
+https://ibm.github.io/mi-neural-nets/
 
 Maintainer
 ----------
