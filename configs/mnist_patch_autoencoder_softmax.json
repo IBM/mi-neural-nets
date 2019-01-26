@@ -13,14 +13,14 @@
 	},
 	"mnist_training_dataset_importer" : {
 		"patch_size" : 9,
-		"data_filename": "../data/mnist/train-images.idx3-ubyte",
-		"labels_filename": "../data/mnist/train-labels.idx1-ubyte",
+		"data_filename": "../../../data/mnist/raw/train-images-idx3-ubyte",
+		"labels_filename": "../../../data/mnist/raw/train-labels-idx1-ubyte",
 		"samples_limit": "1000"
 	},
 	"mnist_test_dataset_importer" : {
 		"patch_size" : 9,
-		"data_filename": "../data/mnist/t10k-images.idx3-ubyte",
-		"labels_filename": "../data/mnist/t10k-labels.idx1-ubyte",
+		"data_filename": "../../../data/mnist/raw/t10k-images-idx3-ubyte",
+		"labels_filename": "../../../data/mnist/raw/t10k-labels-idx1-ubyte",
 		"samples_limit": "1000"
 	}
 }

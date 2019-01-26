@@ -74,7 +74,7 @@ endif(${BUILD_TEST_BATCH_TRAINING_MLNN})
 # Build and install - MNIST recognition based on CNNs.
 # =======================================================================
 
-set(BUILD_MNIST_CNN_APP OFF CACHE BOOL "Build the application for visualization of features of convolutional neural net trained on MNIST digits")
+set(BUILD_MNIST_CNN_APP ON CACHE BOOL "Build the application for visualization of features of convolutional neural net trained on MNIST digits")
 
 if(${BUILD_MNIST_CNN_APP})
         # Create exeutable.
