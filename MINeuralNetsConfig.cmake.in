@@ -1,0 +1,17 @@
+# ==============================================================================
+# Include directories to add to the user project.
+# ==============================================================================
+
+# Provide the include directory to the caller
+set(MINeuralNets_INCLUDE_DIRS @CMAKE_INCLUDE_DIRS_CONFIGCMAKE@)
+include_directories(${MINeuralNets_INCLUDE_DIRS})
+
+# Provide the libs directory to the caller
+SET(MINeuralNets_LIB_DIR @CMAKE_LIB_DIRS_CONFIGCMAKE@)
+LINK_DIRECTORIES(${MINeuralNets_LIB_DIR})
+
+# Provide the variable containing list of libraries to the caller
+SET(MINeuralNets_LIBRARIES "@MINeuralNets_LIBRARIES@")
+
+message("-- MI Neural Nets version: ${MIToolchain_VERSION}")
+message("-- Found the following MI Neural Nets libraries:\n--   ${MINeuralNets_LIBRARIES} ")

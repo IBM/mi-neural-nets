@@ -1,0 +1,142 @@
+language: cpp c
+
+# This will run on Travis' 'new' container-based infrastructure
+# https://docs.travis-ci.com/user/migrating-from-legacy/#How-can-I-use-container-based-infrastructure%3F
+sudo: false
+
+# Safelist: focus Travis' attention on the master branch.
+branches:
+  only:
+    - master
+
+# Environment variables
+env:
+  global:
+    - GH_REPO_NAME: mi-neural-nets
+    - DOXYFILE: $TRAVIS_BUILD_DIR/mi-neural-nets.doxyfile
+    - GH_REPO_REF: github.ibm.com:tkornut/mi-neural-nets.git
+  matrix:
+   # Workaround for https://github.com/travis-ci/travis-ci/issues/4681
+   - TRAVIS_4681_WORKAROUND=1
+
+
+# Define matrix of test environments.
+matrix:
+  # Travis workaround - disable "main" test environment.
+  exclude:
+    - env: TRAVIS_4681_WORKAROUND=1
+
+  include:
+    # 1. Ubuntu 14.04 g++-4.8
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      env:
+        - OS=Ubuntu-14.04
+        - COMPILER=g++-4.8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libboost-all-dev
+            - libeigen3-dev
+            - freeglut3-dev
+            - libxmu-dev
+            - libxi-dev
+            - g++-4.8
+            - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
+
+      # Generate and deploy documentation - only once, for this test environment.
+      after_success:
+      - cd $TRAVIS_BUILD_DIR
+      - chmod +x generateDocumentationAndDeploy.sh
+      - ./generateDocumentationAndDeploy.sh
+
+   # 3. Ubuntu 14.04 clang++
+#    - os: linux
+#      dist: trusty
+#      compiler: clang
+#      env:
+#        - OS=Ubuntu-14.04
+#        - COMPILER=clang++
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#          packages:
+#            - libboost-all-dev
+#            - libeigen3-dev
+#            - freeglut3-dev
+#            - libxmu-dev
+#            - libxi-dev
+#            - g++-4.8
+#            - doxygen
+#            - doxygen-doc
+#            - doxygen-latex
+#            - doxygen-gui
+#            - graphviz
+
+# Install gTesest.
+install:
+  # Fix gTest problem with symbolic links 
+  - DIR=$(pwd)
+  - sudo apt-get install libgtest-dev
+  - cd /usr/src/gtest
+  - sudo cmake CMakeLists.txt
+  - sudo make
+  - sudo cp *.a /usr/lib
+  - cd $DIR
+
+# Configure cmake and prepare installation dir.
+before_script:
+  # Make mic output
+  - mkdir $TRAVIS_BUILD_DIR/../mic/
+  # Clone, configure and install mi-toolchain
+  - cd $TRAVIS_BUILD_DIR/..
+  # Install mi-toolchain
+  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-toolchain.git
+  - mkdir mi-toolchain/build
+  - cd mi-toolchain/build
+  # Overwrite compiler!
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
+  - make -j2 install
+  # Install mi-algorithms
+  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-algorithms.git
+  - mkdir mi-algorithms/build
+  - cd mi-algorithms/build
+  # Overwrite compiler!
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
+  - make -j2 install
+  # Install mi-visualization
+  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-visualization.git
+  - mkdir mi-visualization/build
+  - cd mi-visualization/build
+  # Overwrite compiler!
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
+  - make -j2 install
+  # Make mi-neural-nets
+  - mkdir $TRAVIS_BUILD_DIR/build
+  - cd $TRAVIS_BUILD_DIR/build
+  # Overwrite compiler!
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
+
+# Build and install.
+script:
+  - make install VERBOSE=1
+  - src/loss/lossTestsRunner
+  - src/mlnn/cost_function/softmaxTestsRunner
+  - src/mlnn/convolution/convolutionTestsRunner
+  - src/mlnn/fully_connected/linearTestsRunner
+  - src/mlnn/mlnnTestsRunner
+  - src/optimization/artificialLandscapesTestsRunner
+  - src/optimization/optimizationFunctionsTestsRunner
+  - src/optimization/hebbianLearningTestsRunner
