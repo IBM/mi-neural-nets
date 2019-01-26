@@ -12,42 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-language: cpp c
-
-# This will run on Travis' 'new' container-based infrastructure
-# https://docs.travis-ci.com/user/migrating-from-legacy/#How-can-I-use-container-based-infrastructure%3F
-sudo: false
+language: cpp
 
 # Safelist: focus Travis' attention on the master branch.
 branches:
   only:
     - master
 
-# Environment variables
-env:
-  global:
-    - GH_REPO_NAME: mi-neural-nets
-    - DOXYFILE: $TRAVIS_BUILD_DIR/mi-neural-nets.doxyfile
-    - GH_REPO_REF: github.ibm.com:tkornut/mi-neural-nets.git
-  matrix:
-   # Workaround for https://github.com/travis-ci/travis-ci/issues/4681
-   - TRAVIS_4681_WORKAROUND=1
-
-
-# Define matrix of test environments.
-matrix:
-  # Travis workaround - disable "main" test environment.
-  exclude:
-    - env: TRAVIS_4681_WORKAROUND=1
-
+# Define matrix of build environments.
+jobs:
   include:
-    # 1. Ubuntu 14.04 g++-4.8
-    - os: linux
+
+    # 1. Ubuntu 14.04 g++-4.8 (WORKING, BUT COMMENTED FOR SPEED-UP)
+    - stage: "Compilation"
+      os: linux
       dist: trusty
       compiler: gcc
-      env:
-        - OS=Ubuntu-14.04
-        - COMPILER=g++-4.8
       addons:
         apt:
           sources:
@@ -55,102 +35,93 @@ matrix:
           packages:
             - libboost-all-dev
             - libeigen3-dev
+            - g++-4.8
             - freeglut3-dev
             - libxmu-dev
             - libxi-dev
-            - g++-4.8
+      env:
+        - OS=Ubuntu-14.04
+        - COMPILER=g++-4.8
+      before_script:
+        # Install MI-* dependencies.
+        - ./scripts/install_mi_deps.sh
+      script:
+        - ./scripts/build_mi_module.sh
+
+    # 2. Ubuntu 14.04 g++5 (WORKING, BUT COMMENTED FOR SPEED-UP)
+    #- os: linux
+    #  dist: trusty
+    #  compiler: gcc
+    #  addons:
+    #    apt:
+    #      sources:
+    #        - ubuntu-toolchain-r-test
+    #      packages:
+    #        - libboost-all-dev
+    #        - 'libeigen3-dev'
+    #        - g++-5
+    #  env:
+    #    - OS=Ubuntu-14.04
+    #    - COMPILER=g++-5
+    #    - CC=gcc-5
+    #    - CXX=g++-5
+    #  before_script:
+    #    - ./scripts/install_mi_deps.sh
+    #  script:
+    #    - ./scripts/build_mi_module.sh
+
+    # 3. Ubuntu 14.04 clang++ (WORKING, BUT COMMENTED FOR SPEED-UP)
+    # - os: linux
+    #  dist: trusty
+    #  compiler: clang
+    #  env:
+    #    - OS=Ubuntu-14.04
+    #    - COMPILER=clang++
+    #  addons:
+    #    apt:
+    #      sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5']
+    #      packages:
+    #        - libboost-all-dev
+    #        - 'libeigen3-dev'
+    #  before_script:
+    #    - ./scripts/install_mi_deps.sh
+    #  script:
+    #    - ./scripts/build_mi_module.sh
+
+    # 4. OSX clang
+    - os: osx
+      osx_image: xcode10.1
+      compiler: clang
+      env:
+        - OS=MacOS 10.13
+        - COMPILER=clang++
+      addons:
+        homebrew:
+          packages:   
+            - boost 
+            - eigen 
+            - glfw3
+      before_script:
+        - ./scripts/install_mi_deps.sh
+      script:
+        - ./scripts/build_mi_module.sh
+
+    # 6. Deploy
+    - stage: "Deploy"
+      name: "GitHub Pages"
+      addons:
+        apt:
+          packages:
             - doxygen
             - doxygen-doc
             - doxygen-latex
             - doxygen-gui
             - graphviz
-
-      # Generate and deploy documentation - only once, for this test environment.
-      after_success:
-      - cd $TRAVIS_BUILD_DIR
-      - chmod +x generateDocumentationAndDeploy.sh
-      - ./generateDocumentationAndDeploy.sh
-
-   # 3. Ubuntu 14.04 clang++
-#    - os: linux
-#      dist: trusty
-#      compiler: clang
-#      env:
-#        - OS=Ubuntu-14.04
-#        - COMPILER=clang++
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - libboost-all-dev
-#            - libeigen3-dev
-#            - freeglut3-dev
-#            - libxmu-dev
-#            - libxi-dev
-#            - g++-4.8
-#            - doxygen
-#            - doxygen-doc
-#            - doxygen-latex
-#            - doxygen-gui
-#            - graphviz
-
-# Install gTesest.
-install:
-  # Fix gTest problem with symbolic links 
-  - DIR=$(pwd)
-  - sudo apt-get install libgtest-dev
-  - cd /usr/src/gtest
-  - sudo cmake CMakeLists.txt
-  - sudo make
-  - sudo cp *.a /usr/lib
-  - cd $DIR
-
-# Configure cmake and prepare installation dir.
-before_script:
-  # Make mic output
-  - mkdir $TRAVIS_BUILD_DIR/../mic/
-  # Clone, configure and install mi-toolchain
-  - cd $TRAVIS_BUILD_DIR/..
-  # Install mi-toolchain
-  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-toolchain.git
-  - mkdir mi-toolchain/build
-  - cd mi-toolchain/build
-  # Overwrite compiler!
-  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
-  - make -j2 install
-  # Install mi-algorithms
-  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-algorithms.git
-  - mkdir mi-algorithms/build
-  - cd mi-algorithms/build
-  # Overwrite compiler!
-  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
-  - make -j2 install
-  # Install mi-visualization
-  - git clone https://f3cf58e97c9d0599d37121d9a1411552288a6e59@github.ibm.com/tkornut/mi-visualization.git
-  - mkdir mi-visualization/build
-  - cd mi-visualization/build
-  # Overwrite compiler!
-  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
-  - make -j2 install
-  # Make mi-neural-nets
-  - mkdir $TRAVIS_BUILD_DIR/build
-  - cd $TRAVIS_BUILD_DIR/build
-  # Overwrite compiler!
-  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-  - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../mic/
-
-# Build and install.
-script:
-  - make install VERBOSE=1
-  - src/loss/lossTestsRunner
-  - src/mlnn/cost_function/softmaxTestsRunner
-  - src/mlnn/convolution/convolutionTestsRunner
-  - src/mlnn/fully_connected/linearTestsRunner
-  - src/mlnn/mlnnTestsRunner
-  - src/optimization/artificialLandscapesTestsRunner
-  - src/optimization/optimizationFunctionsTestsRunner
-  - src/optimization/hebbianLearningTestsRunner
+      script: 
+        - doxygen mi-neural-nets.doxyfile
+      # Deploy using travis builtin GitHub Pages support
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        local_dir: $TRAVIS_BUILD_DIR/html
+        github_token: $GITHUB_TOKEN
