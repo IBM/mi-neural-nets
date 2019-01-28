@@ -33,7 +33,7 @@ On Linux (Ubuntu 14.04):
    *  mnist_patch_autoencoder_reconstruction -- application realizing MNIST patch autoencoder-based reconstruction
    *  mnist_patch_autoencoder_softmax -- application realizing MNIST patch autoencoder-based softmax classifier, using the imported, previously trained auto-encoder
    *  mlnn_sample_training_test -- (test) application for testing of training of a multi-layer neural network
-   *  mlnn_batch_training_test -- (test) application for ttesting batch training of a multi-layer neural network
+   *  mlnn_batch_training_test -- (test) application for testing batch training of a multi-layer neural network
    *  mnist_convnet -- (test) application using Convolutional Neural Network for recognition of MNIST digits
    *  mnist_simple_mlnn_app -- (test) application using a simple multi-Layer neural net for recognition of MNIST digits
    *  mnist_batch_visualization_test -- the MNIST batch visualization test application
