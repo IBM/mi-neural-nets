@@ -18,7 +18,7 @@ project(MINeuralNets CXX C)
 #  Set current version number.
 set (MINeuralNets_VERSION_MAJOR 1)
 set (MINeuralNets_VERSION_MINOR 2)
-set (MINeuralNets_VERSION_PATCH 1)
+set (MINeuralNets_VERSION_PATCH 2)
 set (MINeuralNets_VERSION ${MINeuralNets_VERSION_MAJOR}.${MINeuralNets_VERSION_MINOR}.${MINeuralNets_VERSION_PATCH})
 
 # CMake required version.
