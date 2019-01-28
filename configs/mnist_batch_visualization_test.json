@@ -4,7 +4,7 @@
 		"single_step_mode": "1"
 	},
 	"mnist_matrix_importer" : {
-		"data_filename": "../data/mnist/t10k-images.idx3-ubyte",
-		"labels_filename": "../data/mnist/t10k-labels.idx1-ubyte"
+		"data_filename": "../../../data/mnist/raw/t10k-images-idx3-ubyte",
+		"labels_filename": "../../../data/mnist/raw/t10k-labels-idx1-ubyte"
 	}
 }

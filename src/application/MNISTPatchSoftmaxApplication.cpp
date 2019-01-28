@@ -79,6 +79,13 @@ MNISTPatchSoftmaxApplication::MNISTPatchSoftmaxApplication(std::string node_name
 MNISTPatchSoftmaxApplication::~MNISTPatchSoftmaxApplication() {
 	delete(training_dataset_importer);
 	delete(test_dataset_importer);
+	// Delete visualization windows.
+	delete (w2d_input);
+	delete (w_prob);
+	delete (w_chart);
+	// Delete encoders.
+	delete (mnist_encoder);
+	delete (label_encoder);	
 }
 
 void MNISTPatchSoftmaxApplication::initialize(int argc, char* argv[]) {
