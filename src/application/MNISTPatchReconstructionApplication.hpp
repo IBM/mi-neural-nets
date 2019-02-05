@@ -32,7 +32,7 @@
 #include <opengl/visualization/WindowCollectorChart.hpp>
 using namespace mic::opengl::visualization;
 
-#include <data_io/MNISTPatchImporter.hpp>
+#include <importers/MNISTPatchImporter.hpp>
 
 #include <mlnn/BackpropagationNeuralNetwork.hpp>
 using namespace mic::mlnn;
@@ -94,10 +94,10 @@ private:
 	mic::types::MatrixXfPtr reconstructed_image;
 
 	/// Importer responsible for loading training dataset.
-	mic::data_io::MNISTPatchImporter* training_dataset_importer;
+	mic::importers::MNISTPatchImporter* training_dataset_importer;
 
 	/// Importer responsible for loading testing dataset.
-	mic::data_io::MNISTPatchImporter* test_dataset_importer;
+	mic::importers::MNISTPatchImporter* test_dataset_importer;
 
 	/// Window for displaying the input image.
 	WindowMatrix2D* w2d_input;
@@ -112,7 +112,7 @@ private:
 	size_t patch_size;
 
 	/// Data collector.
-	mic::data_io::DataCollectorPtr<std::string, float> collector_ptr;
+	mic::utils::DataCollectorPtr<std::string, float> collector_ptr;
 
 	/// Property: name of the file to which the neural network will be serialized (or deserialized from).
 	mic::configuration::Property<std::string> mlnn_filename;

@@ -26,7 +26,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 
-#include <data_io/MNISTMatrixImporter.hpp>
+#include <importers/MNISTMatrixImporter.hpp>
 
 #include <logger/Log.hpp>
 #include <logger/ConsoleOutput.hpp>
@@ -56,7 +56,7 @@ WindowGrayscaleBatch<float>* w_weights1;
 WindowGrayscaleBatch<float>* w_weights2;
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter<float>* importer;
+mic::importers::MNISTMatrixImporter<float>* importer;
 /// Multi-layer neural network.
 HebbianNeuralNetwork<float> neural_net;
 
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 	APP_STATE;
 
 	// Load dataset.
-	importer = new mic::data_io::MNISTMatrixImporter<float>();
+	importer = new mic::importers::MNISTMatrixImporter<float>();
 	importer->setBatchSize(batch_size);
 
 	// Initialize the encoders.

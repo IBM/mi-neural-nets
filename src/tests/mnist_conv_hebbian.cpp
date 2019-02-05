@@ -26,7 +26,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 
-#include <data_io/MNISTMatrixImporter.hpp>
+#include <importers/MNISTMatrixImporter.hpp>
 
 #include <logger/Log.hpp>
 #include <logger/ConsoleOutput.hpp>
@@ -64,10 +64,10 @@ WindowGrayscaleBatch<double>* w_similarity;
 
 /// Data collector.
 WindowCollectorChart<double>* w_chart;
-mic::data_io::DataCollectorPtr<std::string, double> collector_ptr;
+mic::utils::DataCollectorPtr<std::string, double> collector_ptr;
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter<double>* importer;
+mic::importers::MNISTMatrixImporter<double>* importer;
 /// Multi-layer neural network.
 HebbianNeuralNetwork<double> neural_net;
 
@@ -175,7 +175,7 @@ int main(int argc, char* argv[]) {
     APP_STATE;
 
     // Load dataset.
-    importer = new mic::data_io::MNISTMatrixImporter<double>();
+    importer = new mic::importers::MNISTMatrixImporter<double>();
     importer->setDataFilename("../data/mnist/train-images.idx3-ubyte");
     importer->setLabelsFilename("../data/mnist/train-labels.idx1-ubyte");
     importer->setBatchSize(batch_size);
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
 
     // Chart.
     w_chart = new WindowCollectorChart<double>("Statistics", 60, 878, 512, 256);
-    collector_ptr= std::make_shared < mic::data_io::DataCollector<std::string, double> >( );
+    collector_ptr= std::make_shared < mic::utils::DataCollector<std::string, double> >( );
     w_chart->setDataCollectorPtr(collector_ptr);
 
     // Create data containers.

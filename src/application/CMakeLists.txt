@@ -27,7 +27,7 @@ if(${BUILD_APP_MNIST_PATCH_RECONSTRUCTION})
 		configuration
 		application
 		data_utils
-		data_io
+		importers
 		opengl_visualization
 		opengl_application
 		${OPENGL_LIBRARIES}
@@ -62,7 +62,7 @@ if(${BUILD_APP_MNIST_PATCH_SOFTMAX})
 		configuration
 		application
 		data_utils
-		data_io
+		importers
 		encoders
 		opengl_visualization
 		opengl_application

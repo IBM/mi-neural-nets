@@ -24,7 +24,7 @@ using namespace mic::logger;
 
 #include <iomanip>
 
-#include <data_io/MNISTMatrixImporter.hpp>
+#include <importers/MNISTMatrixImporter.hpp>
 #include <encoders/MatrixXfMatrixXfEncoder.hpp>
 #include <encoders/UIntMatrixXfEncoder.hpp>
 
@@ -61,7 +61,7 @@ int main() {
 
 	//[60000, 784]
 	// Load the MNIST training...
-	mic::data_io::MNISTMatrixImporter<float> training;
+	mic::importers::MNISTMatrixImporter<float> training;
 	// Manually set paths. DEPRICATED! Used here only for simplification of the test.
 	training.setDataFilename("../data/mnist/train-images.idx3-ubyte");
 	training.setLabelsFilename("../data/mnist/train-labels.idx1-ubyte");
@@ -71,7 +71,7 @@ int main() {
 		return -1;
 
 	// ... and test datasets.
-	mic::data_io::MNISTMatrixImporter<float> test;
+	mic::importers::MNISTMatrixImporter<float> test;
 	// Manually set paths. DEPRICATED! Used here only for simplification of the test.
 	test.setDataFilename("../data/mnist/t10k-images.idx3-ubyte");
 	test.setLabelsFilename("../data/mnist/t10k-labels.idx1-ubyte");

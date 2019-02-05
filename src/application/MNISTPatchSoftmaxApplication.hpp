@@ -33,7 +33,7 @@
 #include <opengl/visualization/WindowCollectorChart.hpp>
 using namespace mic::opengl::visualization;
 
-#include <data_io/MNISTPatchImporter.hpp>
+#include <importers/MNISTPatchImporter.hpp>
 
 #include <mlnn/BackpropagationNeuralNetwork.hpp>
 using namespace mic::mlnn;
@@ -93,10 +93,10 @@ protected:
 
 private:
 	/// Importer responsible for loading training dataset.
-	mic::data_io::MNISTPatchImporter* training_dataset_importer;
+	mic::importers::MNISTPatchImporter* training_dataset_importer;
 
 	/// Importer responsible for loading testing dataset.
-	mic::data_io::MNISTPatchImporter* test_dataset_importer;
+	mic::importers::MNISTPatchImporter* test_dataset_importer;
 
 	/// MNIST matrix encoder.
 	mic::encoders::MatrixXfMatrixXfEncoder* mnist_encoder;
@@ -126,7 +126,7 @@ private:
 	size_t patch_size;
 
 	/// Data collector.
-	mic::data_io::DataCollectorPtr<std::string, float> collector_ptr;
+	mic::utils::DataCollectorPtr<std::string, float> collector_ptr;
 
 	/// Property: name of the file to which the original auto-encoder will be loaded from.
 	mic::configuration::Property<std::string> autoencoder_filename;
