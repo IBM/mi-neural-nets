@@ -27,5 +27,5 @@ LINK_DIRECTORIES(${MINeuralNets_LIB_DIR})
 # Provide the variable containing list of libraries to the caller
 SET(MINeuralNets_LIBRARIES "@MINeuralNets_LIBRARIES@")
 
-message("-- MI Neural Nets version: ${MIToolchain_VERSION}")
+message("-- MI Neural Nets version: ${MINeuralNets_VERSION}")
 message("-- Found the following MI Neural Nets libraries:\n--   ${MINeuralNets_LIBRARIES} ")

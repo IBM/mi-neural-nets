@@ -93,25 +93,6 @@ else(NOT OpenBLAS_FOUND)
 #	ADD_DEFINITIONS("-DARMA_DONT_USE_WRAPPER -DARMA_USE_BLAS -DARMA_USE_LAPACK")
 endif(NOT OpenBLAS_FOUND)
 
-# Find GLUT package
-find_package(GLUT REQUIRED)
-include_directories(${GLUT_INCLUDE_DIRS})
-link_directories(${GLUT_LIBRARY_DIRS})
-add_definitions(${GLUT_DEFINITIONS})
-if(NOT GLUT_FOUND)
-    message(ERROR " GLUT not found!")
-endif(NOT GLUT_FOUND)
-
-# Find OPENGL package
-find_package(OpenGL REQUIRED)
-if(NOT OPENGL_FOUND)
-    message(ERROR " OPENGL not found!")
-elsif(NOT OPENGL_FOUND)
-	include_directories(${OpenGL_INCLUDE_DIRS})
-	link_directories(${OpenGL_LIBRARY_DIRS})
-	add_definitions(${OpenGL_DEFINITIONS})
-endif(NOT OPENGL_FOUND)
-
 # Locate GTest
 find_package(GTest)
 if(NOT GTEST_FOUND)

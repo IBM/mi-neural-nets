@@ -26,7 +26,6 @@ if(${BUILD_APP_MNIST_PATCH_RECONSTRUCTION})
 		logger
 		configuration
 		application
-		types
 		data_utils
 		data_io
 		opengl_visualization
@@ -62,7 +61,6 @@ if(${BUILD_APP_MNIST_PATCH_SOFTMAX})
 		logger
 		configuration
 		application
-		types
 		data_utils
 		data_io
 		encoders
