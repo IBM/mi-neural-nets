@@ -70,13 +70,13 @@ elsif(NOT OPENGL_FOUND)
 endif(NOT OPENGL_FOUND)
 
 # Find MIC Toolchain
-find_package(MIToolchain 1.1 REQUIRED)
+find_package(MIToolchain 1.3 REQUIRED)
 
 # Find MIC Algorithms
-find_package(MIAlgorithms 1.2 REQUIRED)
+find_package(MIAlgorithms 1.3 REQUIRED)
 
 # Find MIC Visualization
-find_package(MIVisualization 1.2.1 REQUIRED)
+find_package(MIVisualization 1.3 REQUIRED)
 
 # =======================================================================
 # Find optional packages

@@ -13,23 +13,7 @@ A subproject of Machine Intelligence Core framework.
 
 The repository contains solutions and applications related to multi-layer (deep) feed-forward (for now) neural nets.
 
-## MIC dependencies
-
-   * MIToolchain - the core of MIC framework.
-
-## External dependencies
-
-Additionally it depends on the following external libraries:
-   * Boost - library of free (open source) peer-reviewed portable C++ source libraries.
-   * Eigen - a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
-
-### Installation of the dependencies/required tools
-
-On Linux (Ubuntu 14.04): 
-
-    sudo apt-get install git cmake cmake-curses-gui doxygen libboost1.54-all-dev libeigen3-dev
-
-## Applications
+### Applications
    *  mnist_patch_autoencoder_reconstruction -- application realizing MNIST patch autoencoder-based reconstruction
    *  mnist_patch_autoencoder_softmax -- application realizing MNIST patch autoencoder-based softmax classifier, using the imported, previously trained auto-encoder
    *  mlnn_sample_training_test -- (test) application for testing of training of a multi-layer neural network
@@ -39,7 +23,7 @@ On Linux (Ubuntu 14.04):
    *  mnist_batch_visualization_test -- the MNIST batch visualization test application
    *  mnist_mlnn_features_visualization_test -- program for visualization of features of mlnn layer trained on MNIST digits
 
-## Unit tests
+### Unit tests
    *  loss/lossTestsRunner -- loss functions unit tests
    *  optimization/artificialLandscapesTestsRunner -- artificial landscapes used for optimization testing unit tests
    *  optimization/optimizationFunctionsTestsRunner -- unit tests of different optimization functions/methods
@@ -48,23 +32,75 @@ On Linux (Ubuntu 14.04):
    *  mlnn/fully_connected/linearTestsRunner -- unit tests for linear (fully-connected) layer
 
  
-## Installation
+## External dependencies
 
-In order to download, configure, make and install new "clean" version of mi-neural-nets please execute the following:
+Additionally it depends on the following external libraries:
+   * Boost - library of free (open source) peer-reviewed portable C++ source libraries.
+   * Eigen - a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
+   * OpenGL/GLUT - a cross-language, cross-platform application programming interface for rendering 2D and 3D vector graphics.
+   * OpenBlas (optional) - An optimized library implementing BLAS routines. If present - used for fastening operation on matrices.
+   * Doxygen (optional) - Tool for generation of documentation.
+   * GTest (optional) - Framework for unit testing.
 
-    cd ~/workspace
-    git clone git@github.ibm.com:tkornut/mi-neural-nets.git
-    cd mi-algorithms
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=~/workspace/mic/
-    make -j4 install
+### Installation of the dependencies/required tools
+
+#### On Linux (Ubuntu 14.04):
+
+    sudo apt-get install git cmake doxygen libboost1.54-all-dev libeigen3-dev freeglut3-dev libxmu-dev libxi-dev
+
+To install GTest on Ubuntu:
+
+    sudo apt-get install libgtest-dev
+
+#### On Mac (OS X 10.14): (last tested on: Feb/01/2019)
+
+    brew install git cmake doxygen boost eigen glfw3
+
+To install GTest on Mac OS X:
+
+    brew install --HEAD https://gist.githubusercontent.com/Kronuz/96ac10fbd8472eb1e7566d740c4034f8/raw/gtest.rb
+
+## MIC dependencies
+
+   * [MI-Toolchain](https://github.com/IBM/mi-toolchain) - the core of MIC framework.
+   * [MI-Algorithms](https://github.com/IBM/mi-algorithms) - contains basic (core) types and algorithms.
+   * [MI-Visualization](https://github.com/IBM/mi-visualization) - contains OpenGL-based visualization.
+
+### Installation of all MIC dependencies (optional)
+
+This step is required only when not downloaded/installed the listed MIC dependencies earlier.
+
+In directory scripts one can find script that will download and install all required MIC modules.
+
+    git clone git@github.com:IBM/mi-neural-nets.git
+    cd mi-neural-nets
+    ./scripts/install_mic_deps.sh ../mic
+
+Then one can install the module by calling the following.
+
+    ./scripts/build_mic_module.sh ../mic
+
+Please note that it will create a directory 'deps' and download all sources into that directory.
+After compilation all dependencies will be installed in the directory '../mic'.
+
+## Installation of MI-Neural-Nets
+The following assumes that all MIC dependencies are installed in the directory '../mic'.
+
+    git clone git@github.com:IBM/mi-neural-nets.git
+    cd mi-neural-nets
+    ./scripts/build_mic_module.sh ../mic
+
+### Make commands
+
+   * make install - install applications to ../mic/bin, headers to ../mic/include, libraries to ../mic/lib, cmake files to ../mic/share
+   * make configs - install config files to ../mic/bin
+   * make datasets - install config files to ../mic/datasets
 
 ## Documentation
 
 In order to generate a "living" documentation of the code please run Doxygen:
 
-    cd ~/workspace/mi-neural-nets
+    cd mi-neural-nets
     doxygen mi-neural-nets.doxyfile
     firefox html/index.html
 
@@ -72,7 +108,7 @@ The current documentation (generated straight from the code and automatically up
 
 https://ibm.github.io/mi-neural-nets/
 
-Maintainer
-----------
-tkornuta
+[tkornuta](http://github.com/tkornut)
+
+[![HitCount](http://hits.dwyl.io/tkornut/ibm/mi-neural-nets.svg)](http://hits.dwyl.io/tkornut/ibm/mi-neural-nets)
 
