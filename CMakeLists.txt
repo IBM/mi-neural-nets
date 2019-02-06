@@ -17,8 +17,8 @@ project(MINeuralNets CXX C)
 
 #  Set current version number.
 set (MINeuralNets_VERSION_MAJOR 1)
-set (MINeuralNets_VERSION_MINOR 2)
-set (MINeuralNets_VERSION_PATCH 2)
+set (MINeuralNets_VERSION_MINOR 3)
+set (MINeuralNets_VERSION_PATCH 0)
 set (MINeuralNets_VERSION ${MINeuralNets_VERSION_MAJOR}.${MINeuralNets_VERSION_MINOR}.${MINeuralNets_VERSION_PATCH})
 
 # CMake required version.
@@ -70,13 +70,13 @@ elsif(NOT OPENGL_FOUND)
 endif(NOT OPENGL_FOUND)
 
 # Find MIC Toolchain
-find_package(MIToolchain 1.1 REQUIRED)
+find_package(MIToolchain 1.3 REQUIRED)
 
 # Find MIC Algorithms
-find_package(MIAlgorithms 1.2 REQUIRED)
+find_package(MIAlgorithms 1.3 REQUIRED)
 
 # Find MIC Visualization
-find_package(MIVisualization 1.2.1 REQUIRED)
+find_package(MIVisualization 1.3 REQUIRED)
 
 # =======================================================================
 # Find optional packages
@@ -92,25 +92,6 @@ else(NOT OpenBLAS_FOUND)
 #	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lopenblas") 
 #	ADD_DEFINITIONS("-DARMA_DONT_USE_WRAPPER -DARMA_USE_BLAS -DARMA_USE_LAPACK")
 endif(NOT OpenBLAS_FOUND)
-
-# Find GLUT package
-find_package(GLUT REQUIRED)
-include_directories(${GLUT_INCLUDE_DIRS})
-link_directories(${GLUT_LIBRARY_DIRS})
-add_definitions(${GLUT_DEFINITIONS})
-if(NOT GLUT_FOUND)
-    message(ERROR " GLUT not found!")
-endif(NOT GLUT_FOUND)
-
-# Find OPENGL package
-find_package(OpenGL REQUIRED)
-if(NOT OPENGL_FOUND)
-    message(ERROR " OPENGL not found!")
-elsif(NOT OPENGL_FOUND)
-	include_directories(${OpenGL_INCLUDE_DIRS})
-	link_directories(${OpenGL_LIBRARY_DIRS})
-	add_definitions(${OpenGL_DEFINITIONS})
-endif(NOT OPENGL_FOUND)
 
 # Locate GTest
 find_package(GTest)

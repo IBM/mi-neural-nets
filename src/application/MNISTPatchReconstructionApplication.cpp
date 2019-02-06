@@ -68,8 +68,8 @@ MNISTPatchReconstructionApplication::MNISTPatchReconstructionApplication(std::st
 	LOG(LINFO) << "Properties registered";
 
 	// Create importers.
-	training_dataset_importer = new mic::data_io::MNISTPatchImporter("mnist_training_dataset_importer");
-	test_dataset_importer = new mic::data_io::MNISTPatchImporter("mnist_test_dataset_importer");
+	training_dataset_importer = new mic::importers::MNISTPatchImporter("mnist_training_dataset_importer");
+	test_dataset_importer = new mic::importers::MNISTPatchImporter("mnist_test_dataset_importer");
 
 }
 
@@ -91,7 +91,7 @@ void MNISTPatchReconstructionApplication::initialize(int argc, char* argv[]) {
 	w2d_input = new WindowMatrix2D("Input matrix", 0, 0, 256, 256);
 	w2d_reconstruction = new WindowMatrix2D("Reconstructed matrix", 320, 0, 256, 256);
 
-	collector_ptr = std::make_shared < mic::data_io::DataCollector<std::string, float> >( );
+	collector_ptr = std::make_shared < mic::utils::DataCollector<std::string, float> >( );
 	// Add containers to collector.
 	collector_ptr->createContainer("training_loss",  mic::types::color_rgba(0, 0, 255, 180));
 	collector_ptr->createContainer("test_loss",  mic::types::color_rgba(0, 255, 0, 180));

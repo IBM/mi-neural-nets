@@ -26,7 +26,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 
-#include <data_io/MNISTMatrixImporter.hpp>
+#include <importers/MNISTMatrixImporter.hpp>
 
 #include <logger/Log.hpp>
 #include <logger/ConsoleOutput.hpp>
@@ -43,7 +43,7 @@ using namespace mic::opengl::visualization;
 /// Window for displaying the MNIST batch.
 WindowGrayscaleBatch<float>* w_batch;
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter<float>* importer;
+mic::importers::MNISTMatrixImporter<float>* importer;
 
 
 /*!
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
 	APP_STATE;
 
 	// Load dataset.
-	importer = new mic::data_io::MNISTMatrixImporter<float>();
+	importer = new mic::importers::MNISTMatrixImporter<float>();
 	importer->setBatchSize(100);
 
 	// Set parameters of all property-tree derived objects - USER independent part.

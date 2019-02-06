@@ -26,7 +26,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 
-#include <data_io/MNISTMatrixImporter.hpp>
+#include <importers/MNISTMatrixImporter.hpp>
 
 #include <logger/Log.hpp>
 #include <logger/ConsoleOutput.hpp>
@@ -56,11 +56,11 @@ WindowGrayscaleBatch<float> *w_conv30, *w_conv31, *w_conv32, *w_conv33, *w_conv3
 /// Window for displaying chart with statistics.
 WindowCollectorChart<float>* w_chart;
 /// Data collector .
-mic::data_io::DataCollectorPtr<std::string, float> collector_ptr;
+mic::utils::DataCollectorPtr<std::string, float> collector_ptr;
 
 
 /// MNIST importer.
-mic::data_io::MNISTMatrixImporter<float>* importer;
+mic::importers::MNISTMatrixImporter<float>* importer;
 /// Multi-layer neural network.
 BackpropagationNeuralNetwork<float> neural_net;
 
@@ -194,7 +194,7 @@ int main(int argc, char* argv[]) {
 	APP_STATE;
 
 	// Load dataset.
-	importer = new mic::data_io::MNISTMatrixImporter<float>();
+	importer = new mic::importers::MNISTMatrixImporter<float>();
 	importer->setBatchSize(batch_size);
 
 	// Initialize the encoders.
@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
 
 	// Chart.
 	w_chart = new WindowCollectorChart<float>("Statistics", 60, 878, 512, 256);
-	collector_ptr= std::make_shared < mic::data_io::DataCollector<std::string, float> >( );
+	collector_ptr= std::make_shared < mic::utils::DataCollector<std::string, float> >( );
 	w_chart->setDataCollectorPtr(collector_ptr);
 
 	// Create data containers.

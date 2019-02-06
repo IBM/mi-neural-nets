@@ -70,8 +70,8 @@ MNISTPatchSoftmaxApplication::MNISTPatchSoftmaxApplication(std::string node_name
 	registerProperty(softmax_load);
 
 	// Create importers.
-	training_dataset_importer = new mic::data_io::MNISTPatchImporter("mnist_training_dataset_importer");
-	test_dataset_importer = new mic::data_io::MNISTPatchImporter("mnist_test_dataset_importer");
+	training_dataset_importer = new mic::importers::MNISTPatchImporter("mnist_training_dataset_importer");
+	test_dataset_importer = new mic::importers::MNISTPatchImporter("mnist_test_dataset_importer");
 
 	LOG(LINFO) << "Properties registered";
 }
@@ -98,7 +98,7 @@ void MNISTPatchSoftmaxApplication::initialize(int argc, char* argv[]) {
 
 	w_prob = new WindowProbability("Probabilty", 128, 256, 320, 0);
 
-	collector_ptr = std::make_shared < mic::data_io::DataCollector<std::string, float> >( );
+	collector_ptr = std::make_shared < mic::utils::DataCollector<std::string, float> >( );
 	// Add containers to collector.
 	collector_ptr->createContainer("training_loss",  mic::types::color_rgba(0, 0, 255, 180));
 	collector_ptr->createContainer("test_loss",  mic::types::color_rgba(0, 255, 0, 180));

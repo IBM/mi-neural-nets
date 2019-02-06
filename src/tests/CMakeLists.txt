@@ -28,8 +28,7 @@ if(${BUILD_TEST_SAMPLE_TRAINING_MLNN})
 	target_link_libraries(mlnn_sample_training_test 
 	    logger
 		configuration
-		types
-		data_io
+		importers
 		${Boost_LIBRARIES}
 		)
 	if(OpenBLAS_FOUND)
@@ -55,8 +54,7 @@ if(${BUILD_TEST_BATCH_TRAINING_MLNN})
 	target_link_libraries(mlnn_batch_training_test 
 	    logger
 		configuration
-		types
-		data_io
+		importers
 		encoders
 		${Boost_LIBRARIES}
 		)
@@ -84,8 +82,7 @@ if(${BUILD_MNIST_CNN_APP})
 			logger
 			application
 			configuration
-	        types
-			data_io
+			importers
 			encoders
 			configuration
 			opengl_visualization
@@ -117,8 +114,7 @@ if(${BUILD_MNIST_MLNN_APP})
         target_link_libraries(mnist_simple_mlnn_app
 			logger
     		configuration
-	        types
-			data_io
+			importers
 			encoders
 	        ${Boost_LIBRARIES}
 	        )
@@ -145,8 +141,7 @@ if(${BUILD_TEST_MNIST_BATCH_VISUALIZATION})
 	target_link_libraries(mnist_batch_visualization_test 
 		logger
 		application
-		types
-		data_io
+		importers
 		encoders
 		configuration
 		opengl_visualization
@@ -177,8 +172,7 @@ if(${BUILD_TEST_MNIST_MLNN_FEATURES_VISUALIZATION})
 	target_link_libraries(mnist_mlnn_features_visualization_test 
 		logger
 		application
-		types
-		data_io
+		importers
 		encoders
 		configuration
 		opengl_visualization
@@ -210,8 +204,7 @@ if(${BUILD_TEST_MNIST_HEBBIAN_FEATURES_VISUALIZATION})
 	target_link_libraries(mnist_hebbian_features_visualization_test 
 		logger
 		application
-		types
-		data_io
+		importers
 		encoders
 		configuration
 		opengl_visualization
@@ -242,8 +235,7 @@ if(${BUILD_MNIST_CONVHEBBIAN_APP})
         target_link_libraries(mnist_conv_hebbian
                     logger
                     application
-                    types
-                    data_io
+                    importers
                     encoders
                     configuration
                     opengl_visualization
