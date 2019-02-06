@@ -11,7 +11,7 @@
 
 A subproject of Machine Intelligence Core framework.
 
-The repository contains solutions and applications related to multi-layer (deep) feed-forward (for now) neural nets.
+The repository contains solutions and applications related to (deep) reinforcement learning. In particular, it contains several classical problems (N-armed bandits, several variations of Gridworld), POMDP environments (Gridworld, Maze of Digits, MNIST digit) and algorithms (from simple Value Iteartion and Q-learning to DQN with Experience Replay).
 
 ### Applications
    *  mnist_patch_autoencoder_reconstruction -- application realizing MNIST patch autoencoder-based reconstruction
