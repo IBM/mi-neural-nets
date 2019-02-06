@@ -71,7 +71,6 @@ if(GTEST_FOUND AND BUILD_UNIT_TESTS)
 	add_executable(mlnnTestsRunner MultiLayerNeuralNetworkTests.cpp)
 	target_link_libraries(mlnnTestsRunner
 		logger
-		types
 		${Boost_LIBRARIES}
 		${GTEST_LIBRARIES})
 	if(OpenBLAS_FOUND)
