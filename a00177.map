@@ -1,0 +1,24 @@
+<map id="src/loss/CrossEntropyLoss.hpp" name="src/loss/CrossEntropyLoss.hpp">
+<area shape="rect" id="node2" href="$a00080.html" title="src/loss/LossTypes.hpp" alt="" coords="711,80,872,107"/>
+<area shape="rect" id="node3" href="$a00078.html" title="src/loss/LossTests.cpp" alt="" coords="531,163,689,189"/>
+<area shape="rect" id="node4" href="$a00089.html" title="src/mlnn/convolution\l/Convolution_tests.hpp" alt="" coords="714,155,869,197"/>
+<area shape="rect" id="node7" href="$a00106.html" title="src/mlnn/MultiLayerNeural\lNetwork.hpp" alt="" coords="894,155,1068,197"/>
+<area shape="rect" id="node5" href="$a00087.html" title="src/mlnn/convolution\l/Convolution_convergence\l_tests.cpp" alt="" coords="513,245,689,301"/>
+<area shape="rect" id="node6" href="$a00088.html" title="src/mlnn/convolution\l/Convolution_tests.cpp" alt="" coords="714,253,869,294"/>
+<area shape="rect" id="node8" href="$a00085.html" title="src/mlnn/Backpropagation\lNeuralNetwork.hpp" alt="" coords="895,253,1068,294"/>
+<area shape="rect" id="node21" href="$a00103.html" title="src/mlnn/HebbianNeuralNetwork.hpp" alt="" coords="1694,260,1929,287"/>
+<area shape="rect" id="node9" href="$a00072.html" title="src/application/MNISTPatch\lReconstructionApplication.hpp" alt="" coords="5,357,203,398"/>
+<area shape="rect" id="node11" href="$a00074.html" title="src/application/MNISTPatch\lSoftmaxApplication.hpp" alt="" coords="228,357,415,398"/>
+<area shape="rect" id="node13" href="$a00108.html" title="src/mlnn/MultiLayerNeural\lNetworkTests.hpp" alt="" coords="439,357,613,398"/>
+<area shape="rect" id="node15" href="$a00138.html" title="Contains program for testing batch training of a multi&#45;layer neural network. " alt="" coords="639,357,783,398"/>
+<area shape="rect" id="node16" href="$a00139.html" title="Contains program for testing of training of a multi&#45;layer neural network. " alt="" coords="807,357,960,398"/>
+<area shape="rect" id="node17" href="$a00142.html" title="src/tests/mnist_convnet.cpp" alt="" coords="985,364,1172,391"/>
+<area shape="rect" id="node18" href="$a00143.html" title="Program for visualization of features of convolutional neural net trained on MNIST digits..." alt="" coords="1196,349,1359,405"/>
+<area shape="rect" id="node19" href="$a00145.html" title="Program for visualization of features of mlnn layers trained on MNIST digits. " alt="" coords="1383,349,1536,405"/>
+<area shape="rect" id="node20" href="$a00146.html" title="src/tests/mnist_simple\l_mlnn.cpp" alt="" coords="1561,357,1715,398"/>
+<area shape="rect" id="node10" href="$a00071.html" title="src/application/MNISTPatch\lReconstructionApplication.cpp" alt="" coords="5,454,203,495"/>
+<area shape="rect" id="node12" href="$a00073.html" title="src/application/MNISTPatch\lSoftmaxApplication.cpp" alt="" coords="228,454,415,495"/>
+<area shape="rect" id="node14" href="$a00107.html" title="src/mlnn/MultiLayerNeural\lNetworkTests.cpp" alt="" coords="439,454,613,495"/>
+<area shape="rect" id="node22" href="$a00141.html" title="Program for visualization of hebbian formed filters trained on MNIST digits. : Alexis Asseman alexis..." alt="" coords="1740,357,1884,398"/>
+<area shape="rect" id="node23" href="$a00144.html" title="Program for visualization of features of hebbian network trained on MNIST digits. : Tomasz Kornuta tk..." alt="" coords="1909,349,2069,405"/>
+</map>

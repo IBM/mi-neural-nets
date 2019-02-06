@@ -1,0 +1,4 @@
+<map id="mic::applications::MNISTPatchSoftmaxApplication::performLearningStep" name="mic::applications::MNISTPatchSoftmaxApplication::performLearningStep">
+<area shape="rect" id="node2" href="$a00046.html#a6a504d4f8307d7b64ab4f4483b132976" title="mic::mlnn::MultiLayerNeural\lNetwork::getPredictions" alt="" coords="265,5,450,46"/>
+<area shape="rect" id="node3" href="$a00006.html#a34652cc616dbf7a475c687272d539a15" title="mic::mlnn::Backpropagation\lNeuralNetwork::train" alt="" coords="265,70,449,111"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="mic::neural_nets::unit_tests::Tutorial2LayerNN::Tutorial2LayerNN" name="mic::neural_nets::unit_tests::Tutorial2LayerNN::Tutorial2LayerNN">
+<area shape="rect" id="node2" href="$a00046.html#a9dc8dd9ca63df849304571c9f18a9859" title="mic::mlnn::MultiLayerNeural\lNetwork::pushLayer" alt="" coords="222,5,407,46"/>
+<area shape="rect" id="node3" href="$a00006.html#a17ff6950ef4cbdb7bb01b8abaeca575b" title="mic::mlnn::Backpropagation\lNeuralNetwork::setLoss" alt="" coords="223,70,407,111"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="mic::applications::MNISTPatchSoftmaxApplication::initializePropertyDependentVariables" name="mic::applications::MNISTPatchSoftmaxApplication::initializePropertyDependentVariables">
+<area shape="rect" id="node2" href="$a00046.html#ab3b741fc57e7ba025699657a573359a2" title="mic::mlnn::MultiLayerNeural\lNetwork::load" alt="" coords="297,5,482,46"/>
+<area shape="rect" id="node3" href="$a00046.html#a3aca2d50c95f2fd7a825e1956c4e4c9b" title="mic::mlnn::MultiLayerNeural\lNetwork::popLayer" alt="" coords="297,70,482,111"/>
+<area shape="rect" id="node4" href="$a00046.html#a9dc8dd9ca63df849304571c9f18a9859" title="mic::mlnn::MultiLayerNeural\lNetwork::pushLayer" alt="" coords="297,135,482,177"/>
+<area shape="rect" id="node5" href="$a00006.html#a17ff6950ef4cbdb7bb01b8abaeca575b" title="mic::mlnn::Backpropagation\lNeuralNetwork::setLoss" alt="" coords="297,201,481,242"/>
+</map>

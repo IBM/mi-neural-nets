@@ -1,0 +1,9 @@
+<map id="main" name="main">
+<area shape="rect" id="node2" href="$a00046.html#a9dc8dd9ca63df849304571c9f18a9859" title="mic::mlnn::MultiLayerNeural\lNetwork::pushLayer" alt="" coords="105,5,290,46"/>
+<area shape="rect" id="node3" href="$a00046.html#a2c2998778e721a9b18b0f8458c8cd85d" title="mic::mlnn::MultiLayerNeural\lNetwork::resizeBatch" alt="" coords="105,70,290,111"/>
+<area shape="rect" id="node4" href="$a00046.html#a95bfa28e490ae923e12bc63a8b347c2d" title="mic::mlnn::MultiLayerNeural\lNetwork::save" alt="" coords="105,135,290,177"/>
+<area shape="rect" id="node5" href="$a00046.html#a5d21d72e988345f6dda34182a2474471" title="mic::mlnn::MultiLayerNeural\lNetwork::setOptimization" alt="" coords="105,201,290,242"/>
+<area shape="rect" id="node6" href="$a00006.html#acc03758652a0fddd4fa6d3e1acf04195" title="mic::mlnn::Backpropagation\lNeuralNetwork::test" alt="" coords="105,266,289,307"/>
+<area shape="rect" id="node7" href="$a00006.html#a34652cc616dbf7a475c687272d539a15" title="mic::mlnn::Backpropagation\lNeuralNetwork::train" alt="" coords="105,331,289,373"/>
+<area shape="rect" id="node8" href="$a00006.html#aec1544a66eaa796e0c429d6c65790609" title="mic::mlnn::Backpropagation\lNeuralNetwork::verify" alt="" coords="105,397,289,438"/>
+</map>

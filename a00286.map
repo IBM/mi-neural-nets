@@ -1,0 +1,36 @@
+<map id="src/tests/mlnn_sample_training_test.cpp" name="src/tests/mlnn_sample_training_test.cpp">
+<area shape="rect" id="node5" href="$a00085.html" title="mlnn/BackpropagationNeural\lNetwork.hpp" alt="" coords="125,97,315,138"/>
+<area shape="rect" id="node6" href="$a00106.html" title="mlnn/MultiLayerNeuralNetwork.hpp" alt="" coords="1333,187,1560,213"/>
+<area shape="rect" id="node8" href="$a00105.html" title="mlnn/layer/LayerTypes.hpp" alt="" coords="971,269,1149,296"/>
+<area shape="rect" id="node41" href="$a00080.html" title="loss/LossTypes.hpp" alt="" coords="1907,269,2045,296"/>
+<area shape="rect" id="node9" href="$a00082.html" title="mlnn/activation_function\l/ELU.hpp" alt="" coords="639,443,801,485"/>
+<area shape="rect" id="node28" href="$a00083.html" title="mlnn/activation_function\l/ReLU.hpp" alt="" coords="1199,443,1361,485"/>
+<area shape="rect" id="node29" href="$a00084.html" title="mlnn/activation_function\l/Sigmoid.hpp" alt="" coords="1385,443,1548,485"/>
+<area shape="rect" id="node30" href="$a00086.html" title="mlnn/convolution/Convolution.hpp" alt="" coords="1799,451,2017,477"/>
+<area shape="rect" id="node31" href="$a00090.html" title="mlnn/convolution/Cropping.hpp" alt="" coords="1573,451,1773,477"/>
+<area shape="rect" id="node32" href="$a00091.html" title="mlnn/convolution/MaxPooling.hpp" alt="" coords="126,451,343,477"/>
+<area shape="rect" id="node33" href="$a00092.html" title="mlnn/convolution/Padding.hpp" alt="" coords="367,451,563,477"/>
+<area shape="rect" id="node34" href="$a00093.html" title="mlnn/cost_function\l/Softmax.hpp" alt="" coords="395,353,527,394"/>
+<area shape="rect" id="node35" href="$a00099.html" title="mlnn/fully_connected\l/Linear.hpp" alt="" coords="877,443,1021,485"/>
+<area shape="rect" id="node36" href="$a00102.html" title="mlnn/fully_connected\l/SparseLinear.hpp" alt="" coords="825,353,969,394"/>
+<area shape="rect" id="node37" href="$a00109.html" title="mlnn/regularisation\l/Dropout.hpp" alt="" coords="995,353,1124,394"/>
+<area shape="rect" id="node38" href="$a00098.html" title=": Tomasz Kornuta tkornut@us.ibm.com : May 16, 2017 " alt="" coords="1150,353,1295,394"/>
+<area shape="rect" id="node39" href="$a00097.html" title=": Tomasz Kornuta tkornut@us.ibm.com : May 16, 2017 " alt="" coords="603,353,748,394"/>
+<area shape="rect" id="node40" href="$a00096.html" title=": Alexis Asseman alexis.asseman@ibm.com, Tomasz Kornuta tkornut@us.ibm.com : May 30, 2017 " alt="" coords="1319,360,1555,387"/>
+<area shape="rect" id="node10" href="$a00104.html" title="Contains a template class representing a layer. " alt="" coords="989,533,1131,560"/>
+<area shape="rect" id="node13" href="$a00135.html" title="optimization/Optimization\lFunctionTypes.hpp" alt="" coords="803,609,972,650"/>
+<area shape="rect" id="node23" href="$a00132.html" title="optimization/Optimization\lArray.hpp" alt="" coords="587,609,756,650"/>
+<area shape="rect" id="node14" href="$a00110.html" title="optimization/AdaDelta.hpp" alt="" coords="1233,707,1407,733"/>
+<area shape="rect" id="node15" href="$a00112.html" title="optimization/AdaGrad.hpp" alt="" coords="1431,707,1603,733"/>
+<area shape="rect" id="node16" href="$a00114.html" title="optimization/Adam.hpp" alt="" coords="1628,707,1781,733"/>
+<area shape="rect" id="node17" href="$a00122.html" title="optimization/GradientDescent.hpp" alt="" coords="1807,707,2025,733"/>
+<area shape="rect" id="node18" href="$a00128.html" title="optimization/Momentum.hpp" alt="" coords="148,707,335,733"/>
+<area shape="rect" id="node19" href="$a00136.html" title="optimization/RMSProp.hpp" alt="" coords="359,707,537,733"/>
+<area shape="rect" id="node20" href="$a00126.html" title="optimization/HebbianRule.hpp" alt="" coords="562,707,757,733"/>
+<area shape="rect" id="node21" href="$a00130.html" title="optimization/NormalizedHebbian\lRule.hpp" alt="" coords="783,699,992,741"/>
+<area shape="rect" id="node22" href="$a00121.html" title="optimization/BinaryCorrelator\lLearningRule.hpp" alt="" coords="1018,699,1208,741"/>
+<area shape="rect" id="node42" href="$a00075.html" title="loss/CrossEntropyLoss.hpp" alt="" coords="1989,360,2171,387"/>
+<area shape="rect" id="node45" href="$a00081.html" title="loss/SquaredErrorLoss.hpp" alt="" coords="2196,360,2375,387"/>
+<area shape="rect" id="node46" href="$a00076.html" title="loss/LogLikelihoodLoss.hpp" alt="" coords="1782,360,1964,387"/>
+<area shape="rect" id="node44" href="$a00077.html" title="loss/Loss.hpp" alt="" coords="2125,451,2227,477"/>
+</map>

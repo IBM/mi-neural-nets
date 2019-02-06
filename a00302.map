@@ -1,0 +1,5 @@
+<map id="Softmax4x1Float" name="Softmax4x1Float">
+<area shape="rect" id="node3" href="$a00058.html" title="mic::mlnn::cost_function\l::Softmax\&lt; float \&gt;" alt="" coords="77,190,241,231"/>
+<area shape="rect" id="node4" href="$a00033.html" title="mic::mlnn::Layer\&lt; float \&gt;" alt="" coords="76,112,244,139"/>
+<area shape="rect" id="node5" href="$a00049.html" title="mic::neural_nets::optimization\l::OptimizationArray\&lt; float \&gt;" alt="" coords="62,6,257,47"/>
+</map>

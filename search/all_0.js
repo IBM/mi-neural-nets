@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['a',['a',['../a00054.html#ad3870eda0b0f7e8e3d56f3802751372e',1,'mic::neural_nets::optimization::artificial_landscapes::Rosenbrock2DFunction']]],
+  ['adadelta',['AdaDelta',['../a00001.html',1,'mic::neural_nets::optimization']]],
+  ['adadelta',['AdaDelta',['../a00001.html#afb8562149b80f1ea8a9dab53d319e137',1,'mic::neural_nets::optimization::AdaDelta']]],
+  ['adadelta_2ehpp',['AdaDelta.hpp',['../a00110.html',1,'']]],
+  ['adadeltatests_2ecpp',['AdaDeltaTests.cpp',['../a00111.html',1,'']]],
+  ['adagrad',['AdaGrad',['../a00002.html',1,'mic::neural_nets::optimization']]],
+  ['adagrad',['AdaGrad',['../a00002.html#a9a9fbc40f7f8af9f0e15625a622743f4',1,'mic::neural_nets::optimization::AdaGrad']]],
+  ['adagrad_2ehpp',['AdaGrad.hpp',['../a00112.html',1,'']]],
+  ['adagradpid',['AdaGradPID',['../a00003.html#a4ae116c1cc4d51886e4aad6711c57518',1,'mic::neural_nets::optimization::AdaGradPID']]],
+  ['adagradpid',['AdaGradPID',['../a00003.html',1,'mic::neural_nets::optimization']]],
+  ['adagradtests_2ecpp',['AdaGradTests.cpp',['../a00113.html',1,'']]],
+  ['adam',['Adam',['../a00004.html',1,'mic::neural_nets::optimization']]],
+  ['adam',['Adam',['../a00004.html#a6e731b3df5bc99b1cd5147efccbb8df6',1,'mic::neural_nets::optimization::Adam']]],
+  ['adam_2ehpp',['Adam.hpp',['../a00114.html',1,'']]],
+  ['adamid',['AdamID',['../a00005.html',1,'mic::neural_nets::optimization']]],
+  ['adamid',['AdamID',['../a00005.html#af5410a298a8cd1b4981da836caffba01',1,'mic::neural_nets::optimization::AdamID']]],
+  ['adamid_2ehpp',['AdamID.hpp',['../a00115.html',1,'']]],
+  ['adamidtests_2ecpp',['AdamIDTests.cpp',['../a00116.html',1,'']]],
+  ['adamtests_2ecpp',['AdamTests.cpp',['../a00117.html',1,'']]],
+  ['add',['add',['../a00049.html#af13aafb312621766da2e81843a0cf92c',1,'mic::neural_nets::optimization::OptimizationArray::add(std::string name_, size_t rows_, size_t cols_)'],['../a00049.html#a29dd44785233cc0d4845dad0ef3bc838',1,'mic::neural_nets::optimization::OptimizationArray::add(std::string name_, std::shared_ptr&lt; opT &gt; opt_)']]],
+  ['artificiallandscapes_2ehpp',['ArtificialLandscapes.hpp',['../a00118.html',1,'']]],
+  ['artificiallandscapestests_2ecpp',['ArtificialLandscapesTests.cpp',['../a00119.html',1,'']]],
+  ['artificiallandscapestests_2ehpp',['ArtificialLandscapesTests.hpp',['../a00120.html',1,'']]],
+  ['autoencoder_5ffilename',['autoencoder_filename',['../a00044.html#a579f4f92054861ada4a5eaeb62cb10f0',1,'mic::applications::MNISTPatchSoftmaxApplication']]],
+  ['autoencoder_5flayers_5fto_5fbe_5fremoved',['autoencoder_layers_to_be_removed',['../a00044.html#a155de51e211178328cfa8443f72f37e9',1,'mic::applications::MNISTPatchSoftmaxApplication']]]
+];

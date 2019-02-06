@@ -1,0 +1,22 @@
+<map id="src/mlnn/cost_function/Softmax.hpp" name="src/mlnn/cost_function/Softmax.hpp">
+<area shape="rect" id="node2" href="$a00095.html" title="src/mlnn/cost_function\l/SoftmaxTests.hpp" alt="" coords="1165,97,1319,138"/>
+<area shape="rect" id="node4" href="$a00105.html" title="src/mlnn/layer/LayerTypes.hpp" alt="" coords="1345,104,1545,131"/>
+<area shape="rect" id="node3" href="$a00094.html" title="src/mlnn/cost_function\l/SoftmaxTests.cpp" alt="" coords="1165,187,1319,229"/>
+<area shape="rect" id="node5" href="$a00106.html" title="src/mlnn/MultiLayerNeural\lNetwork.hpp" alt="" coords="1358,187,1532,229"/>
+<area shape="rect" id="node6" href="$a00085.html" title="src/mlnn/Backpropagation\lNeuralNetwork.hpp" alt="" coords="895,278,1068,319"/>
+<area shape="rect" id="node19" href="$a00103.html" title="src/mlnn/HebbianNeuralNetwork.hpp" alt="" coords="1694,285,1929,312"/>
+<area shape="rect" id="node7" href="$a00072.html" title="src/application/MNISTPatch\lReconstructionApplication.hpp" alt="" coords="5,375,203,417"/>
+<area shape="rect" id="node9" href="$a00074.html" title="src/application/MNISTPatch\lSoftmaxApplication.hpp" alt="" coords="228,375,415,417"/>
+<area shape="rect" id="node11" href="$a00108.html" title="src/mlnn/MultiLayerNeural\lNetworkTests.hpp" alt="" coords="439,375,613,417"/>
+<area shape="rect" id="node13" href="$a00138.html" title="Contains program for testing batch training of a multi&#45;layer neural network. " alt="" coords="639,375,783,417"/>
+<area shape="rect" id="node14" href="$a00139.html" title="Contains program for testing of training of a multi&#45;layer neural network. " alt="" coords="807,375,960,417"/>
+<area shape="rect" id="node15" href="$a00142.html" title="src/tests/mnist_convnet.cpp" alt="" coords="985,383,1172,409"/>
+<area shape="rect" id="node16" href="$a00143.html" title="Program for visualization of features of convolutional neural net trained on MNIST digits..." alt="" coords="1196,368,1359,424"/>
+<area shape="rect" id="node17" href="$a00145.html" title="Program for visualization of features of mlnn layers trained on MNIST digits. " alt="" coords="1383,368,1536,424"/>
+<area shape="rect" id="node18" href="$a00146.html" title="src/tests/mnist_simple\l_mlnn.cpp" alt="" coords="1561,375,1715,417"/>
+<area shape="rect" id="node8" href="$a00071.html" title="src/application/MNISTPatch\lReconstructionApplication.cpp" alt="" coords="5,473,203,514"/>
+<area shape="rect" id="node10" href="$a00073.html" title="src/application/MNISTPatch\lSoftmaxApplication.cpp" alt="" coords="228,473,415,514"/>
+<area shape="rect" id="node12" href="$a00107.html" title="src/mlnn/MultiLayerNeural\lNetworkTests.cpp" alt="" coords="439,473,613,514"/>
+<area shape="rect" id="node20" href="$a00141.html" title="Program for visualization of hebbian formed filters trained on MNIST digits. : Alexis Asseman alexis..." alt="" coords="1740,375,1884,417"/>
+<area shape="rect" id="node21" href="$a00144.html" title="Program for visualization of features of hebbian network trained on MNIST digits. : Tomasz Kornuta tk..." alt="" coords="1909,368,2069,424"/>
+</map>

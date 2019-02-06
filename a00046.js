@@ -1,0 +1,28 @@
+var a00046 =
+[
+    [ "MultiLayerNeuralNetwork", "a00046.html#a517023cef7814845f7bbf89a7c6848b0", null ],
+    [ "~MultiLayerNeuralNetwork", "a00046.html#ac1abd018d53b7b1a90842f43b9e4e31d", null ],
+    [ "countCorrectPredictions", "a00046.html#acaa250378dd9f521f373a86928e88baa", null ],
+    [ "getLayer", "a00046.html#a4cab5a1bfc74e8d2a7508b0129931908", null ],
+    [ "getLayer", "a00046.html#a40422be254edfb825b50ee44325bd05b", null ],
+    [ "getPredictions", "a00046.html#a6a504d4f8307d7b64ab4f4483b132976", null ],
+    [ "getPredictions", "a00046.html#a38d7f51492a20a0a211c9841df4b6f9f", null ],
+    [ "lastLayerBatchSize", "a00046.html#a104b27522ea4fd5b9fdadb955a1448c6", null ],
+    [ "lastLayerOutputsSize", "a00046.html#a042aac26a04a925efd69aa46ea223e03", null ],
+    [ "layerInputsSize", "a00046.html#aca5ffc716041213ad506519d2cfa0adf", null ],
+    [ "load", "a00046.html#ab3b741fc57e7ba025699657a573359a2", null ],
+    [ "load", "a00046.html#af7bbe583d296e13a4631243f898446f4", null ],
+    [ "popLayer", "a00046.html#a3aca2d50c95f2fd7a825e1956c4e4c9b", null ],
+    [ "pushLayer", "a00046.html#a9dc8dd9ca63df849304571c9f18a9859", null ],
+    [ "resetGrads", "a00046.html#ae06415b05efef6234d7fa151aaf13151", null ],
+    [ "resizeBatch", "a00046.html#a2c2998778e721a9b18b0f8458c8cd85d", null ],
+    [ "save", "a00046.html#a95bfa28e490ae923e12bc63a8b347c2d", null ],
+    [ "save", "a00046.html#a2736ef66b4c0bfae861b1a11556bd68d", null ],
+    [ "setOptimization", "a00046.html#a5d21d72e988345f6dda34182a2474471", null ],
+    [ "update", "a00046.html#a2ee3385636fee0ea5b67773e40270735", null ],
+    [ "boost::serialization::access", "a00046.html#ac98d07dd8f7b70e16ccb9a01abf56b9c", null ],
+    [ "operator<<", "a00046.html#a358a26edc44e96c2e3fe1cf98bda8c3d", null ],
+    [ "connected", "a00046.html#a9526d2ad62375359a12c5fd5e8b23cef", null ],
+    [ "layers", "a00046.html#ae1cd4f321013ae35e4fee4641c1e272a", null ],
+    [ "name", "a00046.html#aeaae1a6b22d96429e8353b1563d0b5a4", null ]
+];

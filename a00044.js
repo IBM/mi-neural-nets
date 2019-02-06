@@ -1,0 +1,28 @@
+var a00044 =
+[
+    [ "MNISTPatchSoftmaxApplication", "a00044.html#a557c9c56140f7207dd47acf3ee96650e", null ],
+    [ "~MNISTPatchSoftmaxApplication", "a00044.html#af780faf39a3ccf34660503c0232a9fcf", null ],
+    [ "collectTestStatistics", "a00044.html#a435fce211354792d98cc812e6b9c72a2", null ],
+    [ "initialize", "a00044.html#a863a0b78f9ea246c36376b0979d322bb", null ],
+    [ "initializePropertyDependentVariables", "a00044.html#a4f7efd9ebbc6ef31d2133d96ea4cf0b4", null ],
+    [ "performLearningStep", "a00044.html#af5f710d8ac603a405b3b36e37ed5bf8a", null ],
+    [ "populateTestStatistics", "a00044.html#aca5b43bf5e5f7a807908a61d72d3fca4", null ],
+    [ "autoencoder_filename", "a00044.html#a579f4f92054861ada4a5eaeb62cb10f0", null ],
+    [ "autoencoder_layers_to_be_removed", "a00044.html#a155de51e211178328cfa8443f72f37e9", null ],
+    [ "collector_ptr", "a00044.html#a85b92e4bae57d1eddcfacb156f6a4120", null ],
+    [ "decoded_prediction", "a00044.html#a745f5ab1296958d7f3151b951e8fb857", null ],
+    [ "input_image", "a00044.html#a0b87dee5b075dea93067a62977765fc5", null ],
+    [ "input_target", "a00044.html#a5d886a9522221346b37db71e90c2ca60", null ],
+    [ "label_encoder", "a00044.html#a6b96b2873667d8226f503a3020ef1d35", null ],
+    [ "mnist_encoder", "a00044.html#a5d31ee2f211b7694cb7acdd25207d496", null ],
+    [ "neural_net", "a00044.html#a204cafe38d89e235827f32cab7f44a68", null ],
+    [ "patch_size", "a00044.html#a05b7635834add4d98e242fd8f5540775", null ],
+    [ "softmax_filename", "a00044.html#a2978b9374d236f210dd31891bf501395", null ],
+    [ "softmax_load", "a00044.html#a30d49d18db658887835eb61b5bc839ab", null ],
+    [ "softmax_save", "a00044.html#abedaf5f6b9cffcb3e9ca7e9197c45f78", null ],
+    [ "test_dataset_importer", "a00044.html#ae7d61e5dd2e4402eba24afcf53c0ed6f", null ],
+    [ "training_dataset_importer", "a00044.html#a570e626f19f8629d73bdf1c0550d65a6", null ],
+    [ "w2d_input", "a00044.html#a0d28deb34738c3ae9cb8d432dd70a268", null ],
+    [ "w_chart", "a00044.html#ae6667df3a8f9200364dfb9d9a245e85c", null ],
+    [ "w_prob", "a00044.html#a929deb6d71cb4fd763be06dcb0179f06", null ]
+];

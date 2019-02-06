@@ -1,0 +1,4 @@
+<map id="mic::mlnn::fully_connected::BinaryCorrelator::getActivations" name="mic::mlnn::fully_connected::BinaryCorrelator::getActivations">
+<area shape="rect" id="node2" href="$a00033.html#aeec074547484acb4de4124501fb10a58" title="Returns size (length) of inputs. " alt="" coords="273,5,455,32"/>
+<area shape="rect" id="node3" href="$a00033.html#a2c932ed1758edd3daf527bf99518e19c" title="Returns size (length) of outputs. " alt="" coords="269,56,459,83"/>
+</map>

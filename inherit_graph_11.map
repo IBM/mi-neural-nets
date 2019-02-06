@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$a00025.html" title="mic::neural_nets::optimization\l::artificial_landscapes::Differentiable\lFunction\&lt; double \&gt;" alt="" coords="6,85,239,141"/>
+<area shape="rect" id="node2" href="$a00007.html" title="mic::neural_nets::optimization\l::artificial_landscapes::Beale2DFunction\l\&lt; double \&gt;" alt="" coords="288,5,544,61"/>
+<area shape="rect" id="node3" href="$a00054.html" title="mic::neural_nets::optimization\l::artificial_landscapes::Rosenbrock2\lDFunction\&lt; double \&gt;" alt="" coords="299,85,533,141"/>
+<area shape="rect" id="node4" href="$a00063.html" title="mic::neural_nets::optimization\l::artificial_landscapes::SphereFunction\l\&lt; double \&gt;" alt="" coords="293,165,539,221"/>
+</map>

@@ -1,0 +1,43 @@
+<map id="src/optimization/BinaryCorrelatorLearningRule.hpp" name="src/optimization/BinaryCorrelatorLearningRule.hpp">
+<area shape="rect" id="node2" href="$a00135.html" title="src/optimization/Optimization\lFunctionTypes.hpp" alt="" coords="838,97,1028,138"/>
+<area shape="rect" id="node3" href="$a00104.html" title="Contains a template class representing a layer. " alt="" coords="851,187,1015,213"/>
+<area shape="rect" id="node4" href="$a00082.html" title="src/mlnn/activation\l_function/ELU.hpp" alt="" coords="746,353,877,394"/>
+<area shape="rect" id="node23" href="$a00083.html" title="src/mlnn/activation\l_function/ReLU.hpp" alt="" coords="1247,353,1385,394"/>
+<area shape="rect" id="node24" href="$a00084.html" title="src/mlnn/activation\l_function/Sigmoid.hpp" alt="" coords="1651,353,1801,394"/>
+<area shape="rect" id="node25" href="$a00086.html" title="src/mlnn/convolution\l/Convolution.hpp" alt="" coords="246,262,388,303"/>
+<area shape="rect" id="node29" href="$a00090.html" title="src/mlnn/convolution\l/Cropping.hpp" alt="" coords="477,353,619,394"/>
+<area shape="rect" id="node30" href="$a00091.html" title="src/mlnn/convolution\l/MaxPooling.hpp" alt="" coords="465,262,607,303"/>
+<area shape="rect" id="node31" href="$a00092.html" title="src/mlnn/convolution\l/Padding.hpp" alt="" coords="631,262,773,303"/>
+<area shape="rect" id="node32" href="$a00093.html" title="src/mlnn/cost_function\l/Softmax.hpp" alt="" coords="67,262,220,303"/>
+<area shape="rect" id="node35" href="$a00096.html" title=": Alexis Asseman alexis.asseman@ibm.com, Tomasz Kornuta tkornut@us.ibm.com : May 30, 2017 " alt="" coords="1826,353,1976,394"/>
+<area shape="rect" id="node36" href="$a00097.html" title=": Tomasz Kornuta tkornut@us.ibm.com : May 16, 2017 " alt="" coords="850,262,1016,303"/>
+<area shape="rect" id="node37" href="$a00098.html" title=": Tomasz Kornuta tkornut@us.ibm.com : May 16, 2017 " alt="" coords="1041,262,1207,303"/>
+<area shape="rect" id="node38" href="$a00099.html" title="src/mlnn/fully_connected\l/Linear.hpp" alt="" coords="1231,262,1397,303"/>
+<area shape="rect" id="node42" href="$a00109.html" title="src/mlnn/regularisation\l/Dropout.hpp" alt="" coords="1474,262,1627,303"/>
+<area shape="rect" id="node5" href="$a00105.html" title="src/mlnn/layer/LayerTypes.hpp" alt="" coords="866,457,1067,484"/>
+<area shape="rect" id="node6" href="$a00106.html" title="src/mlnn/MultiLayerNeural\lNetwork.hpp" alt="" coords="1530,547,1704,589"/>
+<area shape="rect" id="node7" href="$a00085.html" title="src/mlnn/Backpropagation\lNeuralNetwork.hpp" alt="" coords="2463,638,2636,679"/>
+<area shape="rect" id="node20" href="$a00103.html" title="src/mlnn/HebbianNeuralNetwork.hpp" alt="" coords="1499,645,1735,672"/>
+<area shape="rect" id="node8" href="$a00072.html" title="src/application/MNISTPatch\lReconstructionApplication.hpp" alt="" coords="3307,735,3505,777"/>
+<area shape="rect" id="node10" href="$a00074.html" title="src/application/MNISTPatch\lSoftmaxApplication.hpp" alt="" coords="1796,735,1983,777"/>
+<area shape="rect" id="node12" href="$a00108.html" title="src/mlnn/MultiLayerNeural\lNetworkTests.hpp" alt="" coords="2007,735,2181,777"/>
+<area shape="rect" id="node14" href="$a00138.html" title="Contains program for testing batch training of a multi&#45;layer neural network. " alt="" coords="2207,735,2351,777"/>
+<area shape="rect" id="node15" href="$a00139.html" title="Contains program for testing of training of a multi&#45;layer neural network. " alt="" coords="2375,735,2528,777"/>
+<area shape="rect" id="node16" href="$a00142.html" title="src/tests/mnist_convnet.cpp" alt="" coords="2553,743,2740,769"/>
+<area shape="rect" id="node17" href="$a00143.html" title="Program for visualization of features of convolutional neural net trained on MNIST digits..." alt="" coords="2764,728,2927,784"/>
+<area shape="rect" id="node18" href="$a00145.html" title="Program for visualization of features of mlnn layers trained on MNIST digits. " alt="" coords="2951,728,3104,784"/>
+<area shape="rect" id="node19" href="$a00146.html" title="src/tests/mnist_simple\l_mlnn.cpp" alt="" coords="3129,735,3283,777"/>
+<area shape="rect" id="node9" href="$a00071.html" title="src/application/MNISTPatch\lReconstructionApplication.cpp" alt="" coords="3307,833,3505,874"/>
+<area shape="rect" id="node11" href="$a00073.html" title="src/application/MNISTPatch\lSoftmaxApplication.cpp" alt="" coords="1796,833,1983,874"/>
+<area shape="rect" id="node13" href="$a00107.html" title="src/mlnn/MultiLayerNeural\lNetworkTests.cpp" alt="" coords="2007,833,2181,874"/>
+<area shape="rect" id="node21" href="$a00141.html" title="Program for visualization of hebbian formed filters trained on MNIST digits. : Alexis Asseman alexis..." alt="" coords="1628,735,1772,777"/>
+<area shape="rect" id="node22" href="$a00144.html" title="Program for visualization of features of hebbian network trained on MNIST digits. : Tomasz Kornuta tk..." alt="" coords="1442,728,1603,784"/>
+<area shape="rect" id="node26" href="$a00089.html" title="src/mlnn/convolution\l/Convolution_tests.hpp" alt="" coords="194,353,349,394"/>
+<area shape="rect" id="node27" href="$a00087.html" title="src/mlnn/convolution\l/Convolution_convergence\l_tests.cpp" alt="" coords="184,443,360,499"/>
+<area shape="rect" id="node28" href="$a00088.html" title="src/mlnn/convolution\l/Convolution_tests.cpp" alt="" coords="385,450,540,491"/>
+<area shape="rect" id="node33" href="$a00095.html" title="src/mlnn/cost_function\l/SoftmaxTests.hpp" alt="" coords="9,353,163,394"/>
+<area shape="rect" id="node34" href="$a00094.html" title="src/mlnn/cost_function\l/SoftmaxTests.cpp" alt="" coords="5,450,159,491"/>
+<area shape="rect" id="node39" href="$a00101.html" title="src/mlnn/fully_connected\l/Linear_tests.hpp" alt="" coords="1461,353,1627,394"/>
+<area shape="rect" id="node41" href="$a00102.html" title="src/mlnn/fully_connected\l/SparseLinear.hpp" alt="" coords="1055,353,1221,394"/>
+<area shape="rect" id="node40" href="$a00100.html" title="src/mlnn/fully_connected\l/Linear_tests.cpp" alt="" coords="1461,450,1627,491"/>
+</map>

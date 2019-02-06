@@ -1,0 +1,8 @@
+<map id="src/loss/LossTests.cpp" name="src/loss/LossTests.cpp">
+<area shape="rect" id="node2" href="$a00079.html" title="LossTests.hpp" alt="" coords="83,80,191,107"/>
+<area shape="rect" id="node6" href="$a00080.html" title="LossTypes.hpp" alt="" coords="314,80,424,107"/>
+<area shape="rect" id="node4" href="$a00077.html" title="Loss.hpp" alt="" coords="357,229,431,256"/>
+<area shape="rect" id="node7" href="$a00075.html" title="loss/CrossEntropyLoss.hpp" alt="" coords="378,155,560,181"/>
+<area shape="rect" id="node9" href="$a00081.html" title="loss/SquaredErrorLoss.hpp" alt="" coords="175,155,353,181"/>
+<area shape="rect" id="node10" href="$a00076.html" title="loss/LogLikelihoodLoss.hpp" alt="" coords="585,155,767,181"/>
+</map>

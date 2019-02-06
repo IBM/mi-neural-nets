@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['activation_5ffunction',['activation_function',['../a00154.html',1,'mic::mlnn']]],
+  ['application',['application',['../a00150.html',1,'mic']]],
+  ['applications',['applications',['../a00151.html',1,'mic']]],
+  ['artificial_5flandscapes',['artificial_landscapes',['../a00164.html',1,'mic::neural_nets::optimization']]],
+  ['convolution',['convolution',['../a00155.html',1,'mic::mlnn']]],
+  ['cost_5ffunction',['cost_function',['../a00156.html',1,'mic::mlnn']]],
+  ['experimental',['experimental',['../a00157.html',1,'mic::mlnn']]],
+  ['fully_5fconnected',['fully_connected',['../a00158.html',1,'mic::mlnn']]],
+  ['learning',['learning',['../a00161.html',1,'mic::neural_nets']]],
+  ['loss',['loss',['../a00162.html',1,'mic::neural_nets']]],
+  ['mic',['mic',['../a00149.html',1,'']]],
+  ['mlnn',['mlnn',['../a00153.html',1,'mic']]],
+  ['neural_5fnets',['neural_nets',['../a00160.html',1,'mic']]],
+  ['optimization',['optimization',['../a00163.html',1,'mic::neural_nets']]],
+  ['regularisation',['regularisation',['../a00159.html',1,'mic::mlnn']]],
+  ['unit_5ftests',['unit_tests',['../a00165.html',1,'mic::neural_nets']]]
+];

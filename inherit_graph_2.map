@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$a00033.html" title="mic::mlnn::Layer\&lt; double \&gt;" alt="" coords="5,45,187,72"/>
+<area shape="rect" id="node2" href="$a00022.html" title="mic::mlnn::convolution\l::Convolution\&lt; double \&gt;" alt="" coords="243,5,405,46"/>
+<area shape="rect" id="node3" href="$a00034.html" title="mic::mlnn::fully_connected\l::Linear\&lt; double \&gt;" alt="" coords="235,70,413,111"/>
+</map>

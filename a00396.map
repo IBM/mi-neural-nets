@@ -1,0 +1,5 @@
+<map id="mic::neural_nets::loss::Loss&lt; dtype &gt;" name="mic::neural_nets::loss::Loss&lt; dtype &gt;">
+<area shape="rect" id="node2" href="$a00024.html" title="Class representing a cross&#45;entropy loss function (classification). " alt="" coords="205,5,400,46"/>
+<area shape="rect" id="node3" href="$a00040.html" title="Class representing a log&#45;likelihood cost (to be used with softmax logistic regression). " alt="" coords="206,70,399,111"/>
+<area shape="rect" id="node4" href="$a00064.html" title="Class representing a squared error loss function (regression). L = 1/2 sum (t &#45; p)^2. " alt="" coords="207,135,398,177"/>
+</map>

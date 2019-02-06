@@ -1,0 +1,4 @@
+<map id="mic::neural_nets::unit_tests::Simple2LayerRegressionNN::Simple2LayerRegressionNN" name="mic::neural_nets::unit_tests::Simple2LayerRegressionNN::Simple2LayerRegressionNN">
+<area shape="rect" id="node2" href="$a00046.html#a9dc8dd9ca63df849304571c9f18a9859" title="mic::mlnn::MultiLayerNeural\lNetwork::pushLayer" alt="" coords="270,5,455,46"/>
+<area shape="rect" id="node3" href="$a00006.html#a17ff6950ef4cbdb7bb01b8abaeca575b" title="mic::mlnn::Backpropagation\lNeuralNetwork::setLoss" alt="" coords="271,70,455,111"/>
+</map>

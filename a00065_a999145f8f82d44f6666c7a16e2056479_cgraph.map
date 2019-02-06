@@ -1,0 +1,4 @@
+<map id="mic::neural_nets::unit_tests::Tutorial2LayerNN::SetUp" name="mic::neural_nets::unit_tests::Tutorial2LayerNN::SetUp">
+<area shape="rect" id="node2" href="$a00046.html#ae06415b05efef6234d7fa151aaf13151" title="mic::mlnn::MultiLayerNeural\lNetwork::resetGrads" alt="" coords="222,5,407,46"/>
+<area shape="rect" id="node3" href="$a00046.html#a2c2998778e721a9b18b0f8458c8cd85d" title="mic::mlnn::MultiLayerNeural\lNetwork::resizeBatch" alt="" coords="222,70,407,111"/>
+</map>

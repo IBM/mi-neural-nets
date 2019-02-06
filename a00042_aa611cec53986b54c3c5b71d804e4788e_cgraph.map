@@ -1,0 +1,6 @@
+<map id="mic::mlnn::convolution::MaxPooling::forward" name="mic::mlnn::convolution::MaxPooling::forward">
+<area shape="rect" id="node2" href="$a00033.html#aeec074547484acb4de4124501fb10a58" title="Returns size (length) of inputs. " alt="" coords="213,5,395,32"/>
+<area shape="rect" id="node3" href="$a00033.html#a9ca3c12d05180ea01c604e0194f7b96f" title="mic::mlnn::Layer::lazyReturn\lInputChannel" alt="" coords="209,57,399,98"/>
+<area shape="rect" id="node4" href="$a00033.html#a76225cc40fc1aa81607fea6430e398b2" title="mic::mlnn::Layer::lazyReturn\lInputSample" alt="" coords="209,122,399,163"/>
+<area shape="rect" id="node5" href="$a00033.html#a2c932ed1758edd3daf527bf99518e19c" title="Returns size (length) of outputs. " alt="" coords="209,188,399,215"/>
+</map>

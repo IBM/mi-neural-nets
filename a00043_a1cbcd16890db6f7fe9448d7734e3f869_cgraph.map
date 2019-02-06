@@ -1,0 +1,4 @@
+<map id="mic::applications::MNISTPatchReconstructionApplication::collectTestStatistics" name="mic::applications::MNISTPatchReconstructionApplication::collectTestStatistics">
+<area shape="rect" id="node2" href="$a00046.html#a6a504d4f8307d7b64ab4f4483b132976" title="mic::mlnn::MultiLayerNeural\lNetwork::getPredictions" alt="" coords="305,5,490,46"/>
+<area shape="rect" id="node3" href="$a00006.html#acc03758652a0fddd4fa6d3e1acf04195" title="mic::mlnn::Backpropagation\lNeuralNetwork::test" alt="" coords="305,70,489,111"/>
+</map>

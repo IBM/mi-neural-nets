@@ -1,0 +1,7 @@
+<map id="mic::neural_nets::unit_tests::Linear2x3Float" name="mic::neural_nets::unit_tests::Linear2x3Float">
+<area shape="rect" id="node3" href="$a00064.html" title="mic::neural_nets::loss\l::SquaredErrorLoss\&lt; float \&gt;" alt="" coords="494,57,677,98"/>
+<area shape="rect" id="node4" href="$a00041.html" title="mic::neural_nets::loss\l::Loss\&lt; float \&gt;" alt="" coords="283,57,434,98"/>
+<area shape="rect" id="node5" href="$a00034.html" title="mic::mlnn::fully_connected\l::Linear\&lt; float \&gt;" alt="" coords="496,122,675,163"/>
+<area shape="rect" id="node6" href="$a00033.html" title="mic::mlnn::Layer\&lt; float \&gt;" alt="" coords="275,129,443,156"/>
+<area shape="rect" id="node7" href="$a00049.html" title="mic::neural_nets::optimization\l::OptimizationArray\&lt; float \&gt;" alt="" coords="6,122,202,163"/>
+</map>
